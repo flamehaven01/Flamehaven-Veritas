@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>SCI-EXP CRITIQUE v2.1</title>
+  <link rel="stylesheet" href="/static/style.css" />
+</head>
+<body>
+  <header class="app-header">
+    <div class="header-inner">
+      <div class="logo">
+        <span class="logo-icon">[#]</span>
+        <span class="logo-text">SCI-EXP CRITIQUE <span class="version">v2.1</span></span>
+      </div>
+      <p class="tagline">Experimental Report Analysis Engine</p>
+    </div>
+  </header>
+
+  <main class="app-main">
+
+    <!-- Upload Panel -->
+    <section class="panel upload-panel" id="uploadPanel">
+      <h2 class="panel-title">Upload Experimental Report</h2>
+
+      <div class="drop-zone" id="dropZone">
+        <div class="drop-icon">[+]</div>
+        <p class="drop-label">Drag &amp; drop a file here, or <label class="browse-link" for="fileInput">browse</label></p>
+        <p class="drop-hint">Supported: PDF · DOCX · DOC · TXT · MD</p>
+        <input type="file" id="fileInput" accept=".pdf,.docx,.doc,.txt,.md" hidden />
+      </div>
+
+      <div class="file-info hidden" id="fileInfo">
+        <span class="file-name" id="fileName"></span>
+        <button class="btn-clear" id="clearFile" title="Clear">✕</button>
+      </div>
+
+      <div class="options-row">
+        <div class="option-group">
+          <label for="templateSelect">Report Template</label>
+          <select id="templateSelect">
+            <option value="bmj">BMJ Scientific Editing Report</option>
+            <option value="ku">KU Research Report Template</option>
+          </select>
+        </div>
+        <div class="option-group">
+          <label for="roundInput">Round</label>
+          <input type="number" id="roundInput" value="1" min="1" max="99" />
+        </div>
+        <div class="option-group">
+          <label for="outputFormat">Output Format</label>
+          <select id="outputFormat">
+            <option value="preview">Preview (inline)</option>
+            <option value="md">Markdown (.md)</option>
+            <option value="docx">Word (.docx)</option>
+            <option value="pdf">PDF (.pdf)</option>
+          </select>
+        </div>
+      </div>
+
+      <button class="btn-primary" id="submitBtn" disabled>
+        <span class="btn-label">Analyse Report</span>
+      </button>
+    </section>
+
+    <!-- Progress -->
+    <section class="panel progress-panel hidden" id="progressPanel">
+      <div class="progress-inner">
+        <div class="spinner"></div>
+        <p class="progress-label" id="progressLabel">Running PRECHECK...</p>
+        <div class="progress-bar-wrap">
+          <div class="progress-bar" id="progressBar"></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Result Panel -->
+    <section class="panel result-panel hidden" id="resultPanel">
+      <div class="result-header">
+        <div class="result-meta" id="resultMeta"></div>
+        <div class="download-group" id="downloadGroup"></div>
+      </div>
+
+      <!-- Precheck badge -->
+      <div class="precheck-row" id="precheckRow"></div>
+
+      <!-- Step accordion -->
+      <div class="steps-container" id="stepsContainer"></div>
+
+      <!-- Priority Fix -->
+      <div class="priority-box" id="priorityBox"></div>
+
+      <button class="btn-secondary" id="newAnalysisBtn">New Analysis</button>
+    </section>
+
+    <!-- Error -->
+    <section class="panel error-panel hidden" id="errorPanel">
+      <p class="error-msg" id="errorMsg"></p>
+      <button class="btn-secondary" id="errorRetryBtn">Try Again</button>
+    </section>
+
+  </main>
+
+  <footer class="app-footer">
+    <span>SCI-EXP CRITIQUE v2.1 · Powered by Flamehaven RAG</span>
+    <a href="/docs" target="_blank">API Docs</a>
+  </footer>
+
+  <script src="/static/app.js"></script>
+</body>
+</html>

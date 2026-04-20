@@ -1,0 +1,3780 @@
+{
+  "project_path": "D:\\Sanctum\\SCI-EXP CRITIQUE \u2014 EXPERIMENTAL REPORT ANALYSIS v2.1",
+  "total_files": 24,
+  "deficit_files": 0,
+  "clean_files": 24,
+  "avg_deficit_score": 5.029656401677948,
+  "weighted_deficit_score": 6.0535758541754925,
+  "avg_ldr": 0.9693392199999666,
+  "avg_inflation": 0.046526806144075304,
+  "avg_ddc": 0.9583333333333334,
+  "overall_status": "clean",
+  "structural_coherence": 0.7301,
+  "coherence_level": "vr_structural",
+  "file_results": [
+    {
+      "file_path": "D:\\Sanctum\\SCI-EXP CRITIQUE \u2014 EXPERIMENTAL REPORT ANALYSIS v2.1\\src\\sciexp_critique\\engine.py",
+      "ldr": {
+        "total_lines": 236,
+        "logic_lines": 236,
+        "empty_lines": 0,
+        "ldr_score": 1.0,
+        "grade": "S++",
+        "is_abc_interface": false,
+        "is_type_stub": false,
+        "is_packaging_init": false
+      },
+      "inflation": {
+        "jargon_count": 0,
+        "avg_complexity": 5.7,
+        "inflation_score": 0.0,
+        "status": "PASS",
+        "jargon_found": [],
+        "jargon_details": [],
+        "justified_jargon": [],
+        "is_config_file": false
+      },
+      "ddc": {
+        "imported": [
+          "docx",
+          "evidence",
+          "fitz",
+          "flamehaven_filesearch",
+          "importlib",
+          "pathlib",
+          "re",
+          "sys",
+          "types"
+        ],
+        "actually_used": [
+          "docx",
+          "evidence",
+          "fitz",
+          "flamehaven_filesearch",
+          "importlib",
+          "pathlib",
+          "re",
+          "sys",
+          "types"
+        ],
+        "unused": [],
+        "fake_imports": [],
+        "type_checking_imports": [
+          "__future__",
+          "typing"
+        ],
+        "usage_ratio": 1.0,
+        "grade": "EXCELLENT"
+      },
+      "deficit_score": 9.0,
+      "status": "clean",
+      "warnings": [],
+      "pattern_issues": [
+        {
+          "pattern_id": "empty_except",
+          "severity": "medium",
+          "axis": "quality",
+          "file": "D:\\Sanctum\\SCI-EXP CRITIQUE \u2014 EXPERIMENTAL REPORT ANALYSIS v2.1\\src\\sciexp_critique\\engine.py",
+          "line": 277,
+          "column": 4,
+          "message": "Empty handler for 'Exception' silently discards the exception",
+          "code": null,
+          "suggestion": "Add logging (logger.debug/warning) or a comment explaining why silence is correct here."
+        },
+        {
+          "pattern_id": "empty_except",
+          "severity": "medium",
+          "axis": "quality",
+          "file": "D:\\Sanctum\\SCI-EXP CRITIQUE \u2014 EXPERIMENTAL REPORT ANALYSIS v2.1\\src\\sciexp_critique\\engine.py",
+          "line": 288,
+          "column": 4,
+          "message": "Empty handler for 'Exception' silently discards the exception",
+          "code": null,
+          "suggestion": "Add logging (logger.debug/warning) or a comment explaining why silence is correct here."
+        },
+        {
+          "pattern_id": "empty_except",
+          "severity": "medium",
+          "axis": "quality",
+          "file": "D:\\Sanctum\\SCI-EXP CRITIQUE \u2014 EXPERIMENTAL REPORT ANALYSIS v2.1\\src\\sciexp_critique\\engine.py",
+          "line": 295,
+          "column": 4,
+          "message": "Empty handler for 'Exception' silently discards the exception",
+          "code": null,
+          "suggestion": "Add logging (logger.debug/warning) or a comment explaining why silence is correct here."
+        },
+        {
+          "pattern_id": "god_function",
+          "severity": "low",
+          "axis": "style",
+          "file": "D:\\Sanctum\\SCI-EXP CRITIQUE \u2014 EXPERIMENTAL REPORT ANALYSIS v2.1\\src\\sciexp_critique\\engine.py",
+          "line": 40,
+          "column": 4,
+          "message": "God function 'critique': 71 logic lines (limit 50)",
+          "code": null,
+          "suggestion": "Break into smaller single-responsibility functions. Each function should do one thing and fit on one screen."
+        },
+        {
+          "pattern_id": "phantom_import",
+          "severity": "medium",
+          "axis": "quality",
+          "file": "D:\\Sanctum\\SCI-EXP CRITIQUE \u2014 EXPERIMENTAL REPORT ANALYSIS v2.1\\src\\sciexp_critique\\engine.py",
+          "line": 275,
+          "column": 8,
+          "message": "Undeclared optional dependency: 'flamehaven_filesearch.engine.file_parser' is guarded with ImportError but not listed in [project.optional-dependencies]",
+          "code": null,
+          "suggestion": "Add 'flamehaven_filesearch.engine.file_parser' to the appropriate [project.optional-dependencies.<group>] in pyproject.toml so users know this feature requires an extra install."
+        }
+      ],
+      "docstring_inflation": {
+        "total_docstrings": 2,
+        "inflated_count": 1,
+        "avg_inflation_ratio": 0.75,
+        "max_inflation_ratio": 1.0,
+        "total_docstring_lines": 10,
+        "total_implementation_lines": 226,
+        "overall_ratio": 0.04424778761061947,
+        "status": "WARNING",
+        "details": [
+          {
+            "name": "critique_from_file",
+            "type": "function",
+            "line": 130,
+            "docstring_lines": 3,
+            "implementation_lines": 3,
+            "inflation_ratio": 1.0,
+            "severity": "warning",
+            "docstring_preview": "Parse a file and critique its content.  Supported: .pdf, .docx, .doc, .txt, .md"
+          },
+          {
+            "name": "_try_init_component",
+            "type": "function",
+            "line": 257,
+            "docstring_lines": 3,
+            "implementation_lines": 6,
+            "inflation_ratio": 0.5,
+            "severity": "info",
+            "docstring_preview": "Import and instantiate an optional component; return None on any failure.  Silent failure is by desi"
+          }
+        ]
+      },
+      "hallucination_deps": {
+        "total_hallucinated": 0,
+        "category_usage": [],
+        "hallucinated_deps": [],
+        "worst_category": "none",
+        "status": "PASS"
+      },
+      "context_jargon": {
+        "total_jargon": 0,
+        "justified_jargon": 0,
+        "unjustified_jargon": 0,
+        "evidence_details": [],
+        "worst_offenders": [],
+        "justification_ratio": 1.0,
+        "status": "PASS"
+      },
+      "ml_score": {
+        "slop_probability": 0.19,
+        "confidence": 0.81,
+        "model_type": "random_forest",
+        "agreement": true,
+        "features_used": 16
+      },
+      "dcf": {
+        "Module": 0.0007283321194464676,
+        "Expr": 0.0065549890750182084,
+        "ImportFrom": 0.008011653313911144,
+        "ClassDef": 0.0007283321194464676,
+        "FunctionDef": 0.0065549890750182084,
+        "Constant": 0.10050983248361253,
+        "alias": 0.013838310269482883,
+        "arguments": 0.0065549890750182084,
+        "Import": 0.0029133284777858705,
+        "Try": 0.005098324836125273,
+        "Assign": 0.04078659868900218,
+        "If": 0.005098324836125273,
+        "Return": 0.014566642388929352,
+        "Name": 0.23743627093954844,
+        "Subscript": 0.0029133284777858705,
+        "arg": 0.01529497450837582,
+        "ExceptHandler": 0.005098324836125273,
+        "Call": 0.05243991260014567,
+        "Compare": 0.010196649672250545,
+        "Load": 0.24471959213401312,
+        "Attribute": 0.05316824471959213,
+        "IfExp": 0.007283321194464676,
+        "Tuple": 0.005826656955571741,
+        "BinOp": 0.009468317552804079,
+        "Pass": 0.0021849963583394027,
+        "Store": 0.05972323379461034,
+        "In": 0.0029133284777858705,
+        "Set": 0.0014566642388929353,
+        "keyword": 0.032046613255644577,
+        "Eq": 0.0029133284777858705,
+        "List": 0.005098324836125273,
+        "Is": 0.0007283321194464676,
+        "BoolOp": 0.0014566642388929353,
+        "GeneratorExp": 0.005098324836125273,
+        "Div": 0.0029133284777858705,
+        "Add": 0.0029133284777858705,
+        "IsNot": 0.003641660597232338,
+        "BitOr": 0.0007283321194464676,
+        "Or": 0.0007283321194464676,
+        "And": 0.0007283321194464676,
+        "Sub": 0.0021849963583394027,
+        "comprehension": 0.0065549890750182084,
+        "Dict": 0.0007283321194464676,
+        "JoinedStr": 0.0029133284777858705,
+        "Slice": 0.0007283321194464676,
+        "ListComp": 0.0007283321194464676,
+        "FormattedValue": 0.004369992716678805,
+        "Mult": 0.0007283321194464676
+      }
+    },
+    {
+      "file_path": "D:\\Sanctum\\SCI-EXP CRITIQUE \u2014 EXPERIMENTAL REPORT ANALYSIS v2.1\\src\\sciexp_critique\\evidence.py",
+      "ldr": {
+        "total_lines": 124,
+        "logic_lines": 124,
+        "empty_lines": 0,
+        "ldr_score": 1.0,
+        "grade": "S++",
+        "is_abc_interface": false,
+        "is_type_stub": false,
+        "is_packaging_init": false
+      },
+      "inflation": {
+        "jargon_count": 0,
+        "avg_complexity": 4.166666666666667,
+        "inflation_score": 0.0,
+        "status": "PASS",
+        "jargon_found": [],
+        "jargon_details": [],
+        "justified_jargon": [],
+        "is_config_file": false
+      },
+      "ddc": {
+        "imported": [
+          "dataclasses",
+          "re",
+          "types"
+        ],
+        "actually_used": [
+          "dataclasses",
+          "re",
+          "types"
+        ],
+        "unused": [],
+        "fake_imports": [],
+        "type_checking_imports": [
+          "__future__",
+          "typing"
+        ],
+        "usage_ratio": 1.0,
+        "grade": "EXCELLENT"
+      },
+      "deficit_score": 14.44369637317158,
+      "status": "clean",
+      "warnings": [
+        "PATTERNS: 1 critical issues found"
+      ],
+      "pattern_issues": [
+        {
+          "pattern_id": "nested_complexity",
+          "severity": "critical",
+          "axis": "quality",
+          "file": "D:\\Sanctum\\SCI-EXP CRITIQUE \u2014 EXPERIMENTAL REPORT ANALYSIS v2.1\\src\\sciexp_critique\\evidence.py",
+          "line": 90,
+          "column": 0,
+          "message": "Function 'resolve' has both deep nesting (depth=4) and high cyclomatic complexity (cc=7) \u2014 structural complexity composite",
+          "code": null,
+          "suggestion": "Extract nested blocks into named helper functions. Use early-return / guard clauses and reduce branch count."
+        }
+      ],
+      "docstring_inflation": {
+        "total_docstrings": 1,
+        "inflated_count": 0,
+        "avg_inflation_ratio": 0.6666666666666666,
+        "max_inflation_ratio": 0.6666666666666666,
+        "total_docstring_lines": 13,
+        "total_implementation_lines": 116,
+        "overall_ratio": 0.11206896551724138,
+        "status": "PASS",
+        "details": [
+          {
+            "name": "check_anchor_completeness",
+            "type": "function",
+            "line": 138,
+            "docstring_lines": 4,
+            "implementation_lines": 6,
+            "inflation_ratio": 0.6666666666666666,
+            "severity": "info",
+            "docstring_preview": "Check whether a figure carries both source_path and sha256.  Returns (has_source_path, has_sha256). "
+          }
+        ]
+      },
+      "hallucination_deps": {
+        "total_hallucinated": 0,
+        "category_usage": [],
+        "hallucinated_deps": [],
+        "worst_category": "none",
+        "status": "PASS"
+      },
+      "context_jargon": {
+        "total_jargon": 0,
+        "justified_jargon": 0,
+        "unjustified_jargon": 0,
+        "evidence_details": [],
+        "worst_offenders": [],
+        "justification_ratio": 1.0,
+        "status": "PASS"
+      },
+      "ml_score": {
+        "slop_probability": 0.05,
+        "confidence": 0.95,
+        "model_type": "random_forest",
+        "agreement": true,
+        "features_used": 16
+      },
+      "dcf": {
+        "Module": 0.0012004801920768306,
+        "Expr": 0.01680672268907563,
+        "ImportFrom": 0.004801920768307323,
+        "Import": 0.0012004801920768306,
+        "ClassDef": 0.0024009603841536613,
+        "Assign": 0.01920768307322929,
+        "FunctionDef": 0.004801920768307323,
+        "Constant": 0.05042016806722689,
+        "alias": 0.007202881152460984,
+        "AnnAssign": 0.012004801920768308,
+        "Name": 0.2388955582232893,
+        "Call": 0.06482593037214886,
+        "arguments": 0.006002400960384154,
+        "For": 0.009603841536614645,
+        "Return": 0.009603841536614645,
+        "Subscript": 0.025210084033613446,
+        "If": 0.008403361344537815,
+        "Load": 0.290516206482593,
+        "Store": 0.05162064825930372,
+        "Attribute": 0.062424969987995196,
+        "arg": 0.008403361344537815,
+        "List": 0.007202881152460984,
+        "Tuple": 0.008403361344537815,
+        "UnaryOp": 0.0024009603841536613,
+        "Dict": 0.0012004801920768306,
+        "keyword": 0.04201680672268908,
+        "Not": 0.0024009603841536613,
+        "Compare": 0.003601440576230492,
+        "ListComp": 0.0012004801920768306,
+        "Lambda": 0.0012004801920768306,
+        "Gt": 0.003601440576230492,
+        "SetComp": 0.0012004801920768306,
+        "comprehension": 0.003601440576230492,
+        "BinOp": 0.006002400960384154,
+        "Sub": 0.0024009603841536613,
+        "Add": 0.003601440576230492,
+        "Slice": 0.004801920768307323,
+        "JoinedStr": 0.003601440576230492,
+        "FormattedValue": 0.006002400960384154
+      }
+    },
+    {
+      "file_path": "D:\\Sanctum\\SCI-EXP CRITIQUE \u2014 EXPERIMENTAL REPORT ANALYSIS v2.1\\src\\sciexp_critique\\pipeline.py",
+      "ldr": {
+        "total_lines": 218,
+        "logic_lines": 218,
+        "empty_lines": 0,
+        "ldr_score": 1.0,
+        "grade": "S++",
+        "is_abc_interface": false,
+        "is_type_stub": false,
+        "is_packaging_init": false
+      },
+      "inflation": {
+        "jargon_count": 0,
+        "avg_complexity": 7.666666666666667,
+        "inflation_score": 0.0,
+        "status": "PASS",
+        "jargon_found": [],
+        "jargon_details": [],
+        "justified_jargon": [],
+        "is_config_file": false
+      },
+      "ddc": {
+        "imported": [
+          "re",
+          "types"
+        ],
+        "actually_used": [
+          "re",
+          "types"
+        ],
+        "unused": [],
+        "fake_imports": [],
+        "type_checking_imports": [
+          "__future__",
+          "typing"
+        ],
+        "usage_ratio": 1.0,
+        "grade": "EXCELLENT"
+      },
+      "deficit_score": 19.44369637317158,
+      "status": "clean",
+      "warnings": [
+        "PATTERNS: 1 critical issues found",
+        "PATTERNS: 1 high-severity issues found"
+      ],
+      "pattern_issues": [
+        {
+          "pattern_id": "nested_complexity",
+          "severity": "critical",
+          "axis": "quality",
+          "file": "D:\\Sanctum\\SCI-EXP CRITIQUE \u2014 EXPERIMENTAL REPORT ANALYSIS v2.1\\src\\sciexp_critique\\pipeline.py",
+          "line": 66,
+          "column": 0,
+          "message": "Function '_find_hold_events' has both deep nesting (depth=4) and high cyclomatic complexity (cc=6) \u2014 structural complexity composite",
+          "code": null,
+          "suggestion": "Extract nested blocks into named helper functions. Use early-return / guard clauses and reduce branch count."
+        },
+        {
+          "pattern_id": "function_clone_cluster",
+          "severity": "high",
+          "axis": "structure",
+          "file": "D:\\Sanctum\\SCI-EXP CRITIQUE \u2014 EXPERIMENTAL REPORT ANALYSIS v2.1\\src\\sciexp_critique\\pipeline.py",
+          "line": 1,
+          "column": 0,
+          "message": "5 structurally similar functions detected (AST JSD < 0.05): _find_hold_events, step2_traceability, step4_publication_readiness, step3_series_continuity, step1_claim_integrity. Review for unnecessary decomposition.",
+          "code": null,
+          "suggestion": "If these functions represent a fragmented complex operation, consider consolidating or using a data-driven dispatch table."
+        }
+      ],
+      "docstring_inflation": {
+        "total_docstrings": 0,
+        "inflated_count": 0,
+        "avg_inflation_ratio": 0.0,
+        "max_inflation_ratio": 0.0,
+        "total_docstring_lines": 6,
+        "total_implementation_lines": 208,
+        "overall_ratio": 0.028846153846153848,
+        "status": "PASS",
+        "details": []
+      },
+      "hallucination_deps": {
+        "total_hallucinated": 0,
+        "category_usage": [],
+        "hallucinated_deps": [],
+        "worst_category": "none",
+        "status": "PASS"
+      },
+      "context_jargon": {
+        "total_jargon": 0,
+        "justified_jargon": 0,
+        "unjustified_jargon": 0,
+        "evidence_details": [],
+        "worst_offenders": [],
+        "justification_ratio": 1.0,
+        "status": "PASS"
+      },
+      "ml_score": {
+        "slop_probability": 0.05,
+        "confidence": 0.95,
+        "model_type": "random_forest",
+        "agreement": true,
+        "features_used": 16
+      },
+      "dcf": {
+        "Module": 0.0004828585224529213,
+        "Expr": 0.008208594881699663,
+        "ImportFrom": 0.0014485755673587638,
+        "Import": 0.0004828585224529213,
+        "AnnAssign": 0.003380009657170449,
+        "FunctionDef": 0.0043457267020762915,
+        "Assign": 0.032351521004345726,
+        "Constant": 0.08691453404152583,
+        "alias": 0.0043457267020762915,
+        "Name": 0.23080637373249638,
+        "Subscript": 0.01496861419604056,
+        "List": 0.0043457267020762915,
+        "arguments": 0.004828585224529213,
+        "For": 0.001931434089811685,
+        "If": 0.00386286817962337,
+        "Return": 0.005794302269435055,
+        "Call": 0.06277160791887977,
+        "Store": 0.042974408498309996,
+        "Load": 0.29164654756156444,
+        "Tuple": 0.010140028971511348,
+        "arg": 0.006760019314340898,
+        "UnaryOp": 0.00386286817962337,
+        "IfExp": 0.016417189763399325,
+        "JoinedStr": 0.01158860453887011,
+        "Attribute": 0.07436021245774987,
+        "ListComp": 0.0009657170449058426,
+        "BinOp": 0.005311443746982134,
+        "Compare": 0.006760019314340898,
+        "BoolOp": 0.0014485755673587638,
+        "Not": 0.0024142926122646064,
+        "FormattedValue": 0.016417189763399325,
+        "comprehension": 0.003380009657170449,
+        "Add": 0.0043457267020762915,
+        "keyword": 0.01496861419604056,
+        "Gt": 0.0024142926122646064,
+        "And": 0.0009657170449058426,
+        "GeneratorExp": 0.001931434089811685,
+        "NotEq": 0.0004828585224529213,
+        "Slice": 0.001931434089811685,
+        "In": 0.001931434089811685,
+        "Sub": 0.0009657170449058426,
+        "Lambda": 0.0004828585224529213,
+        "USub": 0.0014485755673587638,
+        "Eq": 0.001931434089811685,
+        "Or": 0.0004828585224529213
+      }
+    },
+    {
+      "file_path": "D:\\Sanctum\\SCI-EXP CRITIQUE \u2014 EXPERIMENTAL REPORT ANALYSIS v2.1\\src\\sciexp_critique\\precheck.py",
+      "ldr": {
+        "total_lines": 77,
+        "logic_lines": 77,
+        "empty_lines": 0,
+        "ldr_score": 1.0,
+        "grade": "S++",
+        "is_abc_interface": false,
+        "is_type_stub": false,
+        "is_packaging_init": false
+      },
+      "inflation": {
+        "jargon_count": 0,
+        "avg_complexity": 3.75,
+        "inflation_score": 0.0,
+        "status": "PASS",
+        "jargon_found": [],
+        "jargon_details": [],
+        "justified_jargon": [],
+        "is_config_file": false
+      },
+      "ddc": {
+        "imported": [
+          "dataclasses",
+          "re",
+          "types"
+        ],
+        "actually_used": [
+          "dataclasses",
+          "re",
+          "types"
+        ],
+        "unused": [],
+        "fake_imports": [],
+        "type_checking_imports": [
+          "__future__"
+        ],
+        "usage_ratio": 1.0,
+        "grade": "EXCELLENT"
+      },
+      "deficit_score": 0.0,
+      "status": "clean",
+      "warnings": [],
+      "pattern_issues": [],
+      "docstring_inflation": {
+        "total_docstrings": 0,
+        "inflated_count": 0,
+        "avg_inflation_ratio": 0.0,
+        "max_inflation_ratio": 0.0,
+        "total_docstring_lines": 12,
+        "total_implementation_lines": 61,
+        "overall_ratio": 0.19672131147540983,
+        "status": "PASS",
+        "details": []
+      },
+      "hallucination_deps": {
+        "total_hallucinated": 0,
+        "category_usage": [],
+        "hallucinated_deps": [],
+        "worst_category": "none",
+        "status": "PASS"
+      },
+      "context_jargon": {
+        "total_jargon": 0,
+        "justified_jargon": 0,
+        "unjustified_jargon": 0,
+        "evidence_details": [],
+        "worst_offenders": [],
+        "justification_ratio": 1.0,
+        "status": "PASS"
+      },
+      "ml_score": {
+        "slop_probability": 0.0,
+        "confidence": 1.0,
+        "model_type": "random_forest",
+        "agreement": true,
+        "features_used": 16
+      },
+      "dcf": {
+        "Module": 0.0023094688221709007,
+        "Expr": 0.018475750577367205,
+        "ImportFrom": 0.006928406466512702,
+        "Import": 0.0023094688221709007,
+        "Assign": 0.018475750577367205,
+        "ClassDef": 0.0023094688221709007,
+        "FunctionDef": 0.006928406466512702,
+        "Constant": 0.046189376443418015,
+        "alias": 0.011547344110854504,
+        "Name": 0.22863741339491916,
+        "Call": 0.07852193995381063,
+        "AnnAssign": 0.020785219399538105,
+        "arguments": 0.006928406466512702,
+        "Return": 0.013856812933025405,
+        "If": 0.018475750577367205,
+        "Store": 0.03926096997690531,
+        "Attribute": 0.09006928406466513,
+        "Load": 0.28868360277136257,
+        "arg": 0.006928406466512702,
+        "UnaryOp": 0.016166281755196306,
+        "Compare": 0.004618937644341801,
+        "Subscript": 0.004618937644341801,
+        "List": 0.004618937644341801,
+        "BoolOp": 0.006928406466512702,
+        "keyword": 0.02771362586605081,
+        "Not": 0.016166281755196306,
+        "In": 0.0023094688221709007,
+        "And": 0.004618937644341801,
+        "Gt": 0.0023094688221709007,
+        "Or": 0.0023094688221709007
+      }
+    },
+    {
+      "file_path": "D:\\Sanctum\\SCI-EXP CRITIQUE \u2014 EXPERIMENTAL REPORT ANALYSIS v2.1\\src\\sciexp_critique\\types.py",
+      "ldr": {
+        "total_lines": 172,
+        "logic_lines": 172,
+        "empty_lines": 0,
+        "ldr_score": 1.0,
+        "grade": "S++",
+        "is_abc_interface": false,
+        "is_type_stub": false,
+        "is_packaging_init": false
+      },
+      "inflation": {
+        "jargon_count": 0,
+        "avg_complexity": 1.6521739130434783,
+        "inflation_score": 0.0,
+        "status": "PASS",
+        "jargon_found": [],
+        "jargon_details": [],
+        "justified_jargon": [],
+        "is_config_file": false
+      },
+      "ddc": {
+        "imported": [
+          "dataclasses",
+          "enum"
+        ],
+        "actually_used": [
+          "dataclasses",
+          "enum"
+        ],
+        "unused": [],
+        "fake_imports": [],
+        "type_checking_imports": [
+          "__future__",
+          "typing"
+        ],
+        "usage_ratio": 1.0,
+        "grade": "EXCELLENT"
+      },
+      "deficit_score": 0.0,
+      "status": "clean",
+      "warnings": [],
+      "pattern_issues": [],
+      "docstring_inflation": {
+        "total_docstrings": 2,
+        "inflated_count": 1,
+        "avg_inflation_ratio": 0.8928571428571428,
+        "max_inflation_ratio": 1.0,
+        "total_docstring_lines": 21,
+        "total_implementation_lines": 184,
+        "overall_ratio": 0.11413043478260869,
+        "status": "WARNING",
+        "details": [
+          {
+            "name": "HSTA4DScores",
+            "type": "class",
+            "line": 99,
+            "docstring_lines": 6,
+            "implementation_lines": 6,
+            "inflation_ratio": 1.0,
+            "severity": "warning",
+            "docstring_preview": "HSTA extension 4 dimensions (from BioMedical-Paper-Harvester quality tensor).  N: Novelty        \u2014 s"
+          },
+          {
+            "name": "IRF6DScores",
+            "type": "class",
+            "line": 68,
+            "docstring_lines": 11,
+            "implementation_lines": 14,
+            "inflation_ratio": 0.7857142857142857,
+            "severity": "info",
+            "docstring_preview": "LOGOS IRF-Calc 6D dimension scores for a report.  M: Methodic Doubt  \u2014 uncertainty acknowledgment & "
+          }
+        ]
+      },
+      "hallucination_deps": {
+        "total_hallucinated": 0,
+        "category_usage": [],
+        "hallucinated_deps": [],
+        "worst_category": "none",
+        "status": "PASS"
+      },
+      "context_jargon": {
+        "total_jargon": 0,
+        "justified_jargon": 0,
+        "unjustified_jargon": 0,
+        "evidence_details": [],
+        "worst_offenders": [],
+        "justification_ratio": 1.0,
+        "status": "PASS"
+      },
+      "ml_score": {
+        "slop_probability": 0.0,
+        "confidence": 1.0,
+        "model_type": "random_forest",
+        "agreement": true,
+        "features_used": 16
+      },
+      "dcf": {
+        "Module": 0.0011695906432748538,
+        "Expr": 0.017543859649122806,
+        "ImportFrom": 0.004678362573099415,
+        "ClassDef": 0.016374269005847954,
+        "Constant": 0.09590643274853801,
+        "alias": 0.005847953216374269,
+        "Name": 0.27134502923976606,
+        "Assign": 0.03625730994152047,
+        "AnnAssign": 0.06198830409356725,
+        "FunctionDef": 0.010526315789473684,
+        "Load": 0.22807017543859648,
+        "arguments": 0.010526315789473684,
+        "Return": 0.010526315789473684,
+        "Subscript": 0.022222222222222223,
+        "Call": 0.00935672514619883,
+        "Store": 0.10409356725146199,
+        "arg": 0.011695906432748537,
+        "Dict": 0.0011695906432748538,
+        "BinOp": 0.004678362573099415,
+        "JoinedStr": 0.0035087719298245615,
+        "IfExp": 0.0011695906432748538,
+        "keyword": 0.004678362573099415,
+        "Compare": 0.004678362573099415,
+        "Attribute": 0.03859649122807018,
+        "Div": 0.0011695906432748538,
+        "FormattedValue": 0.004678362573099415,
+        "GeneratorExp": 0.0035087719298245615,
+        "Eq": 0.004678362573099415,
+        "Add": 0.0035087719298245615,
+        "comprehension": 0.005847953216374269
+      }
+    },
+    {
+      "file_path": "D:\\Sanctum\\SCI-EXP CRITIQUE \u2014 EXPERIMENTAL REPORT ANALYSIS v2.1\\src\\sciexp_critique\\api\\app.py",
+      "ldr": {
+        "total_lines": 39,
+        "logic_lines": 39,
+        "empty_lines": 0,
+        "ldr_score": 1.0,
+        "grade": "S++",
+        "is_abc_interface": false,
+        "is_type_stub": false,
+        "is_packaging_init": false
+      },
+      "inflation": {
+        "jargon_count": 0,
+        "avg_complexity": 1.0,
+        "inflation_score": 0.0,
+        "status": "PASS",
+        "jargon_found": [],
+        "jargon_details": [],
+        "justified_jargon": [],
+        "is_config_file": false
+      },
+      "ddc": {
+        "imported": [
+          "fastapi",
+          "pathlib",
+          "routes",
+          "uvicorn"
+        ],
+        "actually_used": [
+          "fastapi",
+          "pathlib",
+          "routes",
+          "uvicorn"
+        ],
+        "unused": [],
+        "fake_imports": [],
+        "type_checking_imports": [
+          "__future__"
+        ],
+        "usage_ratio": 1.0,
+        "grade": "EXCELLENT"
+      },
+      "deficit_score": 0.0,
+      "status": "clean",
+      "warnings": [],
+      "pattern_issues": [],
+      "docstring_inflation": {
+        "total_docstrings": 0,
+        "inflated_count": 0,
+        "avg_inflation_ratio": 0.0,
+        "max_inflation_ratio": 0.0,
+        "total_docstring_lines": 1,
+        "total_implementation_lines": 30,
+        "overall_ratio": 0.03333333333333333,
+        "status": "PASS",
+        "details": []
+      },
+      "hallucination_deps": {
+        "total_hallucinated": 0,
+        "category_usage": [
+          {
+            "category": "http",
+            "imported": [
+              "fastapi"
+            ],
+            "used": [
+              "fastapi"
+            ],
+            "unused": [],
+            "usage_ratio": 1.0
+          }
+        ],
+        "hallucinated_deps": [],
+        "worst_category": "none",
+        "status": "PASS"
+      },
+      "context_jargon": {
+        "total_jargon": 0,
+        "justified_jargon": 0,
+        "unjustified_jargon": 0,
+        "evidence_details": [],
+        "worst_offenders": [],
+        "justification_ratio": 1.0,
+        "status": "PASS"
+      },
+      "ml_score": {
+        "slop_probability": 0.0,
+        "confidence": 1.0,
+        "model_type": "random_forest",
+        "agreement": true,
+        "features_used": 16
+      },
+      "dcf": {
+        "Module": 0.005319148936170213,
+        "Expr": 0.031914893617021274,
+        "ImportFrom": 0.03723404255319149,
+        "Assign": 0.010638297872340425,
+        "If": 0.010638297872340425,
+        "AsyncFunctionDef": 0.015957446808510637,
+        "FunctionDef": 0.005319148936170213,
+        "Constant": 0.18085106382978725,
+        "alias": 0.0425531914893617,
+        "Name": 0.12234042553191489,
+        "Call": 0.0797872340425532,
+        "BinOp": 0.010638297872340425,
+        "arguments": 0.02127659574468085,
+        "Return": 0.015957446808510637,
+        "Import": 0.005319148936170213,
+        "Compare": 0.005319148936170213,
+        "Store": 0.010638297872340425,
+        "keyword": 0.09042553191489362,
+        "Attribute": 0.047872340425531915,
+        "Subscript": 0.005319148936170213,
+        "Div": 0.010638297872340425,
+        "Dict": 0.010638297872340425,
+        "Eq": 0.005319148936170213,
+        "Load": 0.19148936170212766,
+        "List": 0.026595744680851064
+      }
+    },
+    {
+      "file_path": "D:\\Sanctum\\SCI-EXP CRITIQUE \u2014 EXPERIMENTAL REPORT ANALYSIS v2.1\\src\\sciexp_critique\\api\\routes.py",
+      "ldr": {
+        "total_lines": 178,
+        "logic_lines": 178,
+        "empty_lines": 0,
+        "ldr_score": 1.0,
+        "grade": "S++",
+        "is_abc_interface": false,
+        "is_type_stub": false,
+        "is_packaging_init": false
+      },
+      "inflation": {
+        "jargon_count": 0,
+        "avg_complexity": 4.6,
+        "inflation_score": 0.0,
+        "status": "PASS",
+        "jargon_found": [],
+        "jargon_details": [],
+        "justified_jargon": [],
+        "is_config_file": false
+      },
+      "ddc": {
+        "imported": [
+          "engine",
+          "fastapi",
+          "ingest",
+          "pathlib",
+          "rag",
+          "render",
+          "tempfile",
+          "uuid"
+        ],
+        "actually_used": [
+          "engine",
+          "fastapi",
+          "ingest",
+          "pathlib",
+          "rag",
+          "render",
+          "tempfile",
+          "uuid"
+        ],
+        "unused": [],
+        "fake_imports": [],
+        "type_checking_imports": [
+          "__future__",
+          "typing"
+        ],
+        "usage_ratio": 1.0,
+        "grade": "EXCELLENT"
+      },
+      "deficit_score": 1.0,
+      "status": "clean",
+      "warnings": [],
+      "pattern_issues": [
+        {
+          "pattern_id": "god_function",
+          "severity": "low",
+          "axis": "style",
+          "file": "D:\\Sanctum\\SCI-EXP CRITIQUE \u2014 EXPERIMENTAL REPORT ANALYSIS v2.1\\src\\sciexp_critique\\api\\routes.py",
+          "line": 145,
+          "column": 0,
+          "message": "God function '_to_response': 74 logic lines (limit 50)",
+          "code": null,
+          "suggestion": "Break into smaller single-responsibility functions. Each function should do one thing and fit on one screen."
+        }
+      ],
+      "docstring_inflation": {
+        "total_docstrings": 1,
+        "inflated_count": 0,
+        "avg_inflation_ratio": 0.5,
+        "max_inflation_ratio": 0.5,
+        "total_docstring_lines": 2,
+        "total_implementation_lines": 164,
+        "overall_ratio": 0.012195121951219513,
+        "status": "PASS",
+        "details": [
+          {
+            "name": "critique_text",
+            "type": "function",
+            "line": 31,
+            "docstring_lines": 1,
+            "implementation_lines": 2,
+            "inflation_ratio": 0.5,
+            "severity": "info",
+            "docstring_preview": "Submit raw text and receive structured SCI-EXP critique."
+          }
+        ]
+      },
+      "hallucination_deps": {
+        "total_hallucinated": 0,
+        "category_usage": [
+          {
+            "category": "http",
+            "imported": [
+              "fastapi"
+            ],
+            "used": [
+              "fastapi"
+            ],
+            "unused": [],
+            "usage_ratio": 1.0
+          }
+        ],
+        "hallucinated_deps": [],
+        "worst_category": "none",
+        "status": "PASS"
+      },
+      "context_jargon": {
+        "total_jargon": 0,
+        "justified_jargon": 0,
+        "unjustified_jargon": 0,
+        "evidence_details": [],
+        "worst_offenders": [],
+        "justification_ratio": 1.0,
+        "status": "PASS"
+      },
+      "ml_score": {
+        "slop_probability": 0.06,
+        "confidence": 0.94,
+        "model_type": "random_forest",
+        "agreement": true,
+        "features_used": 16
+      },
+      "dcf": {
+        "Module": 0.0009132420091324201,
+        "Expr": 0.012785388127853882,
+        "ImportFrom": 0.011872146118721462,
+        "Import": 0.0018264840182648401,
+        "Assign": 0.0273972602739726,
+        "AsyncFunctionDef": 0.0036529680365296802,
+        "FunctionDef": 0.0009132420091324201,
+        "Constant": 0.0547945205479452,
+        "alias": 0.02009132420091324,
+        "Name": 0.20365296803652969,
+        "Call": 0.06575342465753424,
+        "BinOp": 0.0036529680365296802,
+        "arguments": 0.0045662100456621,
+        "Return": 0.0045662100456621,
+        "If": 0.0073059360730593605,
+        "Try": 0.0018264840182648401,
+        "Attribute": 0.1095890410958904,
+        "Store": 0.031050228310502283,
+        "Div": 0.0036529680365296802,
+        "keyword": 0.0684931506849315,
+        "arg": 0.0091324200913242,
+        "Compare": 0.0073059360730593605,
+        "Raise": 0.0045662100456621,
+        "JoinedStr": 0.006392694063926941,
+        "Load": 0.28858447488584477,
+        "List": 0.0036529680365296802,
+        "NotIn": 0.0027397260273972603,
+        "Await": 0.0018264840182648401,
+        "UnaryOp": 0.0018264840182648401,
+        "Tuple": 0.0009132420091324201,
+        "FormattedValue": 0.01004566210045662,
+        "IsNot": 0.0027397260273972603,
+        "Not": 0.0018264840182648401,
+        "Subscript": 0.0018264840182648401,
+        "Eq": 0.0018264840182648401,
+        "IfExp": 0.0036529680365296802,
+        "ListComp": 0.0036529680365296802,
+        "Slice": 0.0018264840182648401,
+        "comprehension": 0.0036529680365296802,
+        "BoolOp": 0.0018264840182648401,
+        "Or": 0.0018264840182648401
+      }
+    },
+    {
+      "file_path": "D:\\Sanctum\\SCI-EXP CRITIQUE \u2014 EXPERIMENTAL REPORT ANALYSIS v2.1\\src\\sciexp_critique\\api\\schemas.py",
+      "ldr": {
+        "total_lines": 74,
+        "logic_lines": 74,
+        "empty_lines": 0,
+        "ldr_score": 1.0,
+        "grade": "S++",
+        "is_abc_interface": false,
+        "is_type_stub": false,
+        "is_packaging_init": false
+      },
+      "inflation": {
+        "jargon_count": 0,
+        "avg_complexity": 1.0,
+        "inflation_score": 0.0,
+        "status": "PASS",
+        "jargon_found": [],
+        "jargon_details": [],
+        "justified_jargon": [],
+        "is_config_file": false
+      },
+      "ddc": {
+        "imported": [
+          "pydantic"
+        ],
+        "actually_used": [
+          "pydantic"
+        ],
+        "unused": [],
+        "fake_imports": [],
+        "type_checking_imports": [
+          "__future__",
+          "typing"
+        ],
+        "usage_ratio": 1.0,
+        "grade": "EXCELLENT"
+      },
+      "deficit_score": 0.0,
+      "status": "clean",
+      "warnings": [],
+      "pattern_issues": [],
+      "docstring_inflation": {
+        "total_docstrings": 0,
+        "inflated_count": 0,
+        "avg_inflation_ratio": 0.0,
+        "max_inflation_ratio": 0.0,
+        "total_docstring_lines": 1,
+        "total_implementation_lines": 70,
+        "overall_ratio": 0.014285714285714285,
+        "status": "PASS",
+        "details": []
+      },
+      "hallucination_deps": {
+        "total_hallucinated": 0,
+        "category_usage": [],
+        "hallucinated_deps": [],
+        "worst_category": "none",
+        "status": "PASS"
+      },
+      "context_jargon": {
+        "total_jargon": 0,
+        "justified_jargon": 0,
+        "unjustified_jargon": 0,
+        "evidence_details": [],
+        "worst_offenders": [],
+        "justification_ratio": 1.0,
+        "status": "PASS"
+      },
+      "ml_score": {
+        "slop_probability": 0.0,
+        "confidence": 1.0,
+        "model_type": "random_forest",
+        "agreement": true,
+        "features_used": 16
+      },
+      "dcf": {
+        "Module": 0.002331002331002331,
+        "Expr": 0.006993006993006993,
+        "ImportFrom": 0.006993006993006993,
+        "ClassDef": 0.02097902097902098,
+        "Constant": 0.04428904428904429,
+        "alias": 0.009324009324009324,
+        "Name": 0.34032634032634035,
+        "AnnAssign": 0.13752913752913754,
+        "Load": 0.2400932400932401,
+        "Call": 0.006993006993006993,
+        "Subscript": 0.037296037296037296,
+        "Store": 0.13752913752913754,
+        "keyword": 0.009324009324009324
+      }
+    },
+    {
+      "file_path": "D:\\Sanctum\\SCI-EXP CRITIQUE \u2014 EXPERIMENTAL REPORT ANALYSIS v2.1\\src\\sciexp_critique\\cli\\formatters.py",
+      "ldr": {
+        "total_lines": 161,
+        "logic_lines": 161,
+        "empty_lines": 0,
+        "ldr_score": 1.0,
+        "grade": "S++",
+        "is_abc_interface": false,
+        "is_type_stub": false,
+        "is_packaging_init": false
+      },
+      "inflation": {
+        "jargon_count": 0,
+        "avg_complexity": 3.3636363636363638,
+        "inflation_score": 0.0,
+        "status": "PASS",
+        "jargon_found": [],
+        "jargon_details": [],
+        "justified_jargon": [],
+        "is_config_file": false
+      },
+      "ddc": {
+        "imported": [
+          "re",
+          "types"
+        ],
+        "actually_used": [
+          "re"
+        ],
+        "unused": [],
+        "fake_imports": [],
+        "type_checking_imports": [
+          "__future__"
+        ],
+        "usage_ratio": 1.0,
+        "grade": "EXCELLENT"
+      },
+      "deficit_score": 0.0,
+      "status": "clean",
+      "warnings": [],
+      "pattern_issues": [],
+      "docstring_inflation": {
+        "total_docstrings": 0,
+        "inflated_count": 0,
+        "avg_inflation_ratio": 0.0,
+        "max_inflation_ratio": 0.0,
+        "total_docstring_lines": 5,
+        "total_implementation_lines": 153,
+        "overall_ratio": 0.032679738562091505,
+        "status": "PASS",
+        "details": []
+      },
+      "hallucination_deps": {
+        "total_hallucinated": 0,
+        "category_usage": [],
+        "hallucinated_deps": [],
+        "worst_category": "none",
+        "status": "PASS"
+      },
+      "context_jargon": {
+        "total_jargon": 0,
+        "justified_jargon": 0,
+        "unjustified_jargon": 0,
+        "evidence_details": [],
+        "worst_offenders": [],
+        "justification_ratio": 1.0,
+        "status": "PASS"
+      },
+      "ml_score": {
+        "slop_probability": 0.0,
+        "confidence": 1.0,
+        "model_type": "random_forest",
+        "agreement": true,
+        "features_used": 16
+      },
+      "dcf": {
+        "Module": 0.0008583690987124463,
+        "Expr": 0.013733905579399141,
+        "ImportFrom": 0.0017167381974248926,
+        "Import": 0.0008583690987124463,
+        "Assign": 0.01888412017167382,
+        "FunctionDef": 0.00944206008583691,
+        "Constant": 0.1313304721030043,
+        "alias": 0.002575107296137339,
+        "Name": 0.18283261802575107,
+        "Dict": 0.0017167381974248926,
+        "arguments": 0.010300429184549357,
+        "Return": 0.012875536480686695,
+        "Subscript": 0.011158798283261802,
+        "AnnAssign": 0.002575107296137339,
+        "If": 0.014592274678111588,
+        "AugAssign": 0.008583690987124463,
+        "For": 0.0034334763948497852,
+        "Store": 0.03347639484978541,
+        "arg": 0.010300429184549357,
+        "BinOp": 0.0068669527896995704,
+        "List": 0.017167381974248927,
+        "Load": 0.26952789699570817,
+        "Attribute": 0.09184549356223176,
+        "Add": 0.015450643776824034,
+        "UnaryOp": 0.002575107296137339,
+        "Call": 0.03347639484978541,
+        "IfExp": 0.0034334763948497852,
+        "Compare": 0.002575107296137339,
+        "JoinedStr": 0.03776824034334764,
+        "Not": 0.002575107296137339,
+        "BoolOp": 0.0008583690987124463,
+        "IsNot": 0.0017167381974248926,
+        "Continue": 0.0008583690987124463,
+        "keyword": 0.0017167381974248926,
+        "Lambda": 0.0008583690987124463,
+        "FormattedValue": 0.03776824034334764,
+        "Or": 0.0008583690987124463,
+        "Eq": 0.0008583690987124463
+      }
+    },
+    {
+      "file_path": "D:\\Sanctum\\SCI-EXP CRITIQUE \u2014 EXPERIMENTAL REPORT ANALYSIS v2.1\\src\\sciexp_critique\\cli\\main.py",
+      "ldr": {
+        "total_lines": 157,
+        "logic_lines": 155,
+        "empty_lines": 2,
+        "ldr_score": 0.9872611464968153,
+        "grade": "S++",
+        "is_abc_interface": false,
+        "is_type_stub": false,
+        "is_packaging_init": false
+      },
+      "inflation": {
+        "jargon_count": 0,
+        "avg_complexity": 3.3333333333333335,
+        "inflation_score": 0.0,
+        "status": "PASS",
+        "jargon_found": [],
+        "jargon_details": [],
+        "justified_jargon": [],
+        "is_config_file": false
+      },
+      "ddc": {
+        "imported": [
+          "click",
+          "docx",
+          "engine",
+          "fitz",
+          "formatters",
+          "importlib",
+          "logos",
+          "pathlib",
+          "precheck",
+          "render",
+          "renderers",
+          "sys"
+        ],
+        "actually_used": [
+          "click",
+          "docx",
+          "engine",
+          "fitz",
+          "formatters",
+          "importlib",
+          "logos",
+          "pathlib",
+          "precheck",
+          "render",
+          "renderers",
+          "sys"
+        ],
+        "unused": [],
+        "fake_imports": [],
+        "type_checking_imports": [
+          "__future__"
+        ],
+        "usage_ratio": 1.0,
+        "grade": "EXCELLENT"
+      },
+      "deficit_score": 0.46512179468046755,
+      "status": "clean",
+      "warnings": [],
+      "pattern_issues": [],
+      "docstring_inflation": {
+        "total_docstrings": 3,
+        "inflated_count": 2,
+        "avg_inflation_ratio": 0.9583333333333334,
+        "max_inflation_ratio": 1.375,
+        "total_docstring_lines": 21,
+        "total_implementation_lines": 146,
+        "overall_ratio": 0.14383561643835616,
+        "status": "WARNING",
+        "details": [
+          {
+            "name": "critique",
+            "type": "function",
+            "line": 134,
+            "docstring_lines": 11,
+            "implementation_lines": 8,
+            "inflation_ratio": 1.375,
+            "severity": "warning",
+            "docstring_preview": "Analyse a document and emit a structured critique report.  Examples:    sciexp critique paper.pdf   "
+          },
+          {
+            "name": "main",
+            "type": "function",
+            "line": 106,
+            "docstring_lines": 1,
+            "implementation_lines": 1,
+            "inflation_ratio": 1.0,
+            "severity": "warning",
+            "docstring_preview": "SCI-EXP CRITIQUE v2.1 \u2014 Experimental Report Analysis Engine."
+          },
+          {
+            "name": "_load_engine",
+            "type": "function",
+            "line": 28,
+            "docstring_lines": 1,
+            "implementation_lines": 2,
+            "inflation_ratio": 0.5,
+            "severity": "info",
+            "docstring_preview": "Lazy import \u2014 keeps startup fast for simple sub-commands."
+          }
+        ]
+      },
+      "hallucination_deps": {
+        "total_hallucinated": 0,
+        "category_usage": [
+          {
+            "category": "cli",
+            "imported": [
+              "click"
+            ],
+            "used": [
+              "click"
+            ],
+            "unused": [],
+            "usage_ratio": 1.0
+          }
+        ],
+        "hallucinated_deps": [],
+        "worst_category": "none",
+        "status": "PASS"
+      },
+      "context_jargon": {
+        "total_jargon": 0,
+        "justified_jargon": 0,
+        "unjustified_jargon": 0,
+        "evidence_details": [],
+        "worst_offenders": [],
+        "justification_ratio": 1.0,
+        "status": "PASS"
+      },
+      "ml_score": {
+        "slop_probability": 0.0,
+        "confidence": 1.0,
+        "model_type": "random_forest",
+        "agreement": true,
+        "features_used": 16
+      },
+      "dcf": {
+        "Module": 0.0010775862068965517,
+        "Expr": 0.028017241379310345,
+        "ImportFrom": 0.009698275862068966,
+        "Import": 0.005387931034482759,
+        "Assign": 0.018318965517241378,
+        "Try": 0.00646551724137931,
+        "FunctionDef": 0.009698275862068966,
+        "If": 0.015086206896551725,
+        "Constant": 0.11422413793103449,
+        "alias": 0.015086206896551725,
+        "Name": 0.17780172413793102,
+        "ExceptHandler": 0.00646551724137931,
+        "arguments": 0.009698275862068966,
+        "Return": 0.009698275862068966,
+        "Raise": 0.008620689655172414,
+        "Call": 0.08189655172413793,
+        "Compare": 0.00646551724137931,
+        "Store": 0.020474137931034482,
+        "Dict": 0.0010775862068965517,
+        "arg": 0.01939655172413793,
+        "Load": 0.24245689655172414,
+        "Attribute": 0.08081896551724138,
+        "keyword": 0.03987068965517242,
+        "BoolOp": 0.0010775862068965517,
+        "UnaryOp": 0.004310344827586207,
+        "BinOp": 0.007543103448275862,
+        "Eq": 0.004310344827586207,
+        "JoinedStr": 0.014008620689655173,
+        "And": 0.0010775862068965517,
+        "Not": 0.004310344827586207,
+        "Div": 0.004310344827586207,
+        "BitOr": 0.003232758620689655,
+        "In": 0.0021551724137931034,
+        "Tuple": 0.0021551724137931034,
+        "FormattedValue": 0.017241379310344827,
+        "List": 0.0021551724137931034,
+        "GeneratorExp": 0.0021551724137931034,
+        "comprehension": 0.0021551724137931034
+      }
+    },
+    {
+      "file_path": "D:\\Sanctum\\SCI-EXP CRITIQUE \u2014 EXPERIMENTAL REPORT ANALYSIS v2.1\\src\\sciexp_critique\\ingest\\document.py",
+      "ldr": {
+        "total_lines": 92,
+        "logic_lines": 92,
+        "empty_lines": 0,
+        "ldr_score": 1.0,
+        "grade": "S++",
+        "is_abc_interface": false,
+        "is_type_stub": false,
+        "is_packaging_init": false
+      },
+      "inflation": {
+        "jargon_count": 0,
+        "avg_complexity": 5.285714285714286,
+        "inflation_score": 0.0,
+        "status": "PASS",
+        "jargon_found": [],
+        "jargon_details": [],
+        "justified_jargon": [],
+        "is_config_file": false
+      },
+      "ddc": {
+        "imported": [
+          "docx",
+          "fitz",
+          "flamehaven_filesearch",
+          "pathlib",
+          "pypdf",
+          "sys"
+        ],
+        "actually_used": [
+          "docx",
+          "fitz",
+          "flamehaven_filesearch",
+          "pathlib",
+          "pypdf",
+          "sys"
+        ],
+        "unused": [],
+        "fake_imports": [],
+        "type_checking_imports": [
+          "__future__",
+          "typing"
+        ],
+        "usage_ratio": 1.0,
+        "grade": "EXCELLENT"
+      },
+      "deficit_score": 6.0,
+      "status": "clean",
+      "warnings": [],
+      "pattern_issues": [
+        {
+          "pattern_id": "empty_except",
+          "severity": "medium",
+          "axis": "quality",
+          "file": "D:\\Sanctum\\SCI-EXP CRITIQUE \u2014 EXPERIMENTAL REPORT ANALYSIS v2.1\\src\\sciexp_critique\\ingest\\document.py",
+          "line": 113,
+          "column": 4,
+          "message": "Empty handler for 'Exception' silently discards the exception",
+          "code": null,
+          "suggestion": "Add logging (logger.debug/warning) or a comment explaining why silence is correct here."
+        },
+        {
+          "pattern_id": "phantom_import",
+          "severity": "medium",
+          "axis": "quality",
+          "file": "D:\\Sanctum\\SCI-EXP CRITIQUE \u2014 EXPERIMENTAL REPORT ANALYSIS v2.1\\src\\sciexp_critique\\ingest\\document.py",
+          "line": 68,
+          "column": 8,
+          "message": "Undeclared optional dependency: 'flamehaven_filesearch.engine.file_parser' is guarded with ImportError but not listed in [project.optional-dependencies]",
+          "code": null,
+          "suggestion": "Add 'flamehaven_filesearch.engine.file_parser' to the appropriate [project.optional-dependencies.<group>] in pyproject.toml so users know this feature requires an extra install."
+        },
+        {
+          "pattern_id": "phantom_import",
+          "severity": "medium",
+          "axis": "quality",
+          "file": "D:\\Sanctum\\SCI-EXP CRITIQUE \u2014 EXPERIMENTAL REPORT ANALYSIS v2.1\\src\\sciexp_critique\\ingest\\document.py",
+          "line": 110,
+          "column": 8,
+          "message": "Undeclared optional dependency: 'flamehaven_filesearch.engine.text_chunker' is guarded with ImportError but not listed in [project.optional-dependencies]",
+          "code": null,
+          "suggestion": "Add 'flamehaven_filesearch.engine.text_chunker' to the appropriate [project.optional-dependencies.<group>] in pyproject.toml so users know this feature requires an extra install."
+        }
+      ],
+      "docstring_inflation": {
+        "total_docstrings": 0,
+        "inflated_count": 0,
+        "avg_inflation_ratio": 0.0,
+        "max_inflation_ratio": 0.0,
+        "total_docstring_lines": 1,
+        "total_implementation_lines": 82,
+        "overall_ratio": 0.012195121951219513,
+        "status": "PASS",
+        "details": []
+      },
+      "hallucination_deps": {
+        "total_hallucinated": 0,
+        "category_usage": [],
+        "hallucinated_deps": [],
+        "worst_category": "none",
+        "status": "PASS"
+      },
+      "context_jargon": {
+        "total_jargon": 0,
+        "justified_jargon": 0,
+        "unjustified_jargon": 0,
+        "evidence_details": [],
+        "worst_offenders": [],
+        "justification_ratio": 1.0,
+        "status": "PASS"
+      },
+      "ml_score": {
+        "slop_probability": 0.13,
+        "confidence": 0.87,
+        "model_type": "random_forest",
+        "agreement": true,
+        "features_used": 16
+      },
+      "dcf": {
+        "Module": 0.0015360983102918587,
+        "Expr": 0.01228878648233487,
+        "ImportFrom": 0.010752688172043012,
+        "Import": 0.0030721966205837174,
+        "Assign": 0.027649769585253458,
+        "FunctionDef": 0.010752688172043012,
+        "Constant": 0.0706605222734255,
+        "alias": 0.013824884792626729,
+        "Name": 0.23963133640552994,
+        "Set": 0.0030721966205837174,
+        "arguments": 0.010752688172043012,
+        "If": 0.010752688172043012,
+        "Return": 0.021505376344086023,
+        "Subscript": 0.013824884792626729,
+        "Try": 0.007680491551459293,
+        "While": 0.0015360983102918587,
+        "Store": 0.047619047619047616,
+        "arg": 0.019969278033794162,
+        "Call": 0.055299539170506916,
+        "Compare": 0.009216589861751152,
+        "Raise": 0.0015360983102918587,
+        "BoolOp": 0.01228878648233487,
+        "Load": 0.2565284178187404,
+        "UnaryOp": 0.0015360983102918587,
+        "Attribute": 0.043010752688172046,
+        "ListComp": 0.004608294930875576,
+        "ExceptHandler": 0.007680491551459293,
+        "For": 0.0030721966205837174,
+        "Tuple": 0.004608294930875576,
+        "AugAssign": 0.0015360983102918587,
+        "BinOp": 0.006144393241167435,
+        "NotIn": 0.004608294930875576,
+        "Eq": 0.0015360983102918587,
+        "Or": 0.010752688172043012,
+        "Not": 0.0015360983102918587,
+        "List": 0.0030721966205837174,
+        "Dict": 0.0015360983102918587,
+        "comprehension": 0.009216589861751152,
+        "IfExp": 0.0015360983102918587,
+        "Pass": 0.0015360983102918587,
+        "Lt": 0.0015360983102918587,
+        "Add": 0.0030721966205837174,
+        "BitOr": 0.0030721966205837174,
+        "JoinedStr": 0.0015360983102918587,
+        "In": 0.0015360983102918587,
+        "keyword": 0.007680491551459293,
+        "FormattedValue": 0.0030721966205837174,
+        "GeneratorExp": 0.004608294930875576,
+        "And": 0.0015360983102918587,
+        "Sub": 0.0015360983102918587,
+        "Slice": 0.0015360983102918587
+      }
+    },
+    {
+      "file_path": "D:\\Sanctum\\SCI-EXP CRITIQUE \u2014 EXPERIMENTAL REPORT ANALYSIS v2.1\\src\\sciexp_critique\\logos\\irf_analyzer.py",
+      "ldr": {
+        "total_lines": 120,
+        "logic_lines": 120,
+        "empty_lines": 0,
+        "ldr_score": 1.0,
+        "grade": "S++",
+        "is_abc_interface": false,
+        "is_type_stub": false,
+        "is_packaging_init": false
+      },
+      "inflation": {
+        "jargon_count": 1,
+        "avg_complexity": 1.5833333333333333,
+        "inflation_score": 0.08819444444444444,
+        "status": "PASS",
+        "jargon_found": [
+          "proof"
+        ],
+        "jargon_details": [
+          {
+            "word": "proof",
+            "line": 45,
+            "category": "academic",
+            "justified": false
+          }
+        ],
+        "justified_jargon": [],
+        "is_config_file": false
+      },
+      "ddc": {
+        "imported": [
+          "math",
+          "re",
+          "types"
+        ],
+        "actually_used": [
+          "math",
+          "re",
+          "types"
+        ],
+        "unused": [],
+        "fake_imports": [],
+        "type_checking_imports": [
+          "__future__",
+          "typing"
+        ],
+        "usage_ratio": 1.0,
+        "grade": "EXCELLENT"
+      },
+      "deficit_score": 6.222441311518563,
+      "status": "clean",
+      "warnings": [
+        "PATTERNS: 1 high-severity issues found"
+      ],
+      "pattern_issues": [
+        {
+          "pattern_id": "function_clone_cluster",
+          "severity": "high",
+          "axis": "structure",
+          "file": "D:\\Sanctum\\SCI-EXP CRITIQUE \u2014 EXPERIMENTAL REPORT ANALYSIS v2.1\\src\\sciexp_critique\\logos\\irf_analyzer.py",
+          "line": 1,
+          "column": 0,
+          "message": "5 structurally similar functions detected (AST JSD < 0.05): _score_M, _score_P, _score_F, _score_D, _score_A. Review for unnecessary decomposition.",
+          "code": null,
+          "suggestion": "If these functions represent a fragmented complex operation, consider consolidating or using a data-driven dispatch table."
+        }
+      ],
+      "docstring_inflation": {
+        "total_docstrings": 7,
+        "inflated_count": 5,
+        "avg_inflation_ratio": 0.8571428571428571,
+        "max_inflation_ratio": 1.0,
+        "total_docstring_lines": 22,
+        "total_implementation_lines": 109,
+        "overall_ratio": 0.2018348623853211,
+        "status": "WARNING",
+        "details": [
+          {
+            "name": "_score_M",
+            "type": "function",
+            "line": 121,
+            "docstring_lines": 1,
+            "implementation_lines": 1,
+            "inflation_ratio": 1.0,
+            "severity": "warning",
+            "docstring_preview": "Methodic Doubt \u2014 uncertainty acknowledgment & premise clarity."
+          },
+          {
+            "name": "_score_A",
+            "type": "function",
+            "line": 125,
+            "docstring_lines": 1,
+            "implementation_lines": 1,
+            "inflation_ratio": 1.0,
+            "severity": "warning",
+            "docstring_preview": "Axiom \u2014 foundational grounding & hypothesis quality."
+          },
+          {
+            "name": "_score_D",
+            "type": "function",
+            "line": 129,
+            "docstring_lines": 1,
+            "implementation_lines": 1,
+            "inflation_ratio": 1.0,
+            "severity": "warning",
+            "docstring_preview": "Deduction \u2014 logical rigor & inference chain."
+          },
+          {
+            "name": "_score_F",
+            "type": "function",
+            "line": 139,
+            "docstring_lines": 1,
+            "implementation_lines": 1,
+            "inflation_ratio": 1.0,
+            "severity": "warning",
+            "docstring_preview": "Falsification \u2014 testability, control, reproducibility."
+          },
+          {
+            "name": "_score_P",
+            "type": "function",
+            "line": 143,
+            "docstring_lines": 1,
+            "implementation_lines": 1,
+            "inflation_ratio": 1.0,
+            "severity": "warning",
+            "docstring_preview": "Paradigm \u2014 reference / prior-work alignment."
+          },
+          {
+            "name": "_marker_density",
+            "type": "function",
+            "line": 66,
+            "docstring_lines": 1,
+            "implementation_lines": 2,
+            "inflation_ratio": 0.5,
+            "severity": "info",
+            "docstring_preview": "Count distinct marker hits; saturate at *saturate_at* \u2192 1.0."
+          },
+          {
+            "name": "_geometric_mean",
+            "type": "function",
+            "line": 152,
+            "docstring_lines": 1,
+            "implementation_lines": 2,
+            "inflation_ratio": 0.5,
+            "severity": "info",
+            "docstring_preview": "Epsilon-smoothed geometric mean."
+          }
+        ]
+      },
+      "hallucination_deps": {
+        "total_hallucinated": 0,
+        "category_usage": [],
+        "hallucinated_deps": [],
+        "worst_category": "none",
+        "status": "PASS"
+      },
+      "context_jargon": {
+        "total_jargon": 0,
+        "justified_jargon": 0,
+        "unjustified_jargon": 0,
+        "evidence_details": [],
+        "worst_offenders": [],
+        "justification_ratio": 1.0,
+        "status": "PASS"
+      },
+      "ml_score": {
+        "slop_probability": 0.0,
+        "confidence": 1.0,
+        "model_type": "random_forest",
+        "agreement": true,
+        "features_used": 16
+      },
+      "dcf": {
+        "Module": 0.0014925373134328358,
+        "Expr": 0.01791044776119403,
+        "ImportFrom": 0.004477611940298508,
+        "Import": 0.0029850746268656717,
+        "AnnAssign": 0.0029850746268656717,
+        "Assign": 0.03134328358208955,
+        "FunctionDef": 0.016417910447761194,
+        "ClassDef": 0.0014925373134328358,
+        "Constant": 0.18208955223880596,
+        "alias": 0.007462686567164179,
+        "Name": 0.2373134328358209,
+        "List": 0.011940298507462687,
+        "arguments": 0.016417910447761194,
+        "Return": 0.01791044776119403,
+        "If": 0.0014925373134328358,
+        "Store": 0.03880597014925373,
+        "Load": 0.23283582089552238,
+        "arg": 0.03283582089552239,
+        "Call": 0.06119402985074627,
+        "UnaryOp": 0.0014925373134328358,
+        "Subscript": 0.0029850746268656717,
+        "GeneratorExp": 0.004477611940298508,
+        "BinOp": 0.010447761194029851,
+        "Attribute": 0.019402985074626865,
+        "Not": 0.0014925373134328358,
+        "BoolOp": 0.0014925373134328358,
+        "comprehension": 0.004477611940298508,
+        "Div": 0.004477611940298508,
+        "And": 0.0014925373134328358,
+        "Compare": 0.004477611940298508,
+        "keyword": 0.013432835820895522,
+        "GtE": 0.0029850746268656717,
+        "Add": 0.0014925373134328358,
+        "In": 0.0014925373134328358,
+        "Mult": 0.004477611940298508
+      }
+    },
+    {
+      "file_path": "D:\\Sanctum\\SCI-EXP CRITIQUE \u2014 EXPERIMENTAL REPORT ANALYSIS v2.1\\src\\sciexp_critique\\logos\\logos_bridge.py",
+      "ldr": {
+        "total_lines": 87,
+        "logic_lines": 87,
+        "empty_lines": 0,
+        "ldr_score": 1.0,
+        "grade": "S++",
+        "is_abc_interface": false,
+        "is_type_stub": false,
+        "is_packaging_init": false
+      },
+      "inflation": {
+        "jargon_count": 0,
+        "avg_complexity": 2.7142857142857144,
+        "inflation_score": 0.0,
+        "status": "PASS",
+        "jargon_found": [],
+        "jargon_details": [],
+        "justified_jargon": [],
+        "is_config_file": false
+      },
+      "ddc": {
+        "imported": [
+          "irf",
+          "irf_analyzer",
+          "re",
+          "sys",
+          "types"
+        ],
+        "actually_used": [
+          "irf",
+          "irf_analyzer",
+          "re",
+          "sys",
+          "types"
+        ],
+        "unused": [],
+        "fake_imports": [],
+        "type_checking_imports": [
+          "__future__",
+          "typing"
+        ],
+        "usage_ratio": 1.0,
+        "grade": "EXCELLENT"
+      },
+      "deficit_score": 4.0,
+      "status": "clean",
+      "warnings": [],
+      "pattern_issues": [
+        {
+          "pattern_id": "lint_escape",
+          "severity": "medium",
+          "axis": "quality",
+          "file": "D:\\Sanctum\\SCI-EXP CRITIQUE \u2014 EXPERIMENTAL REPORT ANALYSIS v2.1\\src\\sciexp_critique\\logos\\logos_bridge.py",
+          "line": 62,
+          "column": 50,
+          "message": "Type error suppressed with '# type: ignore'",
+          "code": null,
+          "suggestion": "Resolve the type error with a proper annotation or cast. # type: ignore hides real bugs from static analysis."
+        },
+        {
+          "pattern_id": "phantom_import",
+          "severity": "medium",
+          "axis": "quality",
+          "file": "D:\\Sanctum\\SCI-EXP CRITIQUE \u2014 EXPERIMENTAL REPORT ANALYSIS v2.1\\src\\sciexp_critique\\logos\\logos_bridge.py",
+          "line": 62,
+          "column": 12,
+          "message": "Undeclared optional dependency: 'irf.pipeline' is guarded with ImportError but not listed in [project.optional-dependencies]",
+          "code": null,
+          "suggestion": "Add 'irf.pipeline' to the appropriate [project.optional-dependencies.<group>] in pyproject.toml so users know this feature requires an extra install."
+        }
+      ],
+      "docstring_inflation": {
+        "total_docstrings": 1,
+        "inflated_count": 1,
+        "avg_inflation_ratio": 1.25,
+        "max_inflation_ratio": 1.25,
+        "total_docstring_lines": 13,
+        "total_implementation_lines": 76,
+        "overall_ratio": 0.17105263157894737,
+        "status": "WARNING",
+        "details": [
+          {
+            "name": "analyze",
+            "type": "function",
+            "line": 71,
+            "docstring_lines": 5,
+            "implementation_lines": 4,
+            "inflation_ratio": 1.25,
+            "severity": "warning",
+            "docstring_preview": "Return IRF6DScores using best available backend.  Args:     text:          Full report text for cont"
+          }
+        ]
+      },
+      "hallucination_deps": {
+        "total_hallucinated": 0,
+        "category_usage": [],
+        "hallucinated_deps": [],
+        "worst_category": "none",
+        "status": "PASS"
+      },
+      "context_jargon": {
+        "total_jargon": 0,
+        "justified_jargon": 0,
+        "unjustified_jargon": 0,
+        "evidence_details": [],
+        "worst_offenders": [],
+        "justification_ratio": 1.0,
+        "status": "PASS"
+      },
+      "ml_score": {
+        "slop_probability": 0.13,
+        "confidence": 0.87,
+        "model_type": "random_forest",
+        "agreement": true,
+        "features_used": 16
+      },
+      "dcf": {
+        "Module": 0.0017064846416382253,
+        "Expr": 0.010238907849829351,
+        "ImportFrom": 0.008532423208191127,
+        "Import": 0.0034129692832764505,
+        "Assign": 0.030716723549488054,
+        "FunctionDef": 0.011945392491467578,
+        "ClassDef": 0.0017064846416382253,
+        "Constant": 0.14334470989761092,
+        "alias": 0.011945392491467578,
+        "Name": 0.20819112627986347,
+        "arguments": 0.011945392491467578,
+        "Return": 0.011945392491467578,
+        "Store": 0.034129692832764506,
+        "arg": 0.01877133105802048,
+        "Call": 0.08020477815699659,
+        "Subscript": 0.008532423208191127,
+        "Dict": 0.0034129692832764505,
+        "Load": 0.24744027303754265,
+        "Try": 0.0034129692832764505,
+        "If": 0.0034129692832764505,
+        "Attribute": 0.051194539249146756,
+        "ExceptHandler": 0.0034129692832764505,
+        "IfExp": 0.006825938566552901,
+        "BoolOp": 0.0017064846416382253,
+        "Compare": 0.008532423208191127,
+        "ListComp": 0.0017064846416382253,
+        "Slice": 0.0034129692832764505,
+        "List": 0.013651877133105802,
+        "Or": 0.0017064846416382253,
+        "IsNot": 0.0034129692832764505,
+        "keyword": 0.01877133105802048,
+        "comprehension": 0.0034129692832764505,
+        "NotIn": 0.0017064846416382253,
+        "BinOp": 0.010238907849829351,
+        "Div": 0.0017064846416382253,
+        "GeneratorExp": 0.0017064846416382253,
+        "Add": 0.008532423208191127,
+        "In": 0.0017064846416382253,
+        "GtE": 0.0017064846416382253
+      }
+    },
+    {
+      "file_path": "D:\\Sanctum\\SCI-EXP CRITIQUE \u2014 EXPERIMENTAL REPORT ANALYSIS v2.1\\src\\sciexp_critique\\logos\\omega_fusion.py",
+      "ldr": {
+        "total_lines": 71,
+        "logic_lines": 71,
+        "empty_lines": 0,
+        "ldr_score": 1.0,
+        "grade": "S++",
+        "is_abc_interface": false,
+        "is_type_stub": false,
+        "is_packaging_init": false
+      },
+      "inflation": {
+        "jargon_count": 0,
+        "avg_complexity": 2.0,
+        "inflation_score": 0.0,
+        "status": "PASS",
+        "jargon_found": [],
+        "jargon_details": [],
+        "justified_jargon": [],
+        "is_config_file": false
+      },
+      "ddc": {
+        "imported": [
+          "dataclasses",
+          "types"
+        ],
+        "actually_used": [
+          "dataclasses"
+        ],
+        "unused": [],
+        "fake_imports": [],
+        "type_checking_imports": [
+          "__future__",
+          "typing"
+        ],
+        "usage_ratio": 1.0,
+        "grade": "EXCELLENT"
+      },
+      "deficit_score": 0.0,
+      "status": "clean",
+      "warnings": [],
+      "pattern_issues": [],
+      "docstring_inflation": {
+        "total_docstrings": 0,
+        "inflated_count": 0,
+        "avg_inflation_ratio": 0.0,
+        "max_inflation_ratio": 0.0,
+        "total_docstring_lines": 11,
+        "total_implementation_lines": 56,
+        "overall_ratio": 0.19642857142857142,
+        "status": "PASS",
+        "details": []
+      },
+      "hallucination_deps": {
+        "total_hallucinated": 0,
+        "category_usage": [],
+        "hallucinated_deps": [],
+        "worst_category": "none",
+        "status": "PASS"
+      },
+      "context_jargon": {
+        "total_jargon": 0,
+        "justified_jargon": 0,
+        "unjustified_jargon": 0,
+        "evidence_details": [],
+        "worst_offenders": [],
+        "justification_ratio": 1.0,
+        "status": "PASS"
+      },
+      "ml_score": {
+        "slop_probability": 0.0,
+        "confidence": 1.0,
+        "model_type": "random_forest",
+        "agreement": true,
+        "features_used": 16
+      },
+      "dcf": {
+        "Module": 0.003745318352059925,
+        "Expr": 0.011235955056179775,
+        "ImportFrom": 0.0149812734082397,
+        "AnnAssign": 0.033707865168539325,
+        "ClassDef": 0.00749063670411985,
+        "Constant": 0.08239700374531835,
+        "alias": 0.0149812734082397,
+        "Name": 0.26217228464419473,
+        "FunctionDef": 0.00749063670411985,
+        "Store": 0.06367041198501873,
+        "Load": 0.23595505617977527,
+        "Subscript": 0.011235955056179775,
+        "arguments": 0.00749063670411985,
+        "Assign": 0.0299625468164794,
+        "If": 0.00749063670411985,
+        "Return": 0.00749063670411985,
+        "arg": 0.02247191011235955,
+        "BinOp": 0.026217228464419477,
+        "Attribute": 0.026217228464419477,
+        "Compare": 0.00749063670411985,
+        "Call": 0.026217228464419477,
+        "Add": 0.00749063670411985,
+        "Div": 0.00749063670411985,
+        "Is": 0.003745318352059925,
+        "Lt": 0.003745318352059925,
+        "JoinedStr": 0.011235955056179775,
+        "keyword": 0.03745318352059925,
+        "Mult": 0.00749063670411985,
+        "FormattedValue": 0.00749063670411985,
+        "Sub": 0.003745318352059925
+      }
+    },
+    {
+      "file_path": "D:\\Sanctum\\SCI-EXP CRITIQUE \u2014 EXPERIMENTAL REPORT ANALYSIS v2.1\\src\\sciexp_critique\\paper\\hypothesis_extractor.py",
+      "ldr": {
+        "total_lines": 107,
+        "logic_lines": 107,
+        "empty_lines": 0,
+        "ldr_score": 1.0,
+        "grade": "S++",
+        "is_abc_interface": false,
+        "is_type_stub": false,
+        "is_packaging_init": false
+      },
+      "inflation": {
+        "jargon_count": 0,
+        "avg_complexity": 4.857142857142857,
+        "inflation_score": 0.0,
+        "status": "PASS",
+        "jargon_found": [],
+        "jargon_details": [],
+        "justified_jargon": [],
+        "is_config_file": false
+      },
+      "ddc": {
+        "imported": [
+          "biomedical_harvester",
+          "dataclasses",
+          "re",
+          "sys"
+        ],
+        "actually_used": [
+          "biomedical_harvester",
+          "dataclasses",
+          "re",
+          "sys"
+        ],
+        "unused": [],
+        "fake_imports": [],
+        "type_checking_imports": [
+          "__future__",
+          "typing"
+        ],
+        "usage_ratio": 1.0,
+        "grade": "EXCELLENT"
+      },
+      "deficit_score": 6.0,
+      "status": "clean",
+      "warnings": [],
+      "pattern_issues": [
+        {
+          "pattern_id": "empty_except",
+          "severity": "medium",
+          "axis": "quality",
+          "file": "D:\\Sanctum\\SCI-EXP CRITIQUE \u2014 EXPERIMENTAL REPORT ANALYSIS v2.1\\src\\sciexp_critique\\paper\\hypothesis_extractor.py",
+          "line": 127,
+          "column": 12,
+          "message": "Empty handler for 'Exception' silently discards the exception",
+          "code": null,
+          "suggestion": "Add logging (logger.debug/warning) or a comment explaining why silence is correct here."
+        },
+        {
+          "pattern_id": "lint_escape",
+          "severity": "medium",
+          "axis": "quality",
+          "file": "D:\\Sanctum\\SCI-EXP CRITIQUE \u2014 EXPERIMENTAL REPORT ANALYSIS v2.1\\src\\sciexp_critique\\paper\\hypothesis_extractor.py",
+          "line": 103,
+          "column": 69,
+          "message": "Type error suppressed with '# type: ignore'",
+          "code": null,
+          "suggestion": "Resolve the type error with a proper annotation or cast. # type: ignore hides real bugs from static analysis."
+        },
+        {
+          "pattern_id": "phantom_import",
+          "severity": "medium",
+          "axis": "quality",
+          "file": "D:\\Sanctum\\SCI-EXP CRITIQUE \u2014 EXPERIMENTAL REPORT ANALYSIS v2.1\\src\\sciexp_critique\\paper\\hypothesis_extractor.py",
+          "line": 103,
+          "column": 12,
+          "message": "Undeclared optional dependency: 'biomedical_harvester.hypothesis_synthesis' is guarded with ImportError but not listed in [project.optional-dependencies]",
+          "code": null,
+          "suggestion": "Add 'biomedical_harvester.hypothesis_synthesis' to the appropriate [project.optional-dependencies.<group>] in pyproject.toml so users know this feature requires an extra install."
+        }
+      ],
+      "docstring_inflation": {
+        "total_docstrings": 0,
+        "inflated_count": 0,
+        "avg_inflation_ratio": 0.0,
+        "max_inflation_ratio": 0.0,
+        "total_docstring_lines": 8,
+        "total_implementation_lines": 93,
+        "overall_ratio": 0.08602150537634409,
+        "status": "PASS",
+        "details": []
+      },
+      "hallucination_deps": {
+        "total_hallucinated": 0,
+        "category_usage": [],
+        "hallucinated_deps": [],
+        "worst_category": "none",
+        "status": "PASS"
+      },
+      "context_jargon": {
+        "total_jargon": 0,
+        "justified_jargon": 0,
+        "unjustified_jargon": 0,
+        "evidence_details": [],
+        "worst_offenders": [],
+        "justification_ratio": 1.0,
+        "status": "PASS"
+      },
+      "ml_score": {
+        "slop_probability": 0.13,
+        "confidence": 0.87,
+        "model_type": "random_forest",
+        "agreement": true,
+        "features_used": 16
+      },
+      "dcf": {
+        "Module": 0.001893939393939394,
+        "Expr": 0.01893939393939394,
+        "ImportFrom": 0.007575757575757576,
+        "Import": 0.003787878787878788,
+        "Assign": 0.03598484848484849,
+        "ClassDef": 0.003787878787878788,
+        "FunctionDef": 0.00946969696969697,
+        "Constant": 0.08712121212121213,
+        "alias": 0.013257575757575758,
+        "Name": 0.22727272727272727,
+        "Call": 0.05113636363636364,
+        "List": 0.00946969696969697,
+        "AnnAssign": 0.011363636363636364,
+        "arguments": 0.00946969696969697,
+        "For": 0.003787878787878788,
+        "Return": 0.005681818181818182,
+        "Subscript": 0.020833333333333332,
+        "Store": 0.05303030303030303,
+        "Attribute": 0.06060606060606061,
+        "Load": 0.26515151515151514,
+        "If": 0.015151515151515152,
+        "arg": 0.013257575757575758,
+        "Try": 0.003787878787878788,
+        "keyword": 0.015151515151515152,
+        "IfExp": 0.003787878787878788,
+        "ExceptHandler": 0.003787878787878788,
+        "Compare": 0.005681818181818182,
+        "BinOp": 0.001893939393939394,
+        "BoolOp": 0.005681818181818182,
+        "IsNot": 0.001893939393939394,
+        "JoinedStr": 0.005681818181818182,
+        "BitOr": 0.001893939393939394,
+        "And": 0.005681818181818182,
+        "NotIn": 0.001893939393939394,
+        "Pass": 0.001893939393939394,
+        "FormattedValue": 0.005681818181818182,
+        "LtE": 0.001893939393939394,
+        "ListComp": 0.001893939393939394,
+        "comprehension": 0.001893939393939394,
+        "Slice": 0.001893939393939394
+      }
+    },
+    {
+      "file_path": "D:\\Sanctum\\SCI-EXP CRITIQUE \u2014 EXPERIMENTAL REPORT ANALYSIS v2.1\\src\\sciexp_critique\\paper\\methodology_detector.py",
+      "ldr": {
+        "total_lines": 98,
+        "logic_lines": 98,
+        "empty_lines": 0,
+        "ldr_score": 1.0,
+        "grade": "S++",
+        "is_abc_interface": false,
+        "is_type_stub": false,
+        "is_packaging_init": false
+      },
+      "inflation": {
+        "jargon_count": 2,
+        "avg_complexity": 6.0,
+        "inflation_score": 0.30612244897959184,
+        "status": "PASS",
+        "jargon_found": [
+          "neural",
+          "deep learning"
+        ],
+        "jargon_details": [
+          {
+            "word": "neural",
+            "line": 51,
+            "category": "ai_ml",
+            "justified": false
+          },
+          {
+            "word": "deep learning",
+            "line": 52,
+            "category": "ai_ml",
+            "justified": false
+          }
+        ],
+        "justified_jargon": [],
+        "is_config_file": false
+      },
+      "ddc": {
+        "imported": [
+          "re",
+          "types"
+        ],
+        "actually_used": [
+          "types"
+        ],
+        "unused": [
+          "re"
+        ],
+        "fake_imports": [],
+        "type_checking_imports": [
+          "__future__",
+          "typing"
+        ],
+        "usage_ratio": 0.5,
+        "grade": "ACCEPTABLE"
+      },
+      "deficit_score": 4.429627821996418,
+      "status": "clean",
+      "warnings": [],
+      "pattern_issues": [],
+      "docstring_inflation": {
+        "total_docstrings": 0,
+        "inflated_count": 0,
+        "avg_inflation_ratio": 0.0,
+        "max_inflation_ratio": 0.0,
+        "total_docstring_lines": 7,
+        "total_implementation_lines": 87,
+        "overall_ratio": 0.08045977011494253,
+        "status": "PASS",
+        "details": []
+      },
+      "hallucination_deps": {
+        "total_hallucinated": 0,
+        "category_usage": [],
+        "hallucinated_deps": [],
+        "worst_category": "none",
+        "status": "PASS"
+      },
+      "context_jargon": {
+        "total_jargon": 0,
+        "justified_jargon": 0,
+        "unjustified_jargon": 0,
+        "evidence_details": [],
+        "worst_offenders": [],
+        "justification_ratio": 1.0,
+        "status": "PASS"
+      },
+      "ml_score": {
+        "slop_probability": 0.14,
+        "confidence": 0.86,
+        "model_type": "random_forest",
+        "agreement": true,
+        "features_used": 16
+      },
+      "dcf": {
+        "Module": 0.0020876826722338203,
+        "Expr": 0.016701461377870562,
+        "ImportFrom": 0.006263048016701462,
+        "Import": 0.0020876826722338203,
+        "AnnAssign": 0.006263048016701462,
+        "ClassDef": 0.0020876826722338203,
+        "Constant": 0.20041753653444677,
+        "alias": 0.008350730688935281,
+        "Name": 0.18162839248434237,
+        "Subscript": 0.033402922755741124,
+        "List": 0.022964509394572025,
+        "FunctionDef": 0.0041753653444676405,
+        "Store": 0.03966597077244259,
+        "Load": 0.26931106471816285,
+        "Tuple": 0.03966597077244259,
+        "arguments": 0.008350730688935281,
+        "Assign": 0.012526096033402923,
+        "For": 0.0041753653444676405,
+        "If": 0.006263048016701462,
+        "Return": 0.006263048016701462,
+        "Attribute": 0.031315240083507306,
+        "arg": 0.012526096033402923,
+        "Call": 0.025052192066805846,
+        "UnaryOp": 0.0020876826722338203,
+        "Compare": 0.008350730688935281,
+        "Not": 0.0020876826722338203,
+        "keyword": 0.008350730688935281,
+        "GeneratorExp": 0.0041753653444676405,
+        "GtE": 0.0041753653444676405,
+        "Lambda": 0.0041753653444676405,
+        "comprehension": 0.0041753653444676405,
+        "BinOp": 0.008350730688935281,
+        "Div": 0.0041753653444676405,
+        "In": 0.0041753653444676405,
+        "Mult": 0.0041753653444676405
+      }
+    },
+    {
+      "file_path": "D:\\Sanctum\\SCI-EXP CRITIQUE \u2014 EXPERIMENTAL REPORT ANALYSIS v2.1\\src\\sciexp_critique\\rag\\context_builder.py",
+      "ldr": {
+        "total_lines": 38,
+        "logic_lines": 38,
+        "empty_lines": 0,
+        "ldr_score": 1.0,
+        "grade": "S++",
+        "is_abc_interface": false,
+        "is_type_stub": false,
+        "is_packaging_init": false
+      },
+      "inflation": {
+        "jargon_count": 0,
+        "avg_complexity": 2.3333333333333335,
+        "inflation_score": 0.0,
+        "status": "PASS",
+        "jargon_found": [],
+        "jargon_details": [],
+        "justified_jargon": [],
+        "is_config_file": false
+      },
+      "ddc": {
+        "imported": [
+          "dataclasses"
+        ],
+        "actually_used": [
+          "dataclasses"
+        ],
+        "unused": [],
+        "fake_imports": [],
+        "type_checking_imports": [
+          "__future__",
+          "retriever",
+          "typing"
+        ],
+        "usage_ratio": 1.0,
+        "grade": "EXCELLENT"
+      },
+      "deficit_score": 0.0,
+      "status": "clean",
+      "warnings": [],
+      "pattern_issues": [],
+      "docstring_inflation": {
+        "total_docstrings": 0,
+        "inflated_count": 0,
+        "avg_inflation_ratio": 0.0,
+        "max_inflation_ratio": 0.0,
+        "total_docstring_lines": 1,
+        "total_implementation_lines": 33,
+        "overall_ratio": 0.030303030303030304,
+        "status": "PASS",
+        "details": []
+      },
+      "hallucination_deps": {
+        "total_hallucinated": 0,
+        "category_usage": [],
+        "hallucinated_deps": [],
+        "worst_category": "none",
+        "status": "PASS"
+      },
+      "context_jargon": {
+        "total_jargon": 0,
+        "justified_jargon": 0,
+        "unjustified_jargon": 0,
+        "evidence_details": [],
+        "worst_offenders": [],
+        "justification_ratio": 1.0,
+        "status": "PASS"
+      },
+      "ml_score": {
+        "slop_probability": 0.0,
+        "confidence": 1.0,
+        "model_type": "random_forest",
+        "agreement": true,
+        "features_used": 16
+      },
+      "dcf": {
+        "Module": 0.004201680672268907,
+        "Expr": 0.012605042016806723,
+        "ImportFrom": 0.01680672268907563,
+        "If": 0.012605042016806723,
+        "AnnAssign": 0.02100840336134454,
+        "ClassDef": 0.004201680672268907,
+        "FunctionDef": 0.008403361344537815,
+        "Constant": 0.08823529411764706,
+        "alias": 0.02100840336134454,
+        "Name": 0.23109243697478993,
+        "Subscript": 0.029411764705882353,
+        "Dict": 0.008403361344537815,
+        "arguments": 0.008403361344537815,
+        "For": 0.004201680672268907,
+        "Return": 0.01680672268907563,
+        "Assign": 0.01680672268907563,
+        "Load": 0.2605042016806723,
+        "Store": 0.0546218487394958,
+        "Tuple": 0.01680672268907563,
+        "Call": 0.04201680672268908,
+        "arg": 0.02100840336134454,
+        "UnaryOp": 0.004201680672268907,
+        "JoinedStr": 0.004201680672268907,
+        "keyword": 0.01680672268907563,
+        "Attribute": 0.037815126050420166,
+        "Not": 0.004201680672268907,
+        "GeneratorExp": 0.004201680672268907,
+        "FormattedValue": 0.008403361344537815,
+        "Compare": 0.004201680672268907,
+        "comprehension": 0.004201680672268907,
+        "Slice": 0.008403361344537815,
+        "In": 0.004201680672268907
+      }
+    },
+    {
+      "file_path": "D:\\Sanctum\\SCI-EXP CRITIQUE \u2014 EXPERIMENTAL REPORT ANALYSIS v2.1\\src\\sciexp_critique\\rag\\retriever.py",
+      "ldr": {
+        "total_lines": 82,
+        "logic_lines": 79,
+        "empty_lines": 3,
+        "ldr_score": 0.9634146341463414,
+        "grade": "S++",
+        "is_abc_interface": false,
+        "is_type_stub": false,
+        "is_packaging_init": false
+      },
+      "inflation": {
+        "jargon_count": 5,
+        "avg_complexity": 2.8461538461538463,
+        "inflation_score": 0.722326454033771,
+        "status": "WARNING",
+        "jargon_found": [
+          "embedding",
+          "embedding",
+          "embedding",
+          "embedding",
+          "embedding"
+        ],
+        "jargon_details": [
+          {
+            "word": "embedding",
+            "line": 1,
+            "category": "ai_ml",
+            "justified": false
+          },
+          {
+            "word": "embedding",
+            "line": 88,
+            "category": "ai_ml",
+            "justified": false
+          },
+          {
+            "word": "embedding",
+            "line": 88,
+            "category": "ai_ml",
+            "justified": false
+          },
+          {
+            "word": "embedding",
+            "line": 89,
+            "category": "ai_ml",
+            "justified": false
+          },
+          {
+            "word": "embedding",
+            "line": 95,
+            "category": "ai_ml",
+            "justified": false
+          }
+        ],
+        "justified_jargon": [],
+        "is_config_file": false
+      },
+      "ddc": {
+        "imported": [
+          "flamehaven_filesearch",
+          "hashlib",
+          "math",
+          "sys"
+        ],
+        "actually_used": [
+          "flamehaven_filesearch",
+          "hashlib",
+          "math",
+          "sys"
+        ],
+        "unused": [],
+        "fake_imports": [],
+        "type_checking_imports": [
+          "__future__",
+          "typing"
+        ],
+        "usage_ratio": 1.0,
+        "grade": "EXCELLENT"
+      },
+      "deficit_score": 16.69513900344793,
+      "status": "clean",
+      "warnings": [
+        "WARNING: High inflation ratio 0.72"
+      ],
+      "pattern_issues": [
+        {
+          "pattern_id": "empty_except",
+          "severity": "medium",
+          "axis": "quality",
+          "file": "D:\\Sanctum\\SCI-EXP CRITIQUE \u2014 EXPERIMENTAL REPORT ANALYSIS v2.1\\src\\sciexp_critique\\rag\\retriever.py",
+          "line": 79,
+          "column": 12,
+          "message": "Empty handler for 'Exception' silently discards the exception",
+          "code": null,
+          "suggestion": "Add logging (logger.debug/warning) or a comment explaining why silence is correct here."
+        },
+        {
+          "pattern_id": "phantom_import",
+          "severity": "medium",
+          "axis": "quality",
+          "file": "D:\\Sanctum\\SCI-EXP CRITIQUE \u2014 EXPERIMENTAL REPORT ANALYSIS v2.1\\src\\sciexp_critique\\rag\\retriever.py",
+          "line": 88,
+          "column": 8,
+          "message": "Undeclared optional dependency: 'flamehaven_filesearch.engine.embedding_generator' is guarded with ImportError but not listed in [project.optional-dependencies]",
+          "code": null,
+          "suggestion": "Add 'flamehaven_filesearch.engine.embedding_generator' to the appropriate [project.optional-dependencies.<group>] in pyproject.toml so users know this feature requires an extra install."
+        }
+      ],
+      "docstring_inflation": {
+        "total_docstrings": 2,
+        "inflated_count": 0,
+        "avg_inflation_ratio": 0.5,
+        "max_inflation_ratio": 0.5,
+        "total_docstring_lines": 3,
+        "total_implementation_lines": 79,
+        "overall_ratio": 0.0379746835443038,
+        "status": "PASS",
+        "details": [
+          {
+            "name": "retrieve",
+            "type": "function",
+            "line": 62,
+            "docstring_lines": 1,
+            "implementation_lines": 2,
+            "inflation_ratio": 0.5,
+            "severity": "info",
+            "docstring_preview": "Retrieve top-k most relevant chunks for a query."
+          },
+          {
+            "name": "build_context",
+            "type": "function",
+            "line": 67,
+            "docstring_lines": 1,
+            "implementation_lines": 2,
+            "inflation_ratio": 0.5,
+            "severity": "info",
+            "docstring_preview": "Return concatenated text of top-k chunks for a query."
+          }
+        ]
+      },
+      "hallucination_deps": {
+        "total_hallucinated": 0,
+        "category_usage": [],
+        "hallucinated_deps": [],
+        "worst_category": "none",
+        "status": "PASS"
+      },
+      "context_jargon": {
+        "total_jargon": 0,
+        "justified_jargon": 0,
+        "unjustified_jargon": 0,
+        "evidence_details": [],
+        "worst_offenders": [],
+        "justification_ratio": 1.0,
+        "status": "PASS"
+      },
+      "ml_score": {
+        "slop_probability": 0.25,
+        "confidence": 0.75,
+        "model_type": "random_forest",
+        "agreement": true,
+        "features_used": 16
+      },
+      "dcf": {
+        "Module": 0.0014577259475218659,
+        "Expr": 0.01749271137026239,
+        "ImportFrom": 0.004373177842565598,
+        "Import": 0.004373177842565598,
+        "Assign": 0.02478134110787172,
+        "ClassDef": 0.0029154518950437317,
+        "FunctionDef": 0.016034985422740525,
+        "Constant": 0.05102040816326531,
+        "alias": 0.008746355685131196,
+        "Name": 0.2303206997084548,
+        "arguments": 0.01749271137026239,
+        "Try": 0.0029154518950437317,
+        "For": 0.0029154518950437317,
+        "Return": 0.016034985422740525,
+        "Subscript": 0.023323615160349854,
+        "Store": 0.05393586005830904,
+        "AnnAssign": 0.0029154518950437317,
+        "If": 0.0058309037900874635,
+        "ExceptHandler": 0.0029154518950437317,
+        "arg": 0.033527696793002916,
+        "BinOp": 0.013119533527696793,
+        "AugAssign": 0.0029154518950437317,
+        "BoolOp": 0.0014577259475218659,
+        "ListComp": 0.004373177842565598,
+        "Load": 0.26822157434402333,
+        "Attribute": 0.056851311953352766,
+        "List": 0.0058309037900874635,
+        "Call": 0.05393586005830904,
+        "UnaryOp": 0.0029154518950437317,
+        "IfExp": 0.0029154518950437317,
+        "Compare": 0.0029154518950437317,
+        "Slice": 0.0029154518950437317,
+        "Mult": 0.004373177842565598,
+        "Add": 0.0029154518950437317,
+        "Or": 0.0014577259475218659,
+        "comprehension": 0.011661807580174927,
+        "Not": 0.0029154518950437317,
+        "Tuple": 0.0058309037900874635,
+        "keyword": 0.0058309037900874635,
+        "GeneratorExp": 0.007288629737609329,
+        "Continue": 0.0014577259475218659,
+        "IsNot": 0.0014577259475218659,
+        "NotIn": 0.0014577259475218659,
+        "Mod": 0.0014577259475218659,
+        "Div": 0.0029154518950437317,
+        "Lambda": 0.0014577259475218659,
+        "Pass": 0.0014577259475218659,
+        "Pow": 0.004373177842565598
+      }
+    },
+    {
+      "file_path": "D:\\Sanctum\\SCI-EXP CRITIQUE \u2014 EXPERIMENTAL REPORT ANALYSIS v2.1\\src\\sciexp_critique\\render\\docx_renderer.py",
+      "ldr": {
+        "total_lines": 51,
+        "logic_lines": 51,
+        "empty_lines": 0,
+        "ldr_score": 1.0,
+        "grade": "S++",
+        "is_abc_interface": false,
+        "is_type_stub": false,
+        "is_packaging_init": false
+      },
+      "inflation": {
+        "jargon_count": 0,
+        "avg_complexity": 5.5,
+        "inflation_score": 0.0,
+        "status": "PASS",
+        "jargon_found": [],
+        "jargon_details": [],
+        "justified_jargon": [],
+        "is_config_file": false
+      },
+      "ddc": {
+        "imported": [
+          "docx",
+          "pathlib",
+          "re",
+          "templates"
+        ],
+        "actually_used": [
+          "docx",
+          "pathlib",
+          "re",
+          "templates"
+        ],
+        "unused": [],
+        "fake_imports": [],
+        "type_checking_imports": [
+          "__future__"
+        ],
+        "usage_ratio": 1.0,
+        "grade": "EXCELLENT"
+      },
+      "deficit_score": 0.0,
+      "status": "clean",
+      "warnings": [],
+      "pattern_issues": [],
+      "docstring_inflation": {
+        "total_docstrings": 0,
+        "inflated_count": 0,
+        "avg_inflation_ratio": 0.0,
+        "max_inflation_ratio": 0.0,
+        "total_docstring_lines": 1,
+        "total_implementation_lines": 43,
+        "overall_ratio": 0.023255813953488372,
+        "status": "PASS",
+        "details": []
+      },
+      "hallucination_deps": {
+        "total_hallucinated": 0,
+        "category_usage": [],
+        "hallucinated_deps": [],
+        "worst_category": "none",
+        "status": "PASS"
+      },
+      "context_jargon": {
+        "total_jargon": 0,
+        "justified_jargon": 0,
+        "unjustified_jargon": 0,
+        "evidence_details": [],
+        "worst_offenders": [],
+        "justification_ratio": 1.0,
+        "status": "PASS"
+      },
+      "ml_score": {
+        "slop_probability": 0.0,
+        "confidence": 1.0,
+        "model_type": "random_forest",
+        "agreement": true,
+        "features_used": 16
+      },
+      "dcf": {
+        "Module": 0.0027397260273972603,
+        "Expr": 0.024657534246575342,
+        "ImportFrom": 0.01643835616438356,
+        "FunctionDef": 0.005479452054794521,
+        "Constant": 0.07123287671232877,
+        "alias": 0.021917808219178082,
+        "arguments": 0.005479452054794521,
+        "Try": 0.0027397260273972603,
+        "Assign": 0.043835616438356165,
+        "If": 0.010958904109589041,
+        "For": 0.010958904109589041,
+        "Return": 0.0027397260273972603,
+        "Name": 0.21095890410958903,
+        "Import": 0.0027397260273972603,
+        "arg": 0.0136986301369863,
+        "ExceptHandler": 0.0027397260273972603,
+        "Call": 0.0684931506849315,
+        "Compare": 0.005479452054794521,
+        "Raise": 0.005479452054794521,
+        "Attribute": 0.09041095890410959,
+        "Load": 0.2465753424657534,
+        "Tuple": 0.0027397260273972603,
+        "BinOp": 0.00821917808219178,
+        "Store": 0.06027397260273973,
+        "Is": 0.0027397260273972603,
+        "keyword": 0.010958904109589041,
+        "UnaryOp": 0.005479452054794521,
+        "Continue": 0.005479452054794521,
+        "BitOr": 0.0027397260273972603,
+        "JoinedStr": 0.00821917808219178,
+        "Not": 0.005479452054794521,
+        "Eq": 0.0027397260273972603,
+        "FormattedValue": 0.010958904109589041,
+        "Add": 0.0027397260273972603,
+        "Subscript": 0.0027397260273972603,
+        "Mod": 0.0027397260273972603
+      }
+    },
+    {
+      "file_path": "D:\\Sanctum\\SCI-EXP CRITIQUE \u2014 EXPERIMENTAL REPORT ANALYSIS v2.1\\src\\sciexp_critique\\render\\md_renderer.py",
+      "ldr": {
+        "total_lines": 40,
+        "logic_lines": 40,
+        "empty_lines": 0,
+        "ldr_score": 1.0,
+        "grade": "S++",
+        "is_abc_interface": false,
+        "is_type_stub": false,
+        "is_packaging_init": false
+      },
+      "inflation": {
+        "jargon_count": 0,
+        "avg_complexity": 3.0,
+        "inflation_score": 0.0,
+        "status": "PASS",
+        "jargon_found": [],
+        "jargon_details": [],
+        "justified_jargon": [],
+        "is_config_file": false
+      },
+      "ddc": {
+        "imported": [
+          "pathlib",
+          "templates"
+        ],
+        "actually_used": [
+          "pathlib",
+          "templates"
+        ],
+        "unused": [],
+        "fake_imports": [],
+        "type_checking_imports": [
+          "__future__"
+        ],
+        "usage_ratio": 1.0,
+        "grade": "EXCELLENT"
+      },
+      "deficit_score": 0.0,
+      "status": "clean",
+      "warnings": [],
+      "pattern_issues": [],
+      "docstring_inflation": {
+        "total_docstrings": 0,
+        "inflated_count": 0,
+        "avg_inflation_ratio": 0.0,
+        "max_inflation_ratio": 0.0,
+        "total_docstring_lines": 1,
+        "total_implementation_lines": 36,
+        "overall_ratio": 0.027777777777777776,
+        "status": "PASS",
+        "details": []
+      },
+      "hallucination_deps": {
+        "total_hallucinated": 0,
+        "category_usage": [],
+        "hallucinated_deps": [],
+        "worst_category": "none",
+        "status": "PASS"
+      },
+      "context_jargon": {
+        "total_jargon": 0,
+        "justified_jargon": 0,
+        "unjustified_jargon": 0,
+        "evidence_details": [],
+        "worst_offenders": [],
+        "justification_ratio": 1.0,
+        "status": "PASS"
+      },
+      "ml_score": {
+        "slop_probability": 0.0,
+        "confidence": 1.0,
+        "model_type": "random_forest",
+        "agreement": true,
+        "features_used": 16
+      },
+      "dcf": {
+        "Module": 0.003745318352059925,
+        "Expr": 0.052434456928838954,
+        "ImportFrom": 0.011235955056179775,
+        "FunctionDef": 0.00749063670411985,
+        "Constant": 0.11610486891385768,
+        "alias": 0.0149812734082397,
+        "arguments": 0.00749063670411985,
+        "Assign": 0.0149812734082397,
+        "If": 0.00749063670411985,
+        "AnnAssign": 0.003745318352059925,
+        "For": 0.00749063670411985,
+        "Return": 0.00749063670411985,
+        "Name": 0.19101123595505617,
+        "arg": 0.018726591760299626,
+        "Call": 0.06741573033707865,
+        "Compare": 0.003745318352059925,
+        "Raise": 0.003745318352059925,
+        "Subscript": 0.003745318352059925,
+        "List": 0.003745318352059925,
+        "Load": 0.25842696629213485,
+        "Store": 0.026217228464419477,
+        "Attribute": 0.08614232209737828,
+        "Is": 0.003745318352059925,
+        "JoinedStr": 0.026217228464419477,
+        "BinOp": 0.011235955056179775,
+        "keyword": 0.003745318352059925,
+        "FormattedValue": 0.026217228464419477,
+        "Mult": 0.003745318352059925,
+        "BitOr": 0.003745318352059925,
+        "Add": 0.003745318352059925
+      }
+    },
+    {
+      "file_path": "D:\\Sanctum\\SCI-EXP CRITIQUE \u2014 EXPERIMENTAL REPORT ANALYSIS v2.1\\src\\sciexp_critique\\render\\pdf_renderer.py",
+      "ldr": {
+        "total_lines": 82,
+        "logic_lines": 82,
+        "empty_lines": 0,
+        "ldr_score": 1.0,
+        "grade": "S++",
+        "is_abc_interface": false,
+        "is_type_stub": false,
+        "is_packaging_init": false
+      },
+      "inflation": {
+        "jargon_count": 0,
+        "avg_complexity": 3.3333333333333335,
+        "inflation_score": 0.0,
+        "status": "PASS",
+        "jargon_found": [],
+        "jargon_details": [],
+        "justified_jargon": [],
+        "is_config_file": false
+      },
+      "ddc": {
+        "imported": [
+          "pathlib",
+          "re",
+          "reportlab",
+          "templates"
+        ],
+        "actually_used": [
+          "pathlib",
+          "re",
+          "reportlab",
+          "templates"
+        ],
+        "unused": [],
+        "fake_imports": [],
+        "type_checking_imports": [
+          "__future__"
+        ],
+        "usage_ratio": 1.0,
+        "grade": "EXCELLENT"
+      },
+      "deficit_score": 2.0,
+      "status": "clean",
+      "warnings": [],
+      "pattern_issues": [
+        {
+          "pattern_id": "god_function",
+          "severity": "medium",
+          "axis": "style",
+          "file": "D:\\Sanctum\\SCI-EXP CRITIQUE \u2014 EXPERIMENTAL REPORT ANALYSIS v2.1\\src\\sciexp_critique\\render\\pdf_renderer.py",
+          "line": 9,
+          "column": 0,
+          "message": "God function 'render_pdf': 72 logic lines (limit 50)",
+          "code": null,
+          "suggestion": "Break into smaller single-responsibility functions. Each function should do one thing and fit on one screen."
+        }
+      ],
+      "docstring_inflation": {
+        "total_docstrings": 0,
+        "inflated_count": 0,
+        "avg_inflation_ratio": 0.0,
+        "max_inflation_ratio": 0.0,
+        "total_docstring_lines": 1,
+        "total_implementation_lines": 72,
+        "overall_ratio": 0.013888888888888888,
+        "status": "PASS",
+        "details": []
+      },
+      "hallucination_deps": {
+        "total_hallucinated": 0,
+        "category_usage": [],
+        "hallucinated_deps": [],
+        "worst_category": "none",
+        "status": "PASS"
+      },
+      "context_jargon": {
+        "total_jargon": 0,
+        "justified_jargon": 0,
+        "unjustified_jargon": 0,
+        "evidence_details": [],
+        "worst_offenders": [],
+        "justification_ratio": 1.0,
+        "status": "PASS"
+      },
+      "ml_score": {
+        "slop_probability": 0.19,
+        "confidence": 0.81,
+        "model_type": "random_forest",
+        "agreement": true,
+        "features_used": 16
+      },
+      "dcf": {
+        "Module": 0.0018115942028985507,
+        "Expr": 0.016304347826086956,
+        "ImportFrom": 0.014492753623188406,
+        "FunctionDef": 0.005434782608695652,
+        "Constant": 0.1213768115942029,
+        "alias": 0.02717391304347826,
+        "arguments": 0.005434782608695652,
+        "Try": 0.0018115942028985507,
+        "Assign": 0.02717391304347826,
+        "If": 0.005434782608695652,
+        "For": 0.0036231884057971015,
+        "Return": 0.005434782608695652,
+        "Name": 0.20652173913043478,
+        "Import": 0.0018115942028985507,
+        "arg": 0.009057971014492754,
+        "ExceptHandler": 0.0018115942028985507,
+        "Call": 0.08695652173913043,
+        "Compare": 0.0018115942028985507,
+        "Raise": 0.0036231884057971015,
+        "List": 0.0018115942028985507,
+        "Load": 0.23731884057971014,
+        "BinOp": 0.014492753623188406,
+        "Store": 0.03260869565217391,
+        "Attribute": 0.05253623188405797,
+        "Is": 0.0018115942028985507,
+        "keyword": 0.06702898550724638,
+        "BitOr": 0.0018115942028985507,
+        "JoinedStr": 0.005434782608695652,
+        "Subscript": 0.009057971014492754,
+        "UnaryOp": 0.0018115942028985507,
+        "Continue": 0.0018115942028985507,
+        "ListComp": 0.0018115942028985507,
+        "FormattedValue": 0.007246376811594203,
+        "Mult": 0.012681159420289856,
+        "Not": 0.0018115942028985507,
+        "comprehension": 0.0018115942028985507
+      }
+    },
+    {
+      "file_path": "D:\\Sanctum\\SCI-EXP CRITIQUE \u2014 EXPERIMENTAL REPORT ANALYSIS v2.1\\src\\sciexp_critique\\templates\\base.py",
+      "ldr": {
+        "total_lines": 31,
+        "logic_lines": 28,
+        "empty_lines": 3,
+        "ldr_score": 0.9516129032258065,
+        "grade": "S++",
+        "is_abc_interface": true,
+        "is_type_stub": false,
+        "is_packaging_init": false
+      },
+      "inflation": {
+        "jargon_count": 0,
+        "avg_complexity": 1.25,
+        "inflation_score": 0.0,
+        "status": "PASS",
+        "jargon_found": [],
+        "jargon_details": [],
+        "justified_jargon": [],
+        "is_config_file": false
+      },
+      "ddc": {
+        "imported": [
+          "abc",
+          "bmj",
+          "dataclasses",
+          "ku"
+        ],
+        "actually_used": [
+          "abc",
+          "bmj",
+          "dataclasses",
+          "ku"
+        ],
+        "unused": [],
+        "fake_imports": [],
+        "type_checking_imports": [
+          "__future__",
+          "types",
+          "typing"
+        ],
+        "usage_ratio": 1.0,
+        "grade": "EXCELLENT"
+      },
+      "deficit_score": 6.787358950765283,
+      "status": "clean",
+      "warnings": [
+        "PATTERNS: 1 high-severity issues found"
+      ],
+      "pattern_issues": [
+        {
+          "pattern_id": "interface_only_class",
+          "severity": "high",
+          "axis": "quality",
+          "file": "D:\\Sanctum\\SCI-EXP CRITIQUE \u2014 EXPERIMENTAL REPORT ANALYSIS v2.1\\src\\sciexp_critique\\templates\\base.py",
+          "line": 21,
+          "column": 0,
+          "message": "Class has 1/2 placeholder methods",
+          "code": null,
+          "suggestion": "Use ABC (Abstract Base Class) if this is intentional, or implement methods"
+        }
+      ],
+      "docstring_inflation": {
+        "total_docstrings": 1,
+        "inflated_count": 1,
+        "avg_inflation_ratio": 1.0,
+        "max_inflation_ratio": 1.0,
+        "total_docstring_lines": 2,
+        "total_implementation_lines": 24,
+        "overall_ratio": 0.08333333333333333,
+        "status": "WARNING",
+        "details": [
+          {
+            "name": "build",
+            "type": "function",
+            "line": 29,
+            "docstring_lines": 1,
+            "implementation_lines": 1,
+            "inflation_ratio": 1.0,
+            "severity": "warning",
+            "docstring_preview": "Convert CritiqueReport into ordered TemplateSection list."
+          }
+        ]
+      },
+      "hallucination_deps": {
+        "total_hallucinated": 0,
+        "category_usage": [],
+        "hallucinated_deps": [],
+        "worst_category": "none",
+        "status": "PASS"
+      },
+      "context_jargon": {
+        "total_jargon": 0,
+        "justified_jargon": 0,
+        "unjustified_jargon": 0,
+        "evidence_details": [],
+        "worst_offenders": [],
+        "justification_ratio": 1.0,
+        "status": "PASS"
+      },
+      "ml_score": {
+        "slop_probability": 0.2,
+        "confidence": 0.8,
+        "model_type": "random_forest",
+        "agreement": true,
+        "features_used": 16
+      },
+      "dcf": {
+        "Module": 0.008,
+        "Expr": 0.032,
+        "ImportFrom": 0.056,
+        "If": 0.008,
+        "ClassDef": 0.016,
+        "Constant": 0.08,
+        "alias": 0.072,
+        "Name": 0.232,
+        "AnnAssign": 0.056,
+        "FunctionDef": 0.016,
+        "Load": 0.224,
+        "Subscript": 0.032,
+        "Call": 0.024,
+        "List": 0.008,
+        "arguments": 0.016,
+        "Pass": 0.008,
+        "Return": 0.008,
+        "Store": 0.056,
+        "keyword": 0.008,
+        "arg": 0.024,
+        "Dict": 0.008,
+        "Tuple": 0.008
+      }
+    },
+    {
+      "file_path": "D:\\Sanctum\\SCI-EXP CRITIQUE \u2014 EXPERIMENTAL REPORT ANALYSIS v2.1\\src\\sciexp_critique\\templates\\bmj.py",
+      "ldr": {
+        "total_lines": 105,
+        "logic_lines": 105,
+        "empty_lines": 0,
+        "ldr_score": 1.0,
+        "grade": "S++",
+        "is_abc_interface": false,
+        "is_type_stub": false,
+        "is_packaging_init": false
+      },
+      "inflation": {
+        "jargon_count": 0,
+        "avg_complexity": 5.25,
+        "inflation_score": 0.0,
+        "status": "PASS",
+        "jargon_found": [],
+        "jargon_details": [],
+        "justified_jargon": [],
+        "is_config_file": false
+      },
+      "ddc": {
+        "imported": [
+          "base",
+          "types"
+        ],
+        "actually_used": [
+          "base"
+        ],
+        "unused": [
+          "types"
+        ],
+        "fake_imports": [],
+        "type_checking_imports": [
+          "__future__"
+        ],
+        "usage_ratio": 0.5,
+        "grade": "ACCEPTABLE"
+      },
+      "deficit_score": 20.224672011518926,
+      "status": "clean",
+      "warnings": [
+        "WARNING: Low import usage 50.00%"
+      ],
+      "pattern_issues": [
+        {
+          "pattern_id": "god_function",
+          "severity": "low",
+          "axis": "style",
+          "file": "D:\\Sanctum\\SCI-EXP CRITIQUE \u2014 EXPERIMENTAL REPORT ANALYSIS v2.1\\src\\sciexp_critique\\templates\\bmj.py",
+          "line": 28,
+          "column": 4,
+          "message": "God function 'build': 72 logic lines (limit 50)",
+          "code": null,
+          "suggestion": "Break into smaller single-responsibility functions. Each function should do one thing and fit on one screen."
+        },
+        {
+          "pattern_id": "placeholder_variable_naming",
+          "severity": "medium",
+          "axis": "quality",
+          "file": "D:\\Sanctum\\SCI-EXP CRITIQUE \u2014 EXPERIMENTAL REPORT ANALYSIS v2.1\\src\\sciexp_critique\\templates\\bmj.py",
+          "line": 28,
+          "column": 4,
+          "message": "Function 'build' uses 5 sequential numbered variables (step1..step5) -- placeholder naming pattern",
+          "code": null,
+          "suggestion": "Use semantic variable names that describe the computation. Sequential numbered variables (r1, r2, r3...) indicate generated or draft code."
+        }
+      ],
+      "docstring_inflation": {
+        "total_docstrings": 0,
+        "inflated_count": 0,
+        "avg_inflation_ratio": 0.0,
+        "max_inflation_ratio": 0.0,
+        "total_docstring_lines": 4,
+        "total_implementation_lines": 98,
+        "overall_ratio": 0.04081632653061224,
+        "status": "PASS",
+        "details": []
+      },
+      "hallucination_deps": {
+        "total_hallucinated": 0,
+        "category_usage": [],
+        "hallucinated_deps": [],
+        "worst_category": "none",
+        "status": "PASS"
+      },
+      "context_jargon": {
+        "total_jargon": 0,
+        "justified_jargon": 0,
+        "unjustified_jargon": 0,
+        "evidence_details": [],
+        "worst_offenders": [],
+        "justification_ratio": 1.0,
+        "status": "PASS"
+      },
+      "ml_score": {
+        "slop_probability": 0.33,
+        "confidence": 0.67,
+        "model_type": "random_forest",
+        "agreement": true,
+        "features_used": 16
+      },
+      "dcf": {
+        "Module": 0.0017921146953405018,
+        "Expr": 0.023297491039426525,
+        "ImportFrom": 0.005376344086021506,
+        "ClassDef": 0.0017921146953405018,
+        "FunctionDef": 0.005376344086021506,
+        "Constant": 0.11469534050179211,
+        "alias": 0.007168458781362007,
+        "Name": 0.18100358422939067,
+        "Assign": 0.025089605734767026,
+        "arguments": 0.005376344086021506,
+        "Return": 0.007168458781362007,
+        "If": 0.007168458781362007,
+        "For": 0.0017921146953405018,
+        "Subscript": 0.005376344086021506,
+        "Load": 0.25985663082437277,
+        "List": 0.010752688172043012,
+        "AnnAssign": 0.0017921146953405018,
+        "arg": 0.007168458781362007,
+        "IfExp": 0.007168458781362007,
+        "UnaryOp": 0.0017921146953405018,
+        "Attribute": 0.0931899641577061,
+        "Store": 0.03046594982078853,
+        "Call": 0.06989247311827956,
+        "Not": 0.0017921146953405018,
+        "JoinedStr": 0.03046594982078853,
+        "AugAssign": 0.0017921146953405018,
+        "FormattedValue": 0.03225806451612903,
+        "Add": 0.0035842293906810036,
+        "keyword": 0.05017921146953405,
+        "BinOp": 0.0017921146953405018,
+        "BoolOp": 0.0017921146953405018,
+        "Or": 0.0017921146953405018
+      }
+    },
+    {
+      "file_path": "D:\\Sanctum\\SCI-EXP CRITIQUE \u2014 EXPERIMENTAL REPORT ANALYSIS v2.1\\src\\sciexp_critique\\templates\\ku.py",
+      "ldr": {
+        "total_lines": 109,
+        "logic_lines": 109,
+        "empty_lines": 0,
+        "ldr_score": 1.0,
+        "grade": "S++",
+        "is_abc_interface": false,
+        "is_type_stub": false,
+        "is_packaging_init": false
+      },
+      "inflation": {
+        "jargon_count": 0,
+        "avg_complexity": 8.25,
+        "inflation_score": 0.0,
+        "status": "PASS",
+        "jargon_found": [],
+        "jargon_details": [],
+        "justified_jargon": [],
+        "is_config_file": false
+      },
+      "ddc": {
+        "imported": [
+          "base"
+        ],
+        "actually_used": [
+          "base"
+        ],
+        "unused": [],
+        "fake_imports": [],
+        "type_checking_imports": [
+          "__future__"
+        ],
+        "usage_ratio": 1.0,
+        "grade": "EXCELLENT"
+      },
+      "deficit_score": 4.0,
+      "status": "clean",
+      "warnings": [],
+      "pattern_issues": [
+        {
+          "pattern_id": "god_function",
+          "severity": "medium",
+          "axis": "style",
+          "file": "D:\\Sanctum\\SCI-EXP CRITIQUE \u2014 EXPERIMENTAL REPORT ANALYSIS v2.1\\src\\sciexp_critique\\templates\\ku.py",
+          "line": 29,
+          "column": 4,
+          "message": "God function 'build': 75 logic lines (limit 50)",
+          "code": null,
+          "suggestion": "Break into smaller single-responsibility functions. Each function should do one thing and fit on one screen."
+        },
+        {
+          "pattern_id": "placeholder_variable_naming",
+          "severity": "medium",
+          "axis": "quality",
+          "file": "D:\\Sanctum\\SCI-EXP CRITIQUE \u2014 EXPERIMENTAL REPORT ANALYSIS v2.1\\src\\sciexp_critique\\templates\\ku.py",
+          "line": 29,
+          "column": 4,
+          "message": "Function 'build' uses 4 sequential numbered variables (step1..step4) -- placeholder naming pattern",
+          "code": null,
+          "suggestion": "Use semantic variable names that describe the computation. Sequential numbered variables (r1, r2, r3...) indicate generated or draft code."
+        }
+      ],
+      "docstring_inflation": {
+        "total_docstrings": 0,
+        "inflated_count": 0,
+        "avg_inflation_ratio": 0.0,
+        "max_inflation_ratio": 0.0,
+        "total_docstring_lines": 5,
+        "total_implementation_lines": 102,
+        "overall_ratio": 0.049019607843137254,
+        "status": "PASS",
+        "details": []
+      },
+      "hallucination_deps": {
+        "total_hallucinated": 0,
+        "category_usage": [],
+        "hallucinated_deps": [],
+        "worst_category": "none",
+        "status": "PASS"
+      },
+      "context_jargon": {
+        "total_jargon": 0,
+        "justified_jargon": 0,
+        "unjustified_jargon": 0,
+        "evidence_details": [],
+        "worst_offenders": [],
+        "justification_ratio": 1.0,
+        "status": "PASS"
+      },
+      "ml_score": {
+        "slop_probability": 0.19,
+        "confidence": 0.81,
+        "model_type": "random_forest",
+        "agreement": true,
+        "features_used": 16
+      },
+      "dcf": {
+        "Module": 0.0014204545454545455,
+        "Expr": 0.019886363636363636,
+        "ImportFrom": 0.002840909090909091,
+        "ClassDef": 0.0014204545454545455,
+        "FunctionDef": 0.004261363636363636,
+        "Constant": 0.11931818181818182,
+        "alias": 0.004261363636363636,
+        "Name": 0.18323863636363635,
+        "Assign": 0.026988636363636364,
+        "arguments": 0.004261363636363636,
+        "Return": 0.005681818181818182,
+        "If": 0.008522727272727272,
+        "For": 0.004261363636363636,
+        "Subscript": 0.004261363636363636,
+        "Load": 0.2571022727272727,
+        "List": 0.008522727272727272,
+        "AnnAssign": 0.0014204545454545455,
+        "arg": 0.005681818181818182,
+        "IfExp": 0.005681818181818182,
+        "UnaryOp": 0.0014204545454545455,
+        "Attribute": 0.10085227272727272,
+        "Store": 0.03977272727272727,
+        "Call": 0.052556818181818184,
+        "BinOp": 0.007102272727272727,
+        "JoinedStr": 0.024147727272727272,
+        "AugAssign": 0.007102272727272727,
+        "Not": 0.0014204545454545455,
+        "Add": 0.014204545454545454,
+        "BoolOp": 0.004261363636363636,
+        "FormattedValue": 0.036931818181818184,
+        "keyword": 0.036931818181818184,
+        "Or": 0.004261363636363636
+      }
+    }
+  ],
+  "js_file_results": [
+    {
+      "file_path": "D:\\Sanctum\\SCI-EXP CRITIQUE \u2014 EXPERIMENTAL REPORT ANALYSIS v2.1\\frontend\\app.js",
+      "language": "javascript",
+      "total_lines": 229,
+      "code_lines": 195,
+      "comment_lines": 11,
+      "blank_lines": 23,
+      "ldr_equivalent": 0.8515,
+      "console_log_count": 0,
+      "var_usage_count": 0,
+      "any_type_count": 0,
+      "double_equals_count": 0,
+      "empty_arrow_count": 0,
+      "max_nesting_depth": 3,
+      "max_complexity": 10,
+      "god_function_count": 1,
+      "dead_code_count": 0,
+      "ast_mode": true,
+      "slop_score": 5.0,
+      "status": "clean",
+      "issues": [
+        {
+          "pattern_id": "js_god_function",
+          "severity": "high",
+          "line": 122,
+          "column": 0,
+          "message": "God function 'renderReport': 63 lines, complexity=10",
+          "suggestion": "Break into smaller single-responsibility functions"
+        }
+      ],
+      "function_metrics": [
+        {
+          "name": "(anonymous)",
+          "start_line": 34,
+          "end_line": 34,
+          "line_count": 1,
+          "complexity": 1,
+          "max_depth": 0,
+          "is_god_function": false
+        },
+        {
+          "name": "(anonymous)",
+          "start_line": 35,
+          "end_line": 35,
+          "line_count": 1,
+          "complexity": 1,
+          "max_depth": 1,
+          "is_god_function": false
+        },
+        {
+          "name": "(anonymous)",
+          "start_line": 36,
+          "end_line": 36,
+          "line_count": 1,
+          "complexity": 1,
+          "max_depth": 0,
+          "is_god_function": false
+        },
+        {
+          "name": "(anonymous)",
+          "start_line": 37,
+          "end_line": 42,
+          "line_count": 6,
+          "complexity": 2,
+          "max_depth": 1,
+          "is_god_function": false
+        },
+        {
+          "name": "(anonymous)",
+          "start_line": 43,
+          "end_line": 43,
+          "line_count": 1,
+          "complexity": 2,
+          "max_depth": 1,
+          "is_god_function": false
+        },
+        {
+          "name": "setFile",
+          "start_line": 46,
+          "end_line": 52,
+          "line_count": 7,
+          "complexity": 1,
+          "max_depth": 1,
+          "is_god_function": false
+        },
+        {
+          "name": "clearSelection",
+          "start_line": 54,
+          "end_line": 60,
+          "line_count": 7,
+          "complexity": 1,
+          "max_depth": 1,
+          "is_god_function": false
+        },
+        {
+          "name": "(anonymous)",
+          "start_line": 63,
+          "end_line": 86,
+          "line_count": 24,
+          "complexity": 6,
+          "max_depth": 3,
+          "is_god_function": false
+        },
+        {
+          "name": "runPreview",
+          "start_line": 88,
+          "end_line": 101,
+          "line_count": 14,
+          "complexity": 3,
+          "max_depth": 3,
+          "is_god_function": false
+        },
+        {
+          "name": "(anonymous)",
+          "start_line": 93,
+          "end_line": 93,
+          "line_count": 1,
+          "complexity": 1,
+          "max_depth": 1,
+          "is_god_function": false
+        },
+        {
+          "name": "(anonymous)",
+          "start_line": 99,
+          "end_line": 99,
+          "line_count": 1,
+          "complexity": 1,
+          "max_depth": 0,
+          "is_god_function": false
+        },
+        {
+          "name": "runDownload",
+          "start_line": 103,
+          "end_line": 119,
+          "line_count": 17,
+          "complexity": 3,
+          "max_depth": 3,
+          "is_god_function": false
+        },
+        {
+          "name": "(anonymous)",
+          "start_line": 107,
+          "end_line": 107,
+          "line_count": 1,
+          "complexity": 1,
+          "max_depth": 1,
+          "is_god_function": false
+        },
+        {
+          "name": "renderReport",
+          "start_line": 122,
+          "end_line": 184,
+          "line_count": 63,
+          "complexity": 10,
+          "max_depth": 2,
+          "is_god_function": true
+        },
+        {
+          "name": "(anonymous)",
+          "start_line": 136,
+          "end_line": 137,
+          "line_count": 2,
+          "complexity": 1,
+          "max_depth": 0,
+          "is_god_function": false
+        },
+        {
+          "name": "(anonymous)",
+          "start_line": 139,
+          "end_line": 141,
+          "line_count": 3,
+          "complexity": 1,
+          "max_depth": 1,
+          "is_god_function": false
+        },
+        {
+          "name": "(anonymous)",
+          "start_line": 140,
+          "end_line": 140,
+          "line_count": 1,
+          "complexity": 1,
+          "max_depth": 0,
+          "is_god_function": false
+        },
+        {
+          "name": "(anonymous)",
+          "start_line": 153,
+          "end_line": 176,
+          "line_count": 24,
+          "complexity": 6,
+          "max_depth": 1,
+          "is_god_function": false
+        },
+        {
+          "name": "(anonymous)",
+          "start_line": 165,
+          "end_line": 170,
+          "line_count": 6,
+          "complexity": 2,
+          "max_depth": 0,
+          "is_god_function": false
+        },
+        {
+          "name": "reDownload",
+          "start_line": 186,
+          "end_line": 202,
+          "line_count": 17,
+          "complexity": 5,
+          "max_depth": 3,
+          "is_god_function": false
+        },
+        {
+          "name": "showUpload",
+          "start_line": 208,
+          "end_line": 208,
+          "line_count": 1,
+          "complexity": 1,
+          "max_depth": 1,
+          "is_god_function": false
+        },
+        {
+          "name": "hideAll",
+          "start_line": 209,
+          "end_line": 211,
+          "line_count": 3,
+          "complexity": 1,
+          "max_depth": 2,
+          "is_god_function": false
+        },
+        {
+          "name": "(anonymous)",
+          "start_line": 210,
+          "end_line": 210,
+          "line_count": 1,
+          "complexity": 1,
+          "max_depth": 0,
+          "is_god_function": false
+        },
+        {
+          "name": "showProgress",
+          "start_line": 212,
+          "end_line": 217,
+          "line_count": 6,
+          "complexity": 1,
+          "max_depth": 1,
+          "is_god_function": false
+        },
+        {
+          "name": "setProgress",
+          "start_line": 218,
+          "end_line": 221,
+          "line_count": 4,
+          "complexity": 1,
+          "max_depth": 1,
+          "is_god_function": false
+        },
+        {
+          "name": "showError",
+          "start_line": 222,
+          "end_line": 226,
+          "line_count": 5,
+          "complexity": 1,
+          "max_depth": 1,
+          "is_god_function": false
+        },
+        {
+          "name": "escHtml",
+          "start_line": 227,
+          "end_line": 229,
+          "line_count": 3,
+          "complexity": 1,
+          "max_depth": 1,
+          "is_god_function": false
+        }
+      ]
+    }
+  ],
+  "go_file_results": []
+}

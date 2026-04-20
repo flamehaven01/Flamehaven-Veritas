@@ -1,0 +1,91 @@
+{
+  "meta": {
+    "artifact": "SCI-EXP CRITIQUE",
+    "version": "2.1",
+    "mica_format": "0.2.3",
+    "pct_state": "CLOSED",
+    "di_count": 6,
+    "critical_count": 4,
+    "high_count": 2
+  },
+  "design_invariants": [
+    {
+      "id": "DI-001",
+      "name": "OUTPUT_CONTRACT",
+      "severity": "CRITICAL",
+      "statement": "Each pipeline step has a fixed output contract: PRECHECK=2 lines (status + missing list), STEP 0=2 sentences (class + reason), STEP 1-4=one paragraph prose + per-finding traceability badge, STEP 5=2 sentences (most vulnerable claim + priority fix).",
+      "binding": {
+        "origin_episode": "sciexp-fullstack-build-session-001",
+        "violation_count": 0,
+        "lesson_ref": "DI-001/lesson",
+        "last_triggered": null,
+        "enforcement": "Any output that omits the traceability badge or priority fix is in breach. Regenerate the step."
+      }
+    },
+    {
+      "id": "DI-002",
+      "name": "TRACEABILITY_VOCAB",
+      "severity": "CRITICAL",
+      "statement": "Traceability has exactly three values: [traceable | partially traceable | not traceable]. No synonyms, paraphrases, or intermediate values are permitted.",
+      "binding": {
+        "origin_episode": "sciexp-fullstack-build-session-001",
+        "violation_count": 0,
+        "lesson_ref": "DI-002/lesson",
+        "last_triggered": null,
+        "enforcement": "If you generate text using 'somewhat traceable', 'partially documented', etc. — treat as DI-002 breach and replace with canonical value."
+      }
+    },
+    {
+      "id": "DI-003",
+      "name": "EVIDENCE_PRECEDENCE",
+      "severity": "CRITICAL",
+      "statement": "Evidence rank runs from 1 (raw data) to 5 (author claim only). A Rank 1 conflict beats a Rank 5 finding. When two sources disagree, the lower rank wins unless the higher-rank source has explicit methodology documentation.",
+      "binding": {
+        "origin_episode": "sciexp-fullstack-build-session-001",
+        "violation_count": 0,
+        "lesson_ref": "DI-003/lesson",
+        "last_triggered": null,
+        "enforcement": "Never treat author claim (Rank 5) as superior to raw data (Rank 1) without explicit documentation of the discrepancy."
+      }
+    },
+    {
+      "id": "DI-004",
+      "name": "HOLD_UNDOCUMENTED",
+      "severity": "CRITICAL",
+      "statement": "A HOLD event without a stated cause is classified as UNDOCUMENTED and counted as a critical deficit in STEP 4.",
+      "binding": {
+        "origin_episode": "sciexp-fullstack-build-session-001",
+        "violation_count": 0,
+        "lesson_ref": "DI-004/lesson",
+        "last_triggered": null,
+        "enforcement": "Scan all HOLD events for cause_stated=false before computing omega score. Each undocumented HOLD reduces STEP 4 score."
+      }
+    },
+    {
+      "id": "DI-005",
+      "name": "IRF_F_GATE",
+      "severity": "HIGH",
+      "statement": "When LOGOS IRF 6D is active and falsification dimension F < 0.40, a reproducibility warning must appear in the STEP 3 output and the hybrid omega score incurs a -0.05 penalty.",
+      "binding": {
+        "origin_episode": "sciexp-logos-integration-session-002",
+        "violation_count": 0,
+        "lesson_ref": "DI-005/lesson",
+        "last_triggered": null,
+        "enforcement": "F < 0.40 is not a soft warning — it triggers a hard penalty on the final omega score and must appear as a named finding in STEP 3."
+      }
+    },
+    {
+      "id": "DI-006",
+      "name": "HYBRID_OMEGA",
+      "severity": "HIGH",
+      "statement": "When LOGOS enrichment is active, the final omega score is a weighted hybrid: 0.6 * sciexp_omega + 0.4 * logos_composite. The raw sciexp_omega must still be reported alongside the hybrid.",
+      "binding": {
+        "origin_episode": "sciexp-logos-integration-session-002",
+        "violation_count": 0,
+        "lesson_ref": "DI-006/lesson",
+        "last_triggered": null,
+        "enforcement": "Never replace the sciexp omega with the LOGOS composite. Both must be visible. The hybrid is the authoritative final score."
+      }
+    }
+  ]
+}

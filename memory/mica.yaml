@@ -1,0 +1,40 @@
+# mica.yaml — VERITAS v2.2 Invocation Contract
+# MICA v0.2.3 Format
+# --------------------------------------------------------------------
+# This file is the memory entry-point for any AI agent that needs to
+# operate VERITAS through its CLI or API.
+# Load this file at session start; it links to the archive (DIs) and
+# the playbook (runtime instructions).
+# --------------------------------------------------------------------
+
+name: VERITAS
+version: "2.1"
+mode: INVOCATION_MODE
+
+layers:
+  archive: "memory/sciexp.mica.archive.json"
+  playbook: "memory/playbook.md"
+
+cli:
+  entry: sciexp
+  pip_install: "pip install -e ."
+  default_command: "veritas critique <file> --format md"
+
+api:
+  base_url: "http://localhost:8400"
+  health: "GET /health"
+  critique_endpoint: "POST /api/v1/critique"
+  content_type: "multipart/form-data"
+
+outputs:
+  preferred: md          # token-efficient, pipe to AI
+  available:
+    - md                 # stdout by default
+    - docx               # requires --out
+    - pdf                # requires --out
+
+token_budget:
+  md_full_report: ~800   # tokens for typical 5000-word paper
+  md_precheck: ~50
+
+pct_state: CLOSED        # PCT = Procedural Closure Test

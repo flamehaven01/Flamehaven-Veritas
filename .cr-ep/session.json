@@ -1,0 +1,12 @@
+{
+  "cr_ep_version": "2.7.2",
+  "session_id": "f142b8e0-d1bb-4cd7-80f5-ec984ba2bda1",
+  "mode": "standard",
+  "trust_tier": "PEER",
+  "working_path": "D:\\Sanctum\\SCI-EXP CRITIQUE — EXPERIMENTAL REPORT ANALYSIS v2.1",
+  "started_at_utc": "2026-04-19T13:50:24.242768+00:00",
+  "dm1_metric": 0.0,
+  "dt3_review_threshold": 0.2,
+  "mode_upgrade_history": [],
+  "tool": "ai-slop-detector"
+}

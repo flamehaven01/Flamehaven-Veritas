@@ -1,0 +1,12 @@
+{
+  "wq_1": "Detect AI-generated code quality deficits in target project",
+  "wq_2": "Run LDR/BCR/DDC metrics + pattern detection on all Python/JS files",
+  "wq_3": "Produce actionable report with gate decisions and optional auto-fix",
+  "q3_scaffold_used": true,
+  "q3_results": {
+    "approach": "hybrid_metric_pattern",
+    "gate_model": "SNP_GateDecision_compatible",
+    "cr_ep_profile": "standard"
+  },
+  "declared_why": "Detect AI-generated code quality issues"
+}
