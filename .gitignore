@@ -26,3 +26,5 @@ Thumbs.db
 slop_report*.json
 .cr-ep/
 
+*.txt
+
