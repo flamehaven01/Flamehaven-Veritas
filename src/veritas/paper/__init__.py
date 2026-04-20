@@ -6,9 +6,9 @@ Provides:
   - BibliographyAnalyzer           : reference section quality metrics
   - ReproducibilityChecklistExtractor : ARRIVE/CONSORT criterion detection
 """
-from .methodology_detector import MethodologyDetector
-from .hypothesis_extractor import HypothesisExtractor
 from .bibliography_analyzer import BibliographyAnalyzer
+from .hypothesis_extractor import HypothesisExtractor
+from .methodology_detector import MethodologyDetector
 from .reproducibility_checklist import ReproducibilityChecklistExtractor
 
 __all__ = [

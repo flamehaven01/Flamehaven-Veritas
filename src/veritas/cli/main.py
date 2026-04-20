@@ -51,19 +51,19 @@ def _read_input(file: str | None, text: str | None, stdin: bool) -> str:
                 import fitz  # PyMuPDF
                 doc = fitz.open(str(p))
                 return "\n".join(page.get_text() for page in doc)
-            except ImportError:
+            except ImportError as err:
                 raise click.ClickException(
                     "PyMuPDF not installed. Install with: pip install PyMuPDF"
-                )
+                ) from err
         if p.suffix.lower() in (".docx",):
             try:
                 import docx
                 doc = docx.Document(str(p))
                 return "\n".join(p.text for p in doc.paragraphs)
-            except ImportError:
+            except ImportError as err:
                 raise click.ClickException(
                     "python-docx not installed. Install with: pip install python-docx"
-                )
+                ) from err
         return p.read_text(encoding="utf-8", errors="replace")
     raise click.ClickException("Provide a file, --text, or --stdin.")
 
@@ -84,7 +84,7 @@ def _emit_report(report, fmt: str, out: str | None, template: str) -> None:
         try:
             from ..render.docx_renderer import DocxRenderer
         except ImportError as exc:
-            raise click.ClickException(f"DOCX renderer unavailable: {exc}")
+            raise click.ClickException(f"DOCX renderer unavailable: {exc}") from exc
         DocxRenderer().render(report, out, template=template)
         click.echo(f"[+] DOCX saved to {out}")
         return
@@ -94,7 +94,7 @@ def _emit_report(report, fmt: str, out: str | None, template: str) -> None:
         try:
             from ..render.pdf_renderer import PdfRenderer
         except ImportError as exc:
-            raise click.ClickException(f"PDF renderer unavailable: {exc}")
+            raise click.ClickException(f"PDF renderer unavailable: {exc}") from exc
         PdfRenderer().render(report, out, template=template)
         click.echo(f"[+] PDF saved to {out}")
         return
@@ -103,7 +103,7 @@ def _emit_report(report, fmt: str, out: str | None, template: str) -> None:
     try:
         from ..render.latex_renderer import LatexRenderer
     except ImportError as exc:
-        raise click.ClickException(f"LaTeX renderer unavailable: {exc}")
+        raise click.ClickException(f"LaTeX renderer unavailable: {exc}") from exc
     LatexRenderer().render(report, out, template=template)
     click.echo(f"[+] LaTeX saved to {out}")
 

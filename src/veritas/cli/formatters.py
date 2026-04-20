@@ -5,6 +5,7 @@ Provides:
   fmt_term(report) -> str   ANSI-stripped plain text for terminal display
 """
 from __future__ import annotations
+
 import re
 
 from ..types import CritiqueReport

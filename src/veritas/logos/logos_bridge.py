@@ -11,10 +11,9 @@ from __future__ import annotations
 
 import re
 import sys
-from typing import Optional
 
-from .irf_analyzer import IRFAnalyzer
 from ..types import IRF6DScores
+from .irf_analyzer import IRFAnalyzer
 
 _LOGOS_PATH = r"D:\Sanctum\Flamehaven-LOGOS"
 
@@ -68,7 +67,7 @@ class LogosBridge:
     def source(self) -> str:
         return "logos_irf_pipeline" if self._pipeline is not None else "local"
 
-    def analyze(self, text: str, central_claim: Optional[str] = None) -> IRF6DScores:
+    def analyze(self, text: str, central_claim: str | None = None) -> IRF6DScores:
         """Return IRF6DScores using best available backend.
 
         Args:
@@ -90,7 +89,7 @@ class LogosBridge:
             M = float(dims.get("M", 0.0))
             A = float(dims.get("A", 0.0))
             D = float(dims.get("D", 0.0))
-            I = float(dims.get("I", 0.0))
+            I = float(dims.get("I", 0.0))  # noqa: E741
             F = float(dims.get("F", 0.0))
             P = float(dims.get("P", 0.0))
             composite = float(sc.composite) if hasattr(sc, "composite") else (

@@ -26,12 +26,12 @@ class BaseTemplate(ABC):
     SECTIONS:     list[str] = []
 
     @abstractmethod
-    def build(self, report: "CritiqueReport") -> list[TemplateSection]:
+    def build(self, report: CritiqueReport) -> list[TemplateSection]:
         """Convert CritiqueReport into ordered TemplateSection list."""
         pass
 
     @classmethod
-    def all_templates(cls) -> dict[str, "BaseTemplate"]:
+    def all_templates(cls) -> dict[str, BaseTemplate]:
         from .bmj import BMJTemplate
         from .ku import KUTemplate
         return {

@@ -24,7 +24,7 @@ def render_docx(report, output_path: str | Path, template_id: str = "bmj") -> Pa
     """Render CritiqueReport as a professional A4 .docx file. Returns path."""
     try:
         from docx import Document
-        from docx.shared import Pt, Cm, RGBColor
+        from docx.shared import Cm, Pt
     except ImportError as exc:
         raise ImportError("python-docx required: pip install python-docx") from exc
 
@@ -118,7 +118,9 @@ def _add_cover(doc, display_name: str, meta_rows, navy, mnav) -> None:
 
     p = doc.add_paragraph()
     r = p.add_run("VERITAS — AI Critique Experimental Report Analysis Framework")
-    r.bold = True; r.font.size = Pt(26); r.font.color.rgb = navy
+    r.bold = True
+    r.font.size = Pt(26)
+    r.font.color.rgb = navy
     p.paragraph_format.space_after = Pt(4)
 
     sub = doc.add_paragraph()
@@ -131,7 +133,9 @@ def _add_cover(doc, display_name: str, meta_rows, navy, mnav) -> None:
     for i, (k, v) in enumerate(meta_rows):
         row = table.add_row()
         kr = row.cells[0].paragraphs[0].add_run(k)
-        kr.bold = True; kr.font.size = Pt(9); kr.font.color.rgb = _rgb_white()
+        kr.bold = True
+        kr.font.size = Pt(9)
+        kr.font.color.rgb = _rgb_white()
         _shade(row.cells[0], "16213e" if i % 2 == 0 else "0f3460")
         vr = row.cells[1].paragraphs[0].add_run(v)
         vr.font.size = Pt(9)
@@ -173,9 +177,11 @@ def _add_findings_table(doc, findings: list[str]) -> None:
 
     table = doc.add_table(rows=1, cols=3)
     table.style = "Table Grid"
-    for cell, label in zip(table.rows[0].cells, ("CODE", "TRACEABILITY", "DESCRIPTION")):
+    for cell, label in zip(table.rows[0].cells, ("CODE", "TRACEABILITY", "DESCRIPTION"), strict=False):
         r = cell.paragraphs[0].add_run(label)
-        r.bold = True; r.font.size = Pt(8.5); r.font.color.rgb = _rgb_white()
+        r.bold = True
+        r.font.size = Pt(8.5)
+        r.font.color.rgb = _rgb_white()
         _shade(cell, "0f3460")
 
     for i, raw in enumerate(findings):
@@ -201,9 +207,11 @@ def _add_dim_table(doc, title: str, dims: list[tuple[str, str, str]], hdr_color)
 
     table = doc.add_table(rows=1, cols=3)
     table.style = "Table Grid"
-    for cell, label in zip(table.rows[0].cells, ("DIM", "SCORE", "MEANING")):
+    for cell, label in zip(table.rows[0].cells, ("DIM", "SCORE", "MEANING"), strict=False):
         r = cell.paragraphs[0].add_run(label)
-        r.bold = True; r.font.size = Pt(8.5); r.font.color.rgb = _rgb_white()
+        r.bold = True
+        r.font.size = Pt(8.5)
+        r.font.color.rgb = _rgb_white()
         _shade(cell, "16213e")
 
     for i, (d, v, m) in enumerate(dims):
@@ -238,8 +246,8 @@ def _rgb_white():
 
 
 def _shade(cell, hex_bg: str) -> None:
-    from docx.oxml.ns import qn
     from docx.oxml import OxmlElement
+    from docx.oxml.ns import qn
     tc_pr = cell._tc.get_or_add_tcPr()
     shd = OxmlElement("w:shd")
     shd.set(qn("w:val"),   "clear")

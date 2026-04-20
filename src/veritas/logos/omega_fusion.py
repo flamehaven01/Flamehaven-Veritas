@@ -13,7 +13,6 @@ risk flag is raised and a 0.05 penalty is applied to hybrid_omega.
 from __future__ import annotations
 
 from dataclasses import dataclass
-from typing import Optional
 
 from ..types import IRF6DScores
 
@@ -31,7 +30,7 @@ class FusionResult:
     logos_omega:   float
     hybrid_omega:  float
     f_risk:        bool     # True when Falsification dim < F_WARN_THRESHOLD
-    f_risk_msg:    Optional[str]
+    f_risk_msg:    str | None
 
 
 class OmegaFusion:
@@ -55,7 +54,7 @@ class OmegaFusion:
     def fuse(
         self,
         sciexp_omega: float,
-        irf_scores:   Optional[IRF6DScores],
+        irf_scores:   IRF6DScores | None,
     ) -> FusionResult:
         """Compute hybrid omega.
 
@@ -73,7 +72,7 @@ class OmegaFusion:
         logos_omega  = irf_scores.composite
         raw_hybrid   = self.w_sciexp * sciexp_omega + self.w_logos * logos_omega
         f_risk       = irf_scores.F < F_WARN_THRESHOLD
-        f_risk_msg: Optional[str] = None
+        f_risk_msg: str | None = None
 
         if f_risk:
             raw_hybrid   = max(0.0, raw_hybrid - 0.05)

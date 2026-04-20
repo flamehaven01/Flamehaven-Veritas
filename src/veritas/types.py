@@ -7,7 +7,6 @@ from __future__ import annotations
 
 from dataclasses import dataclass, field
 from enum import Enum
-from typing import Optional
 
 
 class SciExpMode(Enum):
@@ -81,7 +80,7 @@ class IRF6DScores:
     M: float
     A: float
     D: float
-    I: float
+    I: float  # noqa: E741
     F: float
     P: float
     composite: float
@@ -158,9 +157,9 @@ class StepFinding:
     code:           str
     description:    str
     traceability:   TraceabilityClass
-    verbatim_quote: Optional[str] = None
-    evidence_rank:  Optional[EvidenceRank] = None
-    hold_event:     Optional[HoldEvent] = None
+    verbatim_quote: str | None = None
+    evidence_rank:  EvidenceRank | None = None
+    hold_event:     HoldEvent | None = None
 
 
 @dataclass
@@ -170,7 +169,7 @@ class StepResult:
     weight:           float
     prose:            str
     findings:         list[StepFinding] = field(default_factory=list)
-    vulnerable_claim: Optional[str] = None
+    vulnerable_claim: str | None = None
     not_applicable:   bool = False
 
 
@@ -179,13 +178,13 @@ class CritiqueReport:
     """Full VERITAS — AI Critique Experimental Report Analysis Framework output."""
     precheck: PrecheckResult
 
-    experiment_class:           Optional[ExperimentClass] = None
-    experiment_class_secondary: Optional[ExperimentClass] = None
+    experiment_class:           ExperimentClass | None = None
+    experiment_class_secondary: ExperimentClass | None = None
     experiment_class_reason:    str = ""
 
     steps:          list[StepResult] = field(default_factory=list)
     priority_fix:   str = ""
-    next_liability: Optional[str] = None
+    next_liability: str | None = None
 
     round_number:       int   = 1
     omega_score:        float = 0.0
@@ -193,18 +192,18 @@ class CritiqueReport:
     hold_events:        list[HoldEvent] = field(default_factory=list)
 
     # ---- LOGOS / Paper Intelligence (optional, None when not available)
-    irf_scores:       Optional[IRF6DScores]    = None
-    hsta_scores:      Optional[HSTA4DScores]   = None
-    methodology_class: Optional[MethodologyClass] = None
-    hypothesis_text:   Optional[str]           = None
-    logos_omega:       Optional[float]         = None  # LOGOS-computed omega
-    hybrid_omega:      Optional[float]         = None  # 0.6*sciexp + 0.4*logos
+    irf_scores:       IRF6DScores | None    = None
+    hsta_scores:      HSTA4DScores | None   = None
+    methodology_class: MethodologyClass | None = None
+    hypothesis_text:   str | None           = None
+    logos_omega:       float | None         = None  # LOGOS-computed omega
+    hybrid_omega:      float | None         = None  # 0.6*sciexp + 0.4*logos
 
     # ---- Repository-derived extensions (BibliographyAnalyzer + ReproducibilityChecklist)
-    bibliography_stats:        Optional["BibliographyStats"]        = None
-    reproducibility_checklist: Optional["ReproducibilityChecklist"] = None
+    bibliography_stats:        BibliographyStats | None        = None
+    reproducibility_checklist: ReproducibilityChecklist | None = None
 
-    def step(self, step_id: str) -> Optional[StepResult]:
+    def step(self, step_id: str) -> StepResult | None:
         return next((s for s in self.steps if s.step_id == step_id), None)
 
     def is_blocked(self) -> bool:
@@ -237,8 +236,8 @@ class BibliographyStats:
     """
     total_refs:             int        = 0
     recent_ratio:           float      = 0.0   # refs <= 5 years old / total
-    oldest_year:            Optional[int] = None
-    newest_year:            Optional[int] = None
+    oldest_year:            int | None = None
+    newest_year:            int | None = None
     formats_detected:       list[str]  = field(default_factory=list)
     self_citation_detected: bool       = False
 
@@ -260,7 +259,7 @@ class ReproducibilityItem:
     """Single ARRIVE / CONSORT-style reproducibility criterion."""
     code:      str
     criterion: str
-    satisfied: Optional[bool] = None   # None = cannot determine from text
+    satisfied: bool | None = None   # None = cannot determine from text
     note:      str            = ""
 
 
@@ -277,7 +276,7 @@ class ReproducibilityChecklist:
     items: list[ReproducibilityItem] = field(default_factory=list)
 
     @classmethod
-    def default(cls) -> "ReproducibilityChecklist":
+    def default(cls) -> ReproducibilityChecklist:
         return cls(items=[
             ReproducibilityItem("DATA",   "Raw data publicly available"),
             ReproducibilityItem("CODE",   "Analysis code publicly available"),

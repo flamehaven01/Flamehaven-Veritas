@@ -26,7 +26,6 @@ class BMJTemplate(BaseTemplate):
     ]
 
     def build(self, report) -> list[TemplateSection]:
-        from ..types import TraceabilityClass
 
         sections: list[TemplateSection] = []
 
@@ -35,8 +34,8 @@ class BMJTemplate(BaseTemplate):
             title="Cover Page",
             level=1,
             body="\n".join([
-                f"**VERITAS REPORT — BMJ Format**",
-                f"",
+                "**VERITAS REPORT — BMJ Format**",
+                "",
                 f"Round          : {report.round_number}",
                 f"PRECHECK MODE  : {report.precheck.mode.value}",
                 f"Missing Artifacts: {', '.join(report.precheck.missing_artifacts) or 'none'}",
@@ -47,7 +46,7 @@ class BMJTemplate(BaseTemplate):
         ))
 
         # 2 — Executive Summary
-        step5 = report.step("5")
+        report.step("5")
         sections.append(TemplateSection(
             title="Executive Summary",
             level=1,

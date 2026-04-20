@@ -3,7 +3,6 @@ from __future__ import annotations
 
 import math
 import sys
-from typing import Optional
 
 _FF_ROOT = r"D:\Sanctum\Flamehaven-Filesearch"
 
@@ -24,14 +23,14 @@ class _SimpleVectorStore:
             return []
         scored = [
             (self._cosine(query_vec, v), doc)
-            for v, doc in zip(self._vecs, self._docs)
+            for v, doc in zip(self._vecs, self._docs, strict=False)
         ]
         scored.sort(key=lambda x: x[0], reverse=True)
         return [doc for _, doc in scored[:top_k]]
 
     @staticmethod
     def _cosine(a: list[float], b: list[float]) -> float:
-        dot  = sum(x * y for x, y in zip(a, b))
+        dot  = sum(x * y for x, y in zip(a, b, strict=False))
         norm = math.sqrt(sum(x**2 for x in a)) * math.sqrt(sum(x**2 for x in b))
         return dot / norm if norm else 0.0
 

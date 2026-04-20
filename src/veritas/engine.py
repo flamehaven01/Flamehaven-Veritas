@@ -6,13 +6,15 @@ Wires PRECHECK → RAG ingestion → STEP 0-5 pipeline → LOGOS IRF reasoning
 from __future__ import annotations
 
 from pathlib import Path
-from typing import Optional
 
-from . import precheck as _precheck
 from . import pipeline as _pipeline
+from . import precheck as _precheck
 from .evidence import extract_evidence, resolve
 from .types import (
-    CritiqueReport, PrecheckResult, SciExpMode, StepResult,
+    CritiqueReport,
+    PrecheckResult,
+    SciExpMode,
+    StepResult,
 )
 
 
@@ -42,7 +44,7 @@ class SciExpCritiqueEngine:
     def critique(
         self,
         report_text: str,
-        doc_context: Optional[str] = None,
+        doc_context: str | None = None,
         round_number: int = 1,
     ) -> CritiqueReport:
         """Execute full critique pipeline. Returns CritiqueReport."""
@@ -152,7 +154,7 @@ class SciExpCritiqueEngine:
 
     # ── private helpers ────────────────────────────────────────────────────────
 
-    def _rag_context(self, text: str) -> Optional[str]:
+    def _rag_context(self, text: str) -> str | None:
         if self._rag is None:
             return None
         try:
@@ -206,8 +208,9 @@ class SciExpCritiqueEngine:
     def _compute_hsta(self, text: str):
         """Compute HSTA 4D scores from text heuristics."""
         try:
-            from .types import HSTA4DScores
             import re as _re
+
+            from .types import HSTA4DScores
             t = text.lower()
             # N: Novelty — ratio of rare/unique technical terms
             words = set(_re.findall(r"\b[a-z]{5,}\b", t))

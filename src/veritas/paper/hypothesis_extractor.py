@@ -12,7 +12,6 @@ from __future__ import annotations
 import re
 import sys
 from dataclasses import dataclass, field
-from typing import Optional
 
 _BPH_PATH = r"D:\Sanctum\BioMedical-Paper-Harvester"
 
@@ -54,7 +53,7 @@ class ExtractionResult:
     hypothesis:            list[str] = field(default_factory=list)
     null_hypothesis:       list[str] = field(default_factory=list)
     falsification_criteria: list[str] = field(default_factory=list)
-    primary:               Optional[str] = None  # best-match hypothesis
+    primary:               str | None = None  # best-match hypothesis
     source:                str = "local"
 
     def summary(self) -> str:

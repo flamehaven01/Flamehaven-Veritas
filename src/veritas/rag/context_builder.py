@@ -26,7 +26,7 @@ class StepContext:
 
 
 def build_all_contexts(
-    retriever: "SciExpRetriever",
+    retriever: SciExpRetriever,
     top_k: int = 4,
 ) -> dict[str, StepContext]:
     """Build RAG context for each pipeline step."""

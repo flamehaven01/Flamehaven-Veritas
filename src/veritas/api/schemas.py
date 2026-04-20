@@ -1,7 +1,6 @@
 """API Schemas — Pydantic v2 request/response models."""
 from __future__ import annotations
 
-from typing import Optional
 from pydantic import BaseModel, Field
 
 
@@ -15,7 +14,7 @@ class FindingOut(BaseModel):
     code:           str
     description:    str
     traceability:   str
-    verbatim_quote: Optional[str] = None
+    verbatim_quote: str | None = None
 
 
 class StepOut(BaseModel):
@@ -23,7 +22,7 @@ class StepOut(BaseModel):
     weight:           float
     prose:            str
     findings:         list[FindingOut]
-    vulnerable_claim: Optional[str] = None
+    vulnerable_claim: str | None = None
     not_applicable:   bool = False
 
 
@@ -54,7 +53,7 @@ class IRF6DScoresOut(BaseModel):
     M:         float
     A:         float
     D:         float
-    I:         float
+    I:         float  # noqa: E741
     F:         float
     P:         float
     composite: float
@@ -73,12 +72,12 @@ class HSTA4DScoresOut(BaseModel):
 
 class CritiqueResponse(BaseModel):
     precheck:                    PrecheckOut
-    experiment_class:            Optional[str]
-    experiment_class_secondary:  Optional[str]
+    experiment_class:            str | None
+    experiment_class_secondary:  str | None
     experiment_class_reason:     str
     steps:                       list[StepOut]
     priority_fix:                str
-    next_liability:              Optional[str]
+    next_liability:              str | None
     round_number:                int
     omega_score:                 float
     not_traceable_count:         int
@@ -86,9 +85,9 @@ class CritiqueResponse(BaseModel):
     evidence_conflicts:          list[EvidenceConflictOut]
     hold_events:                 list[HoldEventOut]
     # ---- LOGOS enrichment (optional)
-    irf_scores:        Optional[IRF6DScoresOut]  = None
-    hsta_scores:       Optional[HSTA4DScoresOut] = None
-    methodology_class: Optional[str]             = None
-    hypothesis_text:   Optional[str]             = None
-    logos_omega:       Optional[float]           = None
-    hybrid_omega:      Optional[float]           = None
+    irf_scores:        IRF6DScoresOut | None  = None
+    hsta_scores:       HSTA4DScoresOut | None = None
+    methodology_class: str | None             = None
+    hypothesis_text:   str | None             = None
+    logos_omega:       float | None           = None
+    hybrid_omega:      float | None           = None

@@ -4,17 +4,16 @@ from __future__ import annotations
 import tempfile
 import uuid
 from pathlib import Path
-from typing import Annotated
 
 from fastapi import APIRouter, File, Form, HTTPException, UploadFile
 from fastapi.responses import FileResponse
 
 from ..engine import SciExpCritiqueEngine, _extract_file_text
-from ..ingest.document import extract_chunks, SUPPORTED
+from ..ingest.document import SUPPORTED, extract_chunks
 from ..rag.retriever import SciExpRetriever
-from ..render.md_renderer import render_md, save_md
-from ..render.pdf_renderer import render_pdf
 from ..render.docx_renderer import render_docx
+from ..render.md_renderer import save_md
+from ..render.pdf_renderer import render_pdf
 from . import schemas as S
 
 router = APIRouter()
@@ -38,7 +37,7 @@ async def critique_text(req: S.CritiqueRequest):
 
 @router.post("/critique/upload", response_model=S.CritiqueResponse, tags=["critique"])
 async def critique_upload(
-    file:         UploadFile = File(...),
+    file:         UploadFile = File(...),  # noqa: B008
     template:     str        = Form("bmj"),
     round_number: int        = Form(1),
 ):
@@ -74,7 +73,7 @@ async def critique_upload(
 
 @router.post("/critique/download", tags=["critique"])
 async def critique_download(
-    file:         UploadFile = File(...),
+    file:         UploadFile = File(...),  # noqa: B008
     format:       str        = Form("pdf"),    # pdf | docx | md
     template:     str        = Form("bmj"),
     round_number: int        = Form(1),

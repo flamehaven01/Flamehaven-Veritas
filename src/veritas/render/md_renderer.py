@@ -2,7 +2,8 @@
 from __future__ import annotations
 
 from pathlib import Path
-from ..templates.base import BaseTemplate, TemplateSection
+
+from ..templates.base import BaseTemplate
 
 _TRACEABILITY_BADGE = {
     "traceable":           "[+]",

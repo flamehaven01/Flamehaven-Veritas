@@ -18,7 +18,6 @@ from __future__ import annotations
 
 import math
 import re
-from typing import Optional
 
 from ..types import IRF6DScores
 
@@ -98,7 +97,7 @@ class IRFAnalyzer:
         M = self._score_M(t)
         A = self._score_A(t)
         D = self._score_D(t)
-        I = self._score_I(t)
+        I = self._score_I(t)  # noqa: E741
         F = self._score_F(t)
         P = self._score_P(t)
         composite = self._geometric_mean([M, A, D, I, F, P])

@@ -24,17 +24,27 @@ class PdfRenderer:
 def render_pdf(report, output_path: str | Path, template_id: str = "bmj") -> Path:
     """Render CritiqueReport to a professional A4 .pdf file. Returns path."""
     try:
-        from reportlab.lib.pagesizes import A4
         from reportlab.lib import colors as rl
+        from reportlab.lib.pagesizes import A4
         from reportlab.platypus import (
-            SimpleDocTemplate, Paragraph, Spacer,
-            Table, TableStyle, KeepTogether, PageBreak,
+            KeepTogether,
+            PageBreak,
+            Paragraph,
+            SimpleDocTemplate,
+            Spacer,
         )
     except ImportError as exc:
         raise ImportError("reportlab required: pip install reportlab") from exc
 
-    from .layout import MARGIN, MARGIN_TOP, MARGIN_BOT, HDR_BAR_H, CM
-    from .layout import make_rl_colors, build_pdf_styles
+    from .layout import (
+        CM,
+        HDR_BAR_H,
+        MARGIN,
+        MARGIN_BOT,
+        MARGIN_TOP,
+        build_pdf_styles,
+        make_rl_colors,
+    )
 
     tmpl = BaseTemplate.all_templates().get(template_id)
     if tmpl is None:
@@ -50,9 +60,11 @@ def render_pdf(report, output_path: str | Path, template_id: str = "bmj") -> Pat
         canvas.saveState()
         w, h = A4
         # footer rule
-        canvas.setStrokeColor(C["border"]); canvas.setLineWidth(0.5)
+        canvas.setStrokeColor(C["border"])
+        canvas.setLineWidth(0.5)
         canvas.line(MARGIN, MARGIN_BOT - 0.35 * CM, w - MARGIN, MARGIN_BOT - 0.35 * CM)
-        canvas.setFont("Helvetica", 6.5); canvas.setFillColor(C["subtext"])
+        canvas.setFont("Helvetica", 6.5)
+        canvas.setFillColor(C["subtext"])
         canvas.drawString(MARGIN, MARGIN_BOT - 0.65 * CM,
             "VERITAS — AI Critique Experimental Report Analysis Framework  |  Confidential — Research Review Only")
         canvas.drawRightString(w - MARGIN, MARGIN_BOT - 0.65 * CM, f"Page {doc.page}")
@@ -149,7 +161,7 @@ def render_pdf(report, output_path: str | Path, template_id: str = "bmj") -> Pat
 # ---------------------------------------------------------------------------
 
 def _build_cover(display_name: str, meta_rows, S, W, C, rl) -> list:
-    from reportlab.platypus import Table, TableStyle, Spacer, Paragraph
+    from reportlab.platypus import Paragraph, Spacer, Table, TableStyle
 
     title_t = Table(
         [[Paragraph("VERITAS — AI Critique Experimental Report Analysis Framework", S["doc_title"])],
@@ -183,7 +195,7 @@ def _build_cover(display_name: str, meta_rows, S, W, C, rl) -> list:
 
 
 def _sec_hdr(title: str, S, W, C):
-    from reportlab.platypus import Table, TableStyle, Paragraph
+    from reportlab.platypus import Paragraph, Table, TableStyle
 
     t = Table([[Paragraph(_esc(title), S["sec_hdr"])]], colWidths=[W])
     t.setStyle(TableStyle([
@@ -196,7 +208,7 @@ def _sec_hdr(title: str, S, W, C):
 
 
 def _findings_table(findings: list[str], S, W, C, rl):
-    from reportlab.platypus import Table, TableStyle, Paragraph
+    from reportlab.platypus import Paragraph, Table, TableStyle
 
     _badge = {
         "TRACEABLE":           "[+] TRACEABLE",
@@ -242,7 +254,7 @@ def _findings_table(findings: list[str], S, W, C, rl):
 
 def _dim_table(title: str, dims: list[tuple[str, str, str]], S, W, C, rl) -> list:
     """Score dimension table (used for IRF-6D and HSTA-4D)."""
-    from reportlab.platypus import Table, TableStyle, Paragraph, Spacer
+    from reportlab.platypus import Paragraph, Spacer, Table, TableStyle
 
     col_w = [W * 0.12, W * 0.14, W * 0.74]
     data = []

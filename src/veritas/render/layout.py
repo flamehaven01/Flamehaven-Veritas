@@ -46,9 +46,9 @@ def make_rl_colors() -> dict:
 
 def build_pdf_styles() -> dict:
     """Return named ParagraphStyle dict for A4 PDF report."""
-    from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
-    from reportlab.lib.enums import TA_LEFT
     from reportlab.lib import colors
+    from reportlab.lib.enums import TA_LEFT
+    from reportlab.lib.styles import ParagraphStyle, getSampleStyleSheet
 
     base = getSampleStyleSheet()
     C    = {k: colors.HexColor(v) for k, v in HEX.items()}

@@ -8,11 +8,14 @@ Each step follows the OUTPUT CONTRACT strictly:
 from __future__ import annotations
 
 import re
-from typing import Optional
 
 from .types import (
-    ExperimentClass, HoldDisposition, HoldEvent,
-    StepFinding, StepResult, TraceabilityClass,
+    ExperimentClass,
+    HoldDisposition,
+    HoldEvent,
+    StepFinding,
+    StepResult,
+    TraceabilityClass,
 )
 
 # ── STEP 0 ────────────────────────────────────────────────────────────────────
@@ -26,7 +29,7 @@ _EXP_PATTERNS: list[tuple[re.Pattern, ExperimentClass]] = [
 ]
 
 
-def step0_classify(text: str) -> tuple[ExperimentClass, Optional[ExperimentClass], str]:
+def step0_classify(text: str) -> tuple[ExperimentClass, ExperimentClass | None, str]:
     matched: list[ExperimentClass] = []
     for pattern, cls in _EXP_PATTERNS:
         if pattern.search(text):
@@ -257,7 +260,7 @@ def step4_publication_readiness(text: str) -> StepResult:
 def step5_priority_fix(
     step1: StepResult, step2: StepResult,
     step3: StepResult, step4: StepResult,
-) -> tuple[str, Optional[str]]:
+) -> tuple[str, str | None]:
     not_traceable = sum(
         1 for s in [step1, step2, step3, step4]
         for f in s.findings

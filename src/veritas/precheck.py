@@ -18,7 +18,6 @@ from dataclasses import dataclass
 
 from .types import PrecheckResult, SciExpMode
 
-
 # ---------------------------------------------------------------------------
 # Artifact presence heuristics
 # ---------------------------------------------------------------------------
@@ -66,7 +65,7 @@ def _scan(text: str) -> _ArtifactFlags:
 # Mode determination
 # ---------------------------------------------------------------------------
 
-def _classify_mode(missing: list[str]) -> "SciExpMode":
+def _classify_mode(missing: list[str]) -> SciExpMode:
     """Determine PRECHECK mode from the missing-artifact list."""
     if not missing:
         return SciExpMode.FULL

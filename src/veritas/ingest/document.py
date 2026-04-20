@@ -3,7 +3,6 @@ from __future__ import annotations
 
 import sys
 from pathlib import Path
-from typing import Optional
 
 _FF_ROOT = r"D:\Sanctum\Flamehaven-Filesearch"
 
@@ -61,7 +60,7 @@ def extract_chunks(
 
 # ── private helpers ────────────────────────────────────────────────────────────
 
-def _try_flamehaven(path: str, use_cache: bool) -> Optional[str]:
+def _try_flamehaven(path: str, use_cache: bool) -> str | None:
     try:
         if _FF_ROOT not in sys.path:
             sys.path.insert(0, _FF_ROOT)
@@ -71,7 +70,7 @@ def _try_flamehaven(path: str, use_cache: bool) -> Optional[str]:
         return None
 
 
-def _try_pymupdf(path: Path) -> Optional[str]:
+def _try_pymupdf(path: Path) -> str | None:
     try:
         import fitz
         doc = fitz.open(str(path))
@@ -80,7 +79,7 @@ def _try_pymupdf(path: Path) -> Optional[str]:
         return None
 
 
-def _try_pypdf(path: Path) -> Optional[str]:
+def _try_pypdf(path: Path) -> str | None:
     try:
         from pypdf import PdfReader
         reader = PdfReader(str(path))
@@ -89,7 +88,7 @@ def _try_pypdf(path: Path) -> Optional[str]:
         return None
 
 
-def _try_docx(path: Path) -> Optional[str]:
+def _try_docx(path: Path) -> str | None:
     try:
         from docx import Document
         doc = Document(str(path))

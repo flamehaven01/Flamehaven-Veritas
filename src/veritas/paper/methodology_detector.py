@@ -8,9 +8,6 @@ Returns MethodologyClass (primary) and confidence score [0.0, 1.0].
 """
 from __future__ import annotations
 
-import re
-from typing import Optional
-
 from ..types import MethodologyClass
 
 # Pattern banks: (MethodologyClass, markers, threshold_hits)

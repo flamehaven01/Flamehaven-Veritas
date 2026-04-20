@@ -12,7 +12,6 @@ from __future__ import annotations
 
 import re
 from dataclasses import dataclass
-from typing import Optional
 
 from .types import EvidenceConflict, EvidenceRank
 
@@ -23,13 +22,13 @@ class EvidenceItem:
     rank:        EvidenceRank
     label:       str          # human-readable label (e.g. "Figure 3", "SHA-256: abc...")
     content:     str          # extracted text or hash
-    line_number: Optional[int] = None
+    line_number: int | None = None
 
 
 @dataclass
 class ResolutionResult:
     """Output of the resolver for a given set of evidence items."""
-    resolved:   Optional[EvidenceItem]  # highest-authority item, None if all absent
+    resolved:   EvidenceItem | None  # highest-authority item, None if all absent
     conflicts:  list[EvidenceConflict]
     overridden: list[EvidenceItem]      # items that lost to a higher rank
 
