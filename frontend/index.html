@@ -3,109 +3,189 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>SCI-EXP CRITIQUE v2.1</title>
+  <title>VERITAS v2.2 — AI Critique Engine</title>
   <link rel="stylesheet" href="/static/style.css" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" />
 </head>
 <body>
+
+  <!-- ── Header ──────────────────────────────────────────────────────────── -->
   <header class="app-header">
     <div class="header-inner">
-      <div class="logo">
-        <span class="logo-icon">[#]</span>
-        <span class="logo-text">SCI-EXP CRITIQUE <span class="version">v2.1</span></span>
+      <div class="header-left">
+        <div class="logo">
+          <span class="logo-emoji">🔬</span>
+          <div class="logo-text-group">
+            <span class="logo-name">VERITAS</span>
+            <span class="logo-version">v2.2</span>
+          </div>
+        </div>
+        <p class="tagline">AI Critique · Experimental Report Analysis Framework</p>
       </div>
-      <p class="tagline">Experimental Report Analysis Engine</p>
+      <div class="header-right">
+        <a class="header-link" href="/docs" target="_blank">📄 API Docs</a>
+        <a class="header-link" href="https://github.com/flamehaven01/Flamehaven-Veritas" target="_blank">🐙 GitHub</a>
+      </div>
     </div>
   </header>
 
   <main class="app-main">
 
-    <!-- Upload Panel -->
+    <!-- ── Upload Panel ──────────────────────────────────────────────────── -->
     <section class="panel upload-panel" id="uploadPanel">
-      <h2 class="panel-title">Upload Experimental Report</h2>
+
+      <div class="panel-title-row">
+        <h2 class="panel-title">📁 Upload Experimental Report</h2>
+        <span class="panel-subtitle">PDF · DOCX · DOC · TXT · MD</span>
+      </div>
 
       <div class="drop-zone" id="dropZone">
-        <div class="drop-icon">[+]</div>
-        <p class="drop-label">Drag &amp; drop a file here, or <label class="browse-link" for="fileInput">browse</label></p>
-        <p class="drop-hint">Supported: PDF · DOCX · DOC · TXT · MD</p>
+        <div class="drop-content">
+          <div class="drop-emoji" id="dropEmoji">📂</div>
+          <p class="drop-label">Drag &amp; drop your report here</p>
+          <p class="drop-or">— or —</p>
+          <label class="btn-browse" for="fileInput">Browse File</label>
+        </div>
         <input type="file" id="fileInput" accept=".pdf,.docx,.doc,.txt,.md" hidden />
       </div>
 
       <div class="file-info hidden" id="fileInfo">
-        <span class="file-name" id="fileName"></span>
-        <button class="btn-clear" id="clearFile" title="Clear">✕</button>
+        <span class="file-type-icon" id="fileTypeIcon">📄</span>
+        <div class="file-detail">
+          <span class="file-name" id="fileName"></span>
+          <span class="file-size" id="fileSize"></span>
+        </div>
+        <button class="btn-clear" id="clearFile" title="Remove file">✕</button>
       </div>
 
-      <div class="options-row">
+      <div class="options-grid">
         <div class="option-group">
-          <label for="templateSelect">Report Template</label>
+          <label for="templateSelect">🗂️ Report Template</label>
           <select id="templateSelect">
-            <option value="bmj">BMJ Scientific Editing Report</option>
-            <option value="ku">KU Research Report Template</option>
+            <option value="bmj">BMJ Scientific Editing</option>
+            <option value="ku">KU Research Report</option>
           </select>
         </div>
         <div class="option-group">
-          <label for="roundInput">Round</label>
+          <label for="roundInput">🔄 Critique Round</label>
           <input type="number" id="roundInput" value="1" min="1" max="99" />
         </div>
         <div class="option-group">
-          <label for="outputFormat">Output Format</label>
+          <label for="outputFormat">📤 Output Format</label>
           <select id="outputFormat">
-            <option value="preview">Preview (inline)</option>
-            <option value="md">Markdown (.md)</option>
-            <option value="docx">Word (.docx)</option>
-            <option value="pdf">PDF (.pdf)</option>
+            <option value="preview">🖥️ Preview (inline)</option>
+            <option value="md">📝 Markdown (.md)</option>
+            <option value="docx">📘 Word (.docx)</option>
+            <option value="pdf">📕 PDF (.pdf)</option>
+            <option value="tex">🔤 LaTeX (.tex)</option>
           </select>
         </div>
       </div>
 
       <button class="btn-primary" id="submitBtn" disabled>
+        <span class="btn-icon">🔍</span>
         <span class="btn-label">Analyse Report</span>
       </button>
+
+      <div class="feature-badges">
+        <span class="badge">⚡ LOGOS IRF-Calc 6D</span>
+        <span class="badge">📊 HSTA 4D</span>
+        <span class="badge">📚 Bibliography</span>
+        <span class="badge">✅ Reproducibility</span>
+        <span class="badge">🤖 MICA Agent-Ready</span>
+      </div>
     </section>
 
-    <!-- Progress -->
+    <!-- ── Progress Panel ───────────────────────────────────────────────── -->
     <section class="panel progress-panel hidden" id="progressPanel">
       <div class="progress-inner">
-        <div class="spinner"></div>
+        <div class="progress-spinner-wrap">
+          <div class="spinner"></div>
+          <span class="spinner-emoji" id="spinnerEmoji">🔬</span>
+        </div>
         <p class="progress-label" id="progressLabel">Running PRECHECK...</p>
+        <div class="progress-steps" id="progressSteps">
+          <span class="pstep" data-step="precheck">🚦 PRECHECK</span>
+          <span class="pstep-arrow">›</span>
+          <span class="pstep" data-step="classify">🏷️ CLASSIFY</span>
+          <span class="pstep-arrow">›</span>
+          <span class="pstep" data-step="pipeline">⚙️ PIPELINE</span>
+          <span class="pstep-arrow">›</span>
+          <span class="pstep" data-step="enrich">🧬 ENRICH</span>
+          <span class="pstep-arrow">›</span>
+          <span class="pstep" data-step="render">📄 RENDER</span>
+        </div>
         <div class="progress-bar-wrap">
           <div class="progress-bar" id="progressBar"></div>
         </div>
+        <p class="progress-pct" id="progressPct">0%</p>
       </div>
     </section>
 
-    <!-- Result Panel -->
+    <!-- ── Result Panel ──────────────────────────────────────────────────── -->
     <section class="panel result-panel hidden" id="resultPanel">
-      <div class="result-header">
-        <div class="result-meta" id="resultMeta"></div>
+
+      <!-- Score Hero -->
+      <div class="score-hero" id="scoreHero">
+        <div class="omega-block">
+          <div class="omega-label">Ω Omega Score</div>
+          <div class="omega-value" id="omegaValue">—</div>
+          <div class="omega-bar-wrap"><div class="omega-bar" id="omegaBar"></div></div>
+          <div class="omega-verdict" id="omegaVerdict"></div>
+        </div>
+        <div class="meta-chips" id="metaChips"></div>
+      </div>
+
+      <!-- Toolbar -->
+      <div class="result-toolbar">
+        <div class="precheck-row" id="precheckRow"></div>
         <div class="download-group" id="downloadGroup"></div>
       </div>
 
-      <!-- Precheck badge -->
-      <div class="precheck-row" id="precheckRow"></div>
+      <!-- IRF / HSTA mini-scores -->
+      <div class="score-grid" id="scoreGrid"></div>
 
       <!-- Step accordion -->
+      <div class="steps-header">📋 Critique Steps</div>
       <div class="steps-container" id="stepsContainer"></div>
 
       <!-- Priority Fix -->
       <div class="priority-box" id="priorityBox"></div>
 
-      <button class="btn-secondary" id="newAnalysisBtn">New Analysis</button>
+      <!-- Actions -->
+      <div class="result-actions">
+        <button class="btn-secondary" id="newAnalysisBtn">🔄 New Analysis</button>
+        <button class="btn-secondary" id="copyMdBtn">📋 Copy Markdown</button>
+      </div>
     </section>
 
-    <!-- Error -->
+    <!-- ── Error Panel ───────────────────────────────────────────────────── -->
     <section class="panel error-panel hidden" id="errorPanel">
-      <p class="error-msg" id="errorMsg"></p>
-      <button class="btn-secondary" id="errorRetryBtn">Try Again</button>
+      <div class="error-inner">
+        <div class="error-emoji">⚠️</div>
+        <p class="error-title">Analysis Failed</p>
+        <p class="error-msg" id="errorMsg"></p>
+        <button class="btn-primary small" id="errorRetryBtn">
+          <span class="btn-icon">↩️</span><span class="btn-label">Try Again</span>
+        </button>
+      </div>
     </section>
 
   </main>
 
   <footer class="app-footer">
-    <span>SCI-EXP CRITIQUE v2.1 · Powered by Flamehaven RAG</span>
-    <a href="/docs" target="_blank">API Docs</a>
+    <div class="footer-inner">
+      <span class="footer-brand">🔬 VERITAS v2.2 · Flamehaven Sovereign Stack</span>
+      <div class="footer-links">
+        <a href="/docs" target="_blank">📄 API</a>
+        <a href="https://github.com/flamehaven01/Flamehaven-Veritas" target="_blank">🐙 Source</a>
+        <a href="https://pypi.org/project/flamehaven-veritas/" target="_blank">📦 PyPI</a>
+      </div>
+    </div>
   </footer>
 
   <script src="/static/app.js"></script>
 </body>
 </html>
+
