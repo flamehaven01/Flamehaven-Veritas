@@ -110,7 +110,7 @@ def _emit_report(report, fmt: str, out: str | None, template: str) -> None:
         from ..render.latex_renderer import LatexRenderer
     except ImportError as exc:
         raise click.ClickException(f"LaTeX renderer unavailable: {exc}") from exc
-    LatexRenderer().render(report, out, template=template)
+    LatexRenderer().render(report, out or "report.tex", template=template)
     click.echo(f"[+] LaTeX saved to {out}")
 
 
@@ -200,10 +200,10 @@ def info():
     click.echo(f"VERITAS v{_VERSION}")
     # LOGOS bridge
     try:
-        from ..logos.logos_bridge import make_logos_bridge
+        from ..logos.logos_bridge import LogosBridge
 
-        bridge = make_logos_bridge()
-        click.echo(f"LOGOS bridge  : {bridge.mode()}")
+        bridge = LogosBridge()
+        click.echo(f"LOGOS bridge  : {bridge.source}")
     except Exception as exc:
         click.echo(f"LOGOS bridge  : unavailable ({exc})")
     # MICA

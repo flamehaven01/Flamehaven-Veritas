@@ -35,9 +35,9 @@ def report_to_subject(report: CritiqueReport) -> dict[str, Any]:
 
     repro_completeness: float | None = None
     if report.reproducibility_checklist is not None:
-        items = report.reproducibility_checklist.items or {}
-        tot = len(items)
-        sat = sum(1 for v in items.values() if v is True)
+        checklist_items = report.reproducibility_checklist.items
+        tot = len(checklist_items)
+        sat = sum(1 for item in checklist_items if item.satisfied is True)
         repro_completeness = sat / tot if tot else None
 
     return {

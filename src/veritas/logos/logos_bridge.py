@@ -12,6 +12,7 @@ from __future__ import annotations
 
 import re
 import sys
+from typing import Any
 
 from ..types import IRF6DScores
 from .irf_analyzer import IRFAnalyzer
@@ -19,7 +20,7 @@ from .irf_analyzer import IRFAnalyzer
 _LOGOS_PATH = r"D:\Sanctum\Flamehaven-LOGOS"
 
 
-def _build_irf_context(text: str) -> dict:
+def _build_irf_context(text: str) -> dict[str, Any]:
     """Extract IRF context keys from free-text experimental report.
 
     Returns dict compatible with Flamehaven-LOGOS IRFPipeline.run(query, context).
@@ -50,7 +51,7 @@ class LogosBridge:
     """
 
     def __init__(self) -> None:
-        self._pipeline = None
+        self._pipeline: Any | None = None
         self._try_load_pipeline()
         self._local = IRFAnalyzer()
 
@@ -58,7 +59,7 @@ class LogosBridge:
         try:
             if _LOGOS_PATH not in sys.path:
                 sys.path.insert(0, _LOGOS_PATH)
-            from irf.pipeline import IRFPipeline  # type: ignore
+            from irf.pipeline import IRFPipeline  # type: ignore[import]
 
             self._pipeline = IRFPipeline()
         except Exception:
@@ -81,6 +82,7 @@ class LogosBridge:
         return self._local.score(text, source="local")
 
     def _run_pipeline(self, query: str, text: str) -> IRF6DScores:
+        assert self._pipeline is not None
         try:
             ctx = _build_irf_context(text)
             result = self._pipeline.run(query, ctx)
