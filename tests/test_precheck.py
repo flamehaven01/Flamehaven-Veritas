@@ -7,8 +7,7 @@ from pathlib import Path
 sys.path.insert(0, str(Path(__file__).parents[1] / "src"))
 
 from veritas.precheck import run
-from veritas.types    import SciExpMode
-
+from veritas.types import SciExpMode
 
 FULL_REPORT = """
 Method: dissolve 10 mg compound in 5 mL DMSO. source_path: /data/exp/raw_v1.csv

@@ -1,5 +1,4 @@
 """Tests for ReproducibilityChecklistExtractor."""
-import pytest
 from veritas.paper.reproducibility_checklist import ReproducibilityChecklistExtractor
 from veritas.types import ReproducibilityChecklist
 

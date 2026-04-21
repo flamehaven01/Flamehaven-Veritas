@@ -1,5 +1,4 @@
 """Tests for BibliographyAnalyzer."""
-import pytest
 from veritas.paper.bibliography_analyzer import BibliographyAnalyzer
 from veritas.types import BibliographyStats
 

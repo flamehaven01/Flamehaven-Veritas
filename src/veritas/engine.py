@@ -117,7 +117,7 @@ class SciExpCritiqueEngine:
         # Prefer hybrid_omega if computed; otherwise use sciexp_omega
         final_omega = hybrid_omega if hybrid_omega is not None else sciexp_omega
 
-        return CritiqueReport(
+        report = CritiqueReport(
             precheck=pc,
             experiment_class=exp_class,
             experiment_class_secondary=exp_secondary,
@@ -138,6 +138,10 @@ class SciExpCritiqueEngine:
             bibliography_stats=bibliography_stats,
             reproducibility_checklist=reproducibility_checklist,
         )
+
+        # ── SPAR claim-aware review (post-build; needs complete report as subject)
+        report.spar_review = self._compute_spar(report, text)
+        return report
 
     def critique_from_file(
         self,
@@ -259,6 +263,30 @@ class SciExpCritiqueEngine:
             return None
         try:
             return self._repro.extract(text)
+        except Exception:
+            return None
+
+    def _compute_spar(self, report: CritiqueReport, report_text: str) -> dict | None:
+        """Run SPAR claim-aware review on the completed CritiqueReport.
+
+        Requires spar-framework installed.  Returns dict (ReviewResult.to_dict()) or None.
+        """
+        try:
+            from spar_framework.engine import run_review  # type: ignore[import]
+
+            from .spar_bridge.runtime import get_review_runtime
+            from .spar_bridge.subject_mapper import report_to_subject
+
+            runtime = get_review_runtime()
+            subject = report_to_subject(report)
+            result = run_review(
+                runtime=runtime,
+                subject=subject,
+                source="sciexp",
+                gate="ACCEPT" if report.omega_score >= 0.70 else "REVISION",
+                report_text=report_text,
+            )
+            return result.to_dict()
         except Exception:
             return None
 

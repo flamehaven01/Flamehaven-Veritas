@@ -91,3 +91,5 @@ class CritiqueResponse(BaseModel):
     hypothesis_text:   str | None             = None
     logos_omega:       float | None           = None
     hybrid_omega:      float | None           = None
+    # ---- SPAR claim-aware review (optional; requires spar-framework)
+    spar_review:       dict | None            = None

@@ -5,10 +5,9 @@ import pytest
 
 from veritas.logos.irf_analyzer import IRFAnalyzer
 from veritas.logos.omega_fusion import OmegaFusion
-from veritas.paper.methodology_detector import MethodologyDetector
 from veritas.paper.hypothesis_extractor import HypothesisExtractor
+from veritas.paper.methodology_detector import MethodologyDetector
 from veritas.types import IRF6DScores, MethodologyClass
-
 
 # ── Fixtures ──────────────────────────────────────────────────────────────────
 

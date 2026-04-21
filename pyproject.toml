@@ -56,6 +56,9 @@ logos = [
 rag = [
     "numpy>=1.24.0",
 ]
+spar = [
+    "spar-framework>=1.0.0",
+]
 
 [project.scripts]
 veritas = "veritas.cli.main:main"

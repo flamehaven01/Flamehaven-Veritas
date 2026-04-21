@@ -2,6 +2,7 @@
 from __future__ import annotations
 
 import sys
+
 import pytest
 
 # Ensure src is importable
@@ -40,5 +41,6 @@ def engine():
 @pytest.fixture
 def client():
     from fastapi.testclient import TestClient
+
     from veritas.api.app import app
     return TestClient(app)

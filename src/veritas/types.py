@@ -203,6 +203,9 @@ class CritiqueReport:
     bibliography_stats:        BibliographyStats | None        = None
     reproducibility_checklist: ReproducibilityChecklist | None = None
 
+    # ---- SPAR claim-aware review (optional; None when spar-framework not installed)
+    spar_review: dict | None = None
+
     def step(self, step_id: str) -> StepResult | None:
         return next((s for s in self.steps if s.step_id == step_id), None)
 

@@ -2,11 +2,20 @@
 from __future__ import annotations
 
 import pytest
-from veritas.render.latex_renderer import render_latex, LatexRenderer, _e
+
+from veritas.render.latex_renderer import LatexRenderer, _e, render_latex
 from veritas.types import (
-    CritiqueReport, PrecheckResult, SciExpMode,
-    IRF6DScores, HSTA4DScores, StepResult, StepFinding, TraceabilityClass,
-    BibliographyStats, ReproducibilityChecklist, ReproducibilityItem,
+    BibliographyStats,
+    CritiqueReport,
+    HSTA4DScores,
+    IRF6DScores,
+    PrecheckResult,
+    ReproducibilityChecklist,
+    ReproducibilityItem,
+    SciExpMode,
+    StepFinding,
+    StepResult,
+    TraceabilityClass,
 )
 
 

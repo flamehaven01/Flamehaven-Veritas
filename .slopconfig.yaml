@@ -1,0 +1,11 @@
+ignore:
+  - "**/__init__.py"
+  - "tests/**"
+  - "docs/**"
+  - ".git/**"
+  - ".github/**"
+  - "frontend/**"
+  - "dist/**"
+  - ".venv/**"
+  - "venv/**"
+  - "**/__pycache__/**"

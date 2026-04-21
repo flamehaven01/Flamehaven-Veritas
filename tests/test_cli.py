@@ -1,7 +1,6 @@
 """Tests for the veritas CLI (Mode 2)."""
 from __future__ import annotations
 
-import json
 import pathlib
 import tempfile
 
@@ -9,7 +8,6 @@ import pytest
 from click.testing import CliRunner
 
 from veritas.cli.main import main
-
 
 # ---------------------------------------------------------------------------
 # Fixtures

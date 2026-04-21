@@ -216,4 +216,5 @@ def _to_response(report) -> S.CritiqueResponse:
         hypothesis_text=report.hypothesis_text,
         logos_omega=report.logos_omega,
         hybrid_omega=report.hybrid_omega,
+        spar_review=report.spar_review,
     )

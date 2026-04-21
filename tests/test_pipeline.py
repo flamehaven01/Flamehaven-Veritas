@@ -7,8 +7,12 @@ from pathlib import Path
 sys.path.insert(0, str(Path(__file__).parents[1] / "src"))
 
 from veritas.pipeline import (
-    step0_classify, step1_claim_integrity, step2_traceability,
-    step3_series_continuity, step4_publication_readiness, step5_priority_fix,
+    step0_classify,
+    step1_claim_integrity,
+    step2_traceability,
+    step3_series_continuity,
+    step4_publication_readiness,
+    step5_priority_fix,
 )
 from veritas.types import TraceabilityClass
 
