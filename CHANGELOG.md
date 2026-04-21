@@ -7,6 +7,32 @@ Versioning: [Semantic Versioning](https://semver.org/spec/v2.0.0.html)
 
 ---
 
+## [2.2.1] — 2026-04-21
+
+### Fixed
+- **`cli/main.py`** — fallback `_VERSION` updated to `"2.2.1"`; previously reported `2.1.0`
+  when `importlib.metadata` lookup failed in CI environments
+- **`spar_bridge/layer_a/b/c.py`** — `from spar_framework.result_types import CheckResult`
+  replaced with `try/except ImportError` fallback to `_compat.CheckResult`; CI no longer
+  fails with `ModuleNotFoundError` when `spar-framework` is not installed
+- **`spar_bridge/runtime.py`** — `ReviewRuntime` import made conditional; `get_review_runtime()`
+  raises `ImportError` with install instructions when `spar-framework` is absent
+- **`tests/test_spar_bridge.py`** — `TestRuntime` class decorated with
+  `@pytest.mark.skipif(not _SPAR_AVAILABLE, ...)` so CI skips runtime tests gracefully
+
+### Added
+- **`src/veritas/spar_bridge/_compat.py`** — fallback `CheckResult` dataclass matching
+  `spar_framework.result_types.CheckResult` interface (`check_id`, `label`, `status`,
+  `detail`, `meta`) for CI-safe operation without optional `spar` extra
+
+### Quality
+- **Tests**: 159 passing, 2 skipped (spar runtime, CI-only) — up from 109 in v2.2.0
+- **Coverage**: 82.34% (gate: 80%)
+- **mypy**: 0 errors in 45 source files
+- **ruff**: 0 lint errors, format clean
+
+---
+
 ## [2.2.0] — 2026-04-19
 
 ### Added
