@@ -23,7 +23,7 @@ _VERSION = "unknown"
 try:
     _VERSION = _pkg_version("veritas")
 except Exception:
-    _VERSION = "2.1.0"
+    _VERSION = "2.2.0"
 
 
 def _load_engine():
