@@ -7,6 +7,7 @@ IRFAnalyzer when imports fail (no numpy, server unavailable, etc.).
 Context building: extracts structural cues from report text to populate
 the IRFPipeline context dict (premises, assumptions, observations, etc.).
 """
+
 from __future__ import annotations
 
 import re
@@ -26,17 +27,16 @@ def _build_irf_context(text: str) -> dict:
     sentences = re.split(r"(?<=[.!?])\s+", text)
 
     def _collect(markers: list[str]) -> list[str]:
-        return [s.strip() for s in sentences
-                if any(m.lower() in s.lower() for m in markers)][:5]
+        return [s.strip() for s in sentences if any(m.lower() in s.lower() for m in markers)][:5]
 
     return {
-        "premises":            _collect(["assume", "given", "premise", "based on"]),
-        "assumptions":         _collect(["assumption", "we assume", "suppose"]),
-        "domain_knowledge":    _collect(["prior", "background", "known", "established"]),
-        "observations":        _collect(["observed", "measured", "found", "result"]),
-        "counterexamples":     _collect(["however", "except", "but", "contradict"]),
-        "falsifiable":         _collect(["falsif", "null", "test", "disprove"]),
-        "paradigm":            _collect(["reference", "et al", "doi", "baseline"]),
+        "premises": _collect(["assume", "given", "premise", "based on"]),
+        "assumptions": _collect(["assumption", "we assume", "suppose"]),
+        "domain_knowledge": _collect(["prior", "background", "known", "established"]),
+        "observations": _collect(["observed", "measured", "found", "result"]),
+        "counterexamples": _collect(["however", "except", "but", "contradict"]),
+        "falsifiable": _collect(["falsif", "null", "test", "disprove"]),
+        "paradigm": _collect(["reference", "et al", "doi", "baseline"]),
         "theoretical_grounding": _collect(["theory", "model", "framework"]),
     }
 
@@ -59,6 +59,7 @@ class LogosBridge:
             if _LOGOS_PATH not in sys.path:
                 sys.path.insert(0, _LOGOS_PATH)
             from irf.pipeline import IRFPipeline  # type: ignore
+
             self._pipeline = IRFPipeline()
         except Exception:
             self._pipeline = None
@@ -85,19 +86,23 @@ class LogosBridge:
             result = self._pipeline.run(query, ctx)
             sc = result.score
             # IRFResult has .continuous per-dimension dict + .passed
-            dims   = sc.continuous if hasattr(sc, "continuous") else {}
+            dims = sc.continuous if hasattr(sc, "continuous") else {}
             M = float(dims.get("M", 0.0))
             A = float(dims.get("A", 0.0))
             D = float(dims.get("D", 0.0))
             I = float(dims.get("I", 0.0))  # noqa: E741
             F = float(dims.get("F", 0.0))
             P = float(dims.get("P", 0.0))
-            composite = float(sc.composite) if hasattr(sc, "composite") else (
-                (M + A + D + I + F + P) / 6.0
+            composite = (
+                float(sc.composite) if hasattr(sc, "composite") else ((M + A + D + I + F + P) / 6.0)
             )
             return IRF6DScores(
-                M=round(M, 4), A=round(A, 4), D=round(D, 4),
-                I=round(I, 4), F=round(F, 4), P=round(P, 4),
+                M=round(M, 4),
+                A=round(A, 4),
+                D=round(D, 4),
+                I=round(I, 4),
+                F=round(F, 4),
+                P=round(P, 4),
                 composite=round(composite, 4),
                 passed=bool(getattr(sc, "passed", composite >= 0.65)),
                 source="logos_irf_pipeline",

@@ -1,4 +1,5 @@
 """Tests for the veritas CLI (Mode 2)."""
+
 from __future__ import annotations
 
 import pathlib
@@ -80,9 +81,7 @@ class TestCritique:
         assert result.exit_code == 0, result.output
 
     def test_critique_round_flag(self, runner):
-        result = runner.invoke(
-            main, ["critique", "--text", SAMPLE_TEXT, "--round", "2", "--quiet"]
-        )
+        result = runner.invoke(main, ["critique", "--text", SAMPLE_TEXT, "--round", "2", "--quiet"])
         assert result.exit_code == 0, result.output
         assert "**Round:** 2" in result.output
 
@@ -101,9 +100,7 @@ class TestCritique:
         assert any(badge in result.output for badge in ["[+]", "[-]", "[~]"])
 
     def test_minimal_text_does_not_crash(self, runner):
-        result = runner.invoke(
-            main, ["critique", "--text", "Some experiment.", "--quiet"]
-        )
+        result = runner.invoke(main, ["critique", "--text", "Some experiment.", "--quiet"])
         assert result.exit_code == 0, result.output
 
 

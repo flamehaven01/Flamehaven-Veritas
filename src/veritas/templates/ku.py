@@ -4,6 +4,7 @@ Maps CritiqueReport to the University of Kisumu (KU) Research Report
 structure: Title → Abstract → Introduction → Methodology → Results →
 Discussion → Conclusion → References.
 """
+
 from __future__ import annotations
 
 from .base import BaseTemplate, TemplateSection
@@ -12,7 +13,7 @@ from .base import BaseTemplate, TemplateSection
 class KUTemplate(BaseTemplate):
     """KU Research Report (8-chapter layout)."""
 
-    TEMPLATE_ID  = "ku"
+    TEMPLATE_ID = "ku"
     DISPLAY_NAME = "KU Research Report Template"
 
     SECTIONS = [
@@ -30,35 +31,50 @@ class KUTemplate(BaseTemplate):
         sections: list[TemplateSection] = []
 
         # Title Page
-        sections.append(TemplateSection(
-            title="Title Page",
-            level=1,
-            body="\n".join([
-                "VERITAS — EXPERIMENTAL REPORT ANALYSIS v2.1",
-                "",
-                f"Critique Round    : {report.round_number}",
-                f"PRECHECK Mode     : {report.precheck.mode.value}",
-                f"Missing Artifacts : {', '.join(report.precheck.missing_artifacts) or 'none'}",
-                f"Omega Score       : {report.omega_score:.4f}",
-                "",
-                "Prepared using the KU Research Report Template",
-            ]),
-        ))
+        sections.append(
+            TemplateSection(
+                title="Title Page",
+                level=1,
+                body="\n".join(
+                    [
+                        "VERITAS — EXPERIMENTAL REPORT ANALYSIS v2.1",
+                        "",
+                        f"Critique Round    : {report.round_number}",
+                        f"PRECHECK Mode     : {report.precheck.mode.value}",
+                        f"Missing Artifacts : {', '.join(report.precheck.missing_artifacts) or 'none'}",
+                        f"Omega Score       : {report.omega_score:.4f}",
+                        "",
+                        "Prepared using the KU Research Report Template",
+                    ]
+                ),
+            )
+        )
 
         # Abstract
         step1 = report.step("1")
         abstract = (
             f"PRECHECK MODE: {report.precheck.mode.value}. "
             f"MISSING ARTIFACTS: {', '.join(report.precheck.missing_artifacts) or 'none'}. "
-            + (f"Experiment class: {report.experiment_class.value}. " if report.experiment_class else "")
-            + (step1.vulnerable_claim if step1 and step1.vulnerable_claim else "See Claim Integrity section for details.")
+            + (
+                f"Experiment class: {report.experiment_class.value}. "
+                if report.experiment_class
+                else ""
+            )
+            + (
+                step1.vulnerable_claim
+                if step1 and step1.vulnerable_claim
+                else "See Claim Integrity section for details."
+            )
         )
         sections.append(TemplateSection(title="Abstract", level=1, body=abstract))
 
         # Introduction — STEP 0
         cls_label = report.experiment_class.value if report.experiment_class else "UNKNOWN"
-        secondary = (f", SECONDARY={report.experiment_class_secondary.value}"
-                     if report.experiment_class_secondary else "")
+        secondary = (
+            f", SECONDARY={report.experiment_class_secondary.value}"
+            if report.experiment_class_secondary
+            else ""
+        )
         intro = (
             f"This report is classified as **{cls_label}{secondary}**. "
             f"{report.experiment_class_reason} "
@@ -69,12 +85,14 @@ class KUTemplate(BaseTemplate):
 
         # Methodology — STEP 2 (traceability as methodology audit)
         step2 = report.step("2")
-        sections.append(TemplateSection(
-            title="Methodology",
-            level=1,
-            body=_step_body(step2),
-            findings=_format_findings(step2),
-        ))
+        sections.append(
+            TemplateSection(
+                title="Methodology",
+                level=1,
+                body=_step_body(step2),
+                findings=_format_findings(step2),
+            )
+        )
 
         # Results & Findings — STEP 1 + STEP 3
         step3 = report.step("3")
@@ -82,9 +100,14 @@ class KUTemplate(BaseTemplate):
         if step3:
             results_body += "\n\n**Series Continuity**\n\n" + _step_body(step3)
         findings = _format_findings(step1) + _format_findings(step3)
-        sections.append(TemplateSection(
-            title="Results & Findings", level=1, body=results_body, findings=findings,
-        ))
+        sections.append(
+            TemplateSection(
+                title="Results & Findings",
+                level=1,
+                body=results_body,
+                findings=findings,
+            )
+        )
 
         # Discussion — STEP 4 + evidence conflicts
         step4 = report.step("4")
@@ -111,43 +134,54 @@ class KUTemplate(BaseTemplate):
                     f"disposition={h.disposition.value}, "
                     f"traceable_to_data={h.traceable_to_data}"
                 )
-        refs.append(f"\n**Omega Score:** {report.omega_score:.4f} "
-                    f"(1.0=fully traceable, 0.0=blocked)")
-        sections.append(TemplateSection(
-            title="References & Appendices", level=1, body="\n".join(refs),
-        ))
+        refs.append(
+            f"\n**Omega Score:** {report.omega_score:.4f} (1.0=fully traceable, 0.0=blocked)"
+        )
+        sections.append(
+            TemplateSection(
+                title="References & Appendices",
+                level=1,
+                body="\n".join(refs),
+            )
+        )
 
         # Bibliography Analysis (optional)
         if report.bibliography_stats:
-            s   = report.bibliography_stats
+            s = report.bibliography_stats
             fmt = ", ".join(s.formats_detected) or "Unknown"
-            yr  = f"{s.oldest_year}–{s.newest_year}" if s.oldest_year else "N/A"
-            sections.append(TemplateSection(
-                title="Bibliography Analysis",
-                level=1,
-                body="\n".join([
-                    f"Total references   : {s.total_refs}",
-                    f"Recent ratio (≤5yr): {s.recent_ratio:.1%}",
-                    f"Year range         : {yr}",
-                    f"Citation format    : {fmt}",
-                    f"Self-cite detected : {'Yes' if s.self_citation_detected else 'No'}",
-                    f"Quality score      : {s.quality_score:.4f}",
-                ]),
-            ))
+            yr = f"{s.oldest_year}–{s.newest_year}" if s.oldest_year else "N/A"
+            sections.append(
+                TemplateSection(
+                    title="Bibliography Analysis",
+                    level=1,
+                    body="\n".join(
+                        [
+                            f"Total references   : {s.total_refs}",
+                            f"Recent ratio (≤5yr): {s.recent_ratio:.1%}",
+                            f"Year range         : {yr}",
+                            f"Citation format    : {fmt}",
+                            f"Self-cite detected : {'Yes' if s.self_citation_detected else 'No'}",
+                            f"Quality score      : {s.quality_score:.4f}",
+                        ]
+                    ),
+                )
+            )
 
         # Reproducibility Checklist (optional)
         if report.reproducibility_checklist:
             rc = report.reproducibility_checklist
-            sections.append(TemplateSection(
-                title="Reproducibility Checklist",
-                level=1,
-                body=f"Score: {rc.score:.4f} | {rc.summary}",
-                findings=[
-                    f"[{item.code}] [{'SATISFIED' if item.satisfied else 'NOT MET' if item.satisfied is False else 'UNKNOWN'}] "
-                    f"{item.criterion}" + (f" — {item.note}" if item.note else "")
-                    for item in rc.items
-                ],
-            ))
+            sections.append(
+                TemplateSection(
+                    title="Reproducibility Checklist",
+                    level=1,
+                    body=f"Score: {rc.score:.4f} | {rc.summary}",
+                    findings=[
+                        f"[{item.code}] [{'SATISFIED' if item.satisfied else 'NOT MET' if item.satisfied is False else 'UNKNOWN'}] "
+                        f"{item.criterion}" + (f" — {item.note}" if item.note else "")
+                        for item in rc.items
+                    ],
+                )
+            )
 
         return sections
 
@@ -161,7 +195,7 @@ def _format_findings(step) -> list[str]:
         return []
     lines = []
     for f in step.findings:
-        tc   = f.traceability.value
+        tc = f.traceability.value
         line = f"[{f.code}] [{tc.upper()}] {f.description}"
         if f.verbatim_quote:
             line += f' — "{f.verbatim_quote}"'

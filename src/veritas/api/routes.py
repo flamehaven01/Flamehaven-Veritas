@@ -1,4 +1,5 @@
 """API Routes — /critique, /precheck, /classify, /download."""
+
 from __future__ import annotations
 
 import tempfile
@@ -26,6 +27,7 @@ _TMP.mkdir(exist_ok=True)
 
 # ── /critique/text ─────────────────────────────────────────────────────────────
 
+
 @router.post("/critique/text", response_model=S.CritiqueResponse, tags=["critique"])
 async def critique_text(req: S.CritiqueRequest):
     """Submit raw text and receive structured VERITAS."""
@@ -35,11 +37,12 @@ async def critique_text(req: S.CritiqueRequest):
 
 # ── /critique/upload ───────────────────────────────────────────────────────────
 
+
 @router.post("/critique/upload", response_model=S.CritiqueResponse, tags=["critique"])
 async def critique_upload(
-    file:         UploadFile = File(...),  # noqa: B008
-    template:     str        = Form("bmj"),
-    round_number: int        = Form(1),
+    file: UploadFile = File(...),  # noqa: B008
+    template: str = Form("bmj"),
+    round_number: int = Form(1),
 ):
     """Upload a document (PDF, DOCX, DOC, TXT, MD) and receive critique."""
     suffix = Path(file.filename or "upload.txt").suffix.lower()
@@ -71,12 +74,13 @@ async def critique_upload(
 
 # ── /critique/download ─────────────────────────────────────────────────────────
 
+
 @router.post("/critique/download", tags=["critique"])
 async def critique_download(
-    file:         UploadFile = File(...),  # noqa: B008
-    format:       str        = Form("pdf"),    # pdf | docx | md
-    template:     str        = Form("bmj"),
-    round_number: int        = Form(1),
+    file: UploadFile = File(...),  # noqa: B008
+    format: str = Form("pdf"),  # pdf | docx | md
+    template: str = Form("bmj"),
+    round_number: int = Form(1),
 ):
     """Upload document → receive downloadable critique report in chosen format."""
     suffix = Path(file.filename or "upload.txt").suffix.lower()
@@ -88,7 +92,7 @@ async def critique_download(
     tmp_in = _TMP / f"{uuid.uuid4().hex}{suffix}"
     tmp_in.write_bytes(await file.read())
 
-    out_id  = uuid.uuid4().hex
+    out_id = uuid.uuid4().hex
     out_ext = f".{format}"
     out_path = _TMP / f"critique_{out_id}{out_ext}"
 
@@ -127,9 +131,11 @@ async def critique_download(
 
 # ── /precheck ──────────────────────────────────────────────────────────────────
 
+
 @router.post("/precheck", response_model=S.PrecheckOut, tags=["critique"])
 async def precheck_only(req: S.CritiqueRequest):
     from .. import precheck as _pc
+
     result = _pc.run(req.report_text)
     return S.PrecheckOut(
         mode=result.mode.value,
@@ -141,13 +147,17 @@ async def precheck_only(req: S.CritiqueRequest):
 
 # ── helpers ────────────────────────────────────────────────────────────────────
 
+
 def _to_response(report) -> S.CritiqueResponse:
     # Serialize HSTA 4D
     hsta_out = None
     if report.hsta_scores is not None:
         h = report.hsta_scores
         hsta_out = S.HSTA4DScoresOut(
-            N=h.N, C=h.C, T=h.T, R=h.R,
+            N=h.N,
+            C=h.C,
+            T=h.T,
+            R=h.R,
             composite=round(h.composite, 4),
         )
 
@@ -160,8 +170,7 @@ def _to_response(report) -> S.CritiqueResponse:
         ),
         experiment_class=report.experiment_class.value if report.experiment_class else None,
         experiment_class_secondary=(
-            report.experiment_class_secondary.value
-            if report.experiment_class_secondary else None
+            report.experiment_class_secondary.value if report.experiment_class_secondary else None
         ),
         experiment_class_reason=report.experiment_class_reason,
         steps=[
@@ -175,11 +184,13 @@ def _to_response(report) -> S.CritiqueResponse:
                         description=f.description,
                         traceability=f.traceability.value,
                         verbatim_quote=f.verbatim_quote,
-                    ) for f in s.findings
+                    )
+                    for f in s.findings
                 ],
                 vulnerable_claim=s.vulnerable_claim,
                 not_applicable=s.not_applicable,
-            ) for s in report.steps
+            )
+            for s in report.steps
         ],
         priority_fix=report.priority_fix,
         next_liability=report.next_liability,
@@ -193,7 +204,8 @@ def _to_response(report) -> S.CritiqueResponse:
                 artifact_a=ec.artifact_a,
                 artifact_b=ec.artifact_b,
                 description=ec.description,
-            ) for ec in report.evidence_conflicts
+            )
+            for ec in report.evidence_conflicts
         ],
         hold_events=[
             S.HoldEventOut(
@@ -202,16 +214,17 @@ def _to_response(report) -> S.CritiqueResponse:
                 disposition=h.disposition.value,
                 characterization=h.characterization,
                 traceable_to_data=h.traceable_to_data,
-            ) for h in report.hold_events
+            )
+            for h in report.hold_events
         ],
         irf_scores=(
             S.IRF6DScoresOut(**report.irf_scores.as_dict())
-            if report.irf_scores is not None else None
+            if report.irf_scores is not None
+            else None
         ),
         hsta_scores=hsta_out,
         methodology_class=(
-            report.methodology_class.value
-            if report.methodology_class is not None else None
+            report.methodology_class.value if report.methodology_class is not None else None
         ),
         hypothesis_text=report.hypothesis_text,
         logos_omega=report.logos_omega,

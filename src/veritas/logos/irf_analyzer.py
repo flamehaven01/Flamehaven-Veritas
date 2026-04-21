@@ -14,6 +14,7 @@ Dimensions (all in [0.0, 1.0]):
 
 composite = epsilon-smoothed geometric mean; threshold 0.65
 """
+
 from __future__ import annotations
 
 import math
@@ -23,42 +24,100 @@ from ..types import IRF6DScores
 
 # Passing thresholds
 COMPOSITE_THRESHOLD: float = 0.65
-COMPONENT_MIN:       float = 0.30
+COMPONENT_MIN: float = 0.30
 
 # Pattern banks (lower-cased; matched against lower-cased text)
 _M_MARKERS = [
-    "limitation", "uncertain", "assumption", "caveat",
-    "unknown", "unclear", "may ", "might ", "possibly",
-    "open question", "not yet confirmed", "incomplete",
-    "pending", "cannot confirm",
+    "limitation",
+    "uncertain",
+    "assumption",
+    "caveat",
+    "unknown",
+    "unclear",
+    "may ",
+    "might ",
+    "possibly",
+    "open question",
+    "not yet confirmed",
+    "incomplete",
+    "pending",
+    "cannot confirm",
 ]
 _A_MARKERS = [
-    "hypothesis", "rationale", "expected", "theoretical",
-    "premise", "research question", "we propose",
-    "based on", "prior work", "background", "motivated by",
+    "hypothesis",
+    "rationale",
+    "expected",
+    "theoretical",
+    "premise",
+    "research question",
+    "we propose",
+    "based on",
+    "prior work",
+    "background",
+    "motivated by",
     "our assumption",
 ]
 _D_MARKERS = [
-    "therefore", "hence", "thus", "consequently",
-    "it follows", "implies", "conclude", "shows that",
-    "demonstrates", "establishes", "proving", "proof",
+    "therefore",
+    "hence",
+    "thus",
+    "consequently",
+    "it follows",
+    "implies",
+    "conclude",
+    "shows that",
+    "demonstrates",
+    "establishes",
+    "proving",
+    "proof",
 ]
 _I_MARKERS = [
-    "result", "data", "measure", "observ", "collect",
-    "n=", "sample", "trial", "iteration", "recorded",
-    "experiment", "test ", "run ", "epoch",
+    "result",
+    "data",
+    "measure",
+    "observ",
+    "collect",
+    "n=",
+    "sample",
+    "trial",
+    "iteration",
+    "recorded",
+    "experiment",
+    "test ",
+    "run ",
+    "epoch",
 ]
 _F_MARKERS = [
-    "reproducib", "replicate", "protocol", "control",
-    "null ", "p-value", "p value", "confidence interval",
-    "blind", "randomiz", "falsif", "method",
-    "step-by-step", "procedure",
+    "reproducib",
+    "replicate",
+    "protocol",
+    "control",
+    "null ",
+    "p-value",
+    "p value",
+    "confidence interval",
+    "blind",
+    "randomiz",
+    "falsif",
+    "method",
+    "step-by-step",
+    "procedure",
 ]
 _P_MARKERS = [
-    "reference", "doi:", "doi.org", "et al",
-    "cite", "cited", "prior cycle", "baseline",
-    "previous version", "v1.", "v2.", "v3.",
-    "prior experiment", "earlier work",
+    "reference",
+    "doi:",
+    "doi.org",
+    "et al",
+    "cite",
+    "cited",
+    "prior cycle",
+    "baseline",
+    "previous version",
+    "v1.",
+    "v2.",
+    "v3.",
+    "prior experiment",
+    "earlier work",
 ]
 
 
@@ -71,7 +130,7 @@ def _marker_density(text: str, markers: list[str], saturate_at: int = 5) -> floa
 def _numeric_density(text: str) -> float:
     """Fraction of tokens that look like numbers (e.g. 0.95, 42, 3.14e-5)."""
     numbers = re.findall(r"\b\d+(?:[.,]\d+)?\b", text)
-    words   = text.split()
+    words = text.split()
     if not words:
         return 0.0
     return min(len(numbers) / max(len(words) * 0.10, 1), 1.0)
@@ -101,13 +160,16 @@ class IRFAnalyzer:
         F = self._score_F(t)
         P = self._score_P(t)
         composite = self._geometric_mean([M, A, D, I, F, P])
-        passed = (
-            composite >= COMPOSITE_THRESHOLD
-            and all(v >= COMPONENT_MIN for v in [M, A, D, I, F, P])
+        passed = composite >= COMPOSITE_THRESHOLD and all(
+            v >= COMPONENT_MIN for v in [M, A, D, I, F, P]
         )
         return IRF6DScores(
-            M=round(M, 4), A=round(A, 4), D=round(D, 4),
-            I=round(I, 4), F=round(F, 4), P=round(P, 4),
+            M=round(M, 4),
+            A=round(A, 4),
+            D=round(D, 4),
+            I=round(I, 4),
+            F=round(F, 4),
+            P=round(P, 4),
             composite=round(composite, 4),
             passed=passed,
             source=source,
@@ -131,7 +193,7 @@ class IRFAnalyzer:
 
     def _score_I(self, t: str) -> float:
         """Induction — empirical support combined with numeric density."""
-        marker_score  = _marker_density(t, _I_MARKERS, 5)
+        marker_score = _marker_density(t, _I_MARKERS, 5)
         numeric_score = _numeric_density(t)
         return min(1.0, 0.65 * marker_score + 0.35 * numeric_score)
 

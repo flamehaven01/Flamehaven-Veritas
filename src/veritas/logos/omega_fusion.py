@@ -10,6 +10,7 @@ Formula (configurable weights, default 60/40):
 F-dimension penalty: if IRF-F (Falsification) < F_WARN_THRESHOLD, a
 risk flag is raised and a 0.05 penalty is applied to hybrid_omega.
 """
+
 from __future__ import annotations
 
 from dataclasses import dataclass
@@ -18,7 +19,7 @@ from ..types import IRF6DScores
 
 # Default fusion weights
 W_SCIEXP: float = 0.60
-W_LOGOS:  float = 0.40
+W_LOGOS: float = 0.40
 
 # Falsification risk gate
 F_WARN_THRESHOLD: float = 0.40
@@ -26,11 +27,11 @@ F_WARN_THRESHOLD: float = 0.40
 
 @dataclass
 class FusionResult:
-    sciexp_omega:  float
-    logos_omega:   float
-    hybrid_omega:  float
-    f_risk:        bool     # True when Falsification dim < F_WARN_THRESHOLD
-    f_risk_msg:    str | None
+    sciexp_omega: float
+    logos_omega: float
+    hybrid_omega: float
+    f_risk: bool  # True when Falsification dim < F_WARN_THRESHOLD
+    f_risk_msg: str | None
 
 
 class OmegaFusion:
@@ -45,16 +46,16 @@ class OmegaFusion:
     def __init__(
         self,
         w_sciexp: float = W_SCIEXP,
-        w_logos:  float = W_LOGOS,
+        w_logos: float = W_LOGOS,
     ) -> None:
         total = w_sciexp + w_logos
         self.w_sciexp = w_sciexp / total
-        self.w_logos  = w_logos  / total
+        self.w_logos = w_logos / total
 
     def fuse(
         self,
         sciexp_omega: float,
-        irf_scores:   IRF6DScores | None,
+        irf_scores: IRF6DScores | None,
     ) -> FusionResult:
         """Compute hybrid omega.
 
@@ -69,14 +70,14 @@ class OmegaFusion:
                 f_risk_msg=None,
             )
 
-        logos_omega  = irf_scores.composite
-        raw_hybrid   = self.w_sciexp * sciexp_omega + self.w_logos * logos_omega
-        f_risk       = irf_scores.F < F_WARN_THRESHOLD
+        logos_omega = irf_scores.composite
+        raw_hybrid = self.w_sciexp * sciexp_omega + self.w_logos * logos_omega
+        f_risk = irf_scores.F < F_WARN_THRESHOLD
         f_risk_msg: str | None = None
 
         if f_risk:
-            raw_hybrid   = max(0.0, raw_hybrid - 0.05)
-            f_risk_msg   = (
+            raw_hybrid = max(0.0, raw_hybrid - 0.05)
+            f_risk_msg = (
                 f"F-dimension (Falsification) = {irf_scores.F:.2f} < "
                 f"{F_WARN_THRESHOLD:.2f}: reproducibility or testability "
                 "evidence is insufficient. Apply 0.05 omega penalty."

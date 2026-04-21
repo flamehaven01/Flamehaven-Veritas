@@ -13,6 +13,7 @@ Design references:
 The generated .tex is self-contained (no external .cls).
 Compile with: xelatex report.tex  (requires XeLaTeX + texlive-xetex)
 """
+
 from __future__ import annotations
 
 import re
@@ -24,13 +25,20 @@ from ..types import CritiqueReport
 # ---------------------------------------------------------------------------
 # LaTeX escape map (safe for XeLaTeX / LuaLaTeX with Unicode)
 # ---------------------------------------------------------------------------
-_ESC = str.maketrans({
-    "&": r"\&", "%": r"\%", "$": r"\$", "#": r"\#",
-    "_": r"\_", "{": r"\{", "}": r"\}",
-    "~": r"\textasciitilde{}",
-    "^": r"\textasciicircum{}",
-    "\\": r"\textbackslash{}",
-})
+_ESC = str.maketrans(
+    {
+        "&": r"\&",
+        "%": r"\%",
+        "$": r"\$",
+        "#": r"\#",
+        "_": r"\_",
+        "{": r"\{",
+        "}": r"\}",
+        "~": r"\textasciitilde{}",
+        "^": r"\textasciicircum{}",
+        "\\": r"\textbackslash{}",
+    }
+)
 
 
 def _e(s: str) -> str:
@@ -99,7 +107,7 @@ class LatexRenderer:
         compile_pdf: bool = False,
     ) -> Path:
         """Write .tex file; optionally compile with xelatex."""
-        path    = Path(output_path)
+        path = Path(output_path)
         content = render_latex(report, template)
         path.write_text(content, encoding="utf-8")
         if compile_pdf:
@@ -110,17 +118,19 @@ class LatexRenderer:
 def render_latex(report: CritiqueReport, template_id: str = "bmj") -> str:
     """Return full LaTeX source string for *report*."""
     from ..templates.base import BaseTemplate
+
     tmpl = BaseTemplate.all_templates().get(template_id)
     if tmpl is None:
         raise ValueError(f"Unknown template: {template_id!r}")
 
-    sections  = tmpl.build(report)
+    sections = tmpl.build(report)
     omega_str = f"{report.omega_score:.4f}"
     if report.hybrid_omega is not None:
         omega_str += f" (hybrid {report.hybrid_omega:.4f})"
 
     lines: list[str] = [
-        r"\documentclass[a4paper,11pt]{article}", _PREAMBLE,
+        r"\documentclass[a4paper,11pt]{article}",
+        _PREAMBLE,
         r"\begin{document}",
         _cover(report, tmpl.DISPLAY_NAME, omega_str),
     ]
@@ -152,28 +162,31 @@ def render_latex(report: CritiqueReport, template_id: str = "bmj") -> str:
 # Block builders
 # ---------------------------------------------------------------------------
 
+
 def _cover(report: CritiqueReport, display_name: str, omega: str) -> str:
-    return "\n".join([
-        r"\begin{titlepage}",
-        r"  \color{navyblue}\rule{\textwidth}{4pt}\vspace{1em}",
-        r"  {\Huge\bfseries\sffamily VERITAS}\\[0.4em]",
-        r"  {\large\sffamily Experimental Report Analysis v2.1}\\[2em]",
-        r"  \color{black}",
-        r"  \begin{tabular}{ll}",
-        rf"    \textbf{{Template}} & {_e(display_name)} \\",
-        rf"    \textbf{{Round}}    & {_e(str(report.round_number))} \\",
-        rf"    \textbf{{Omega}}    & {_e(omega)} \\",
-        rf"    \textbf{{Precheck}} & {_e(report.precheck.mode.value)} \\",
-        r"  \end{tabular}",
-        r"  \vspace{2em}",
-        r"  \color{navyblue}\rule{\textwidth}{2pt}",
-        r"\end{titlepage}",
-        r"\newpage",
-    ])
+    return "\n".join(
+        [
+            r"\begin{titlepage}",
+            r"  \color{navyblue}\rule{\textwidth}{4pt}\vspace{1em}",
+            r"  {\Huge\bfseries\sffamily VERITAS}\\[0.4em]",
+            r"  {\large\sffamily Experimental Report Analysis v2.1}\\[2em]",
+            r"  \color{black}",
+            r"  \begin{tabular}{ll}",
+            rf"    \textbf{{Template}} & {_e(display_name)} \\",
+            rf"    \textbf{{Round}}    & {_e(str(report.round_number))} \\",
+            rf"    \textbf{{Omega}}    & {_e(omega)} \\",
+            rf"    \textbf{{Precheck}} & {_e(report.precheck.mode.value)} \\",
+            r"  \end{tabular}",
+            r"  \vspace{2em}",
+            r"  \color{navyblue}\rule{\textwidth}{2pt}",
+            r"\end{titlepage}",
+            r"\newpage",
+        ]
+    )
 
 
 def _findings_block(findings: list[str]) -> list[str]:
-    _PAT = re.compile(r'^\[([^\]]+)\]\s+\[([^\]]+)\]\s+(.+)$')
+    _PAT = re.compile(r"^\[([^\]]+)\]\s+\[([^\]]+)\]\s+(.+)$")
     rows = []
     for raw in findings:
         m = _PAT.match(raw.strip())
@@ -196,10 +209,7 @@ def _findings_block(findings: list[str]) -> list[str]:
 def _biblio_block(stats) -> list[str]:
     fmt = ", ".join(stats.formats_detected) or "Unknown"
     self_c = "Yes" if stats.self_citation_detected else "No"
-    yr_range = (
-        f"{stats.oldest_year}--{stats.newest_year}"
-        if stats.oldest_year else "N/A"
-    )
+    yr_range = f"{stats.oldest_year}--{stats.newest_year}" if stats.oldest_year else "N/A"
     return [
         r"\section{Bibliography Analysis}",
         r"\begin{tabular}{ll}",
@@ -209,7 +219,8 @@ def _biblio_block(stats) -> list[str]:
         rf"  \textbf{{Citation format}} & {_e(fmt)} \\",
         rf"  \textbf{{Self-citation detected}} & {self_c} \\",
         rf"  \textbf{{Quality score}} & {stats.quality_score:.4f} \\",
-        r"\end{tabular}", "",
+        r"\end{tabular}",
+        "",
     ]
 
 
@@ -224,13 +235,13 @@ def _repro_block(checklist) -> list[str]:
     ]
     for item in checklist.items:
         status = (
-            r"\traceable{Yes}" if item.satisfied is True else
-            r"\notTC{No}"      if item.satisfied is False else
-            r"\textcolor{gray}{?}"
+            r"\traceable{Yes}"
+            if item.satisfied is True
+            else r"\notTC{No}"
+            if item.satisfied is False
+            else r"\textcolor{gray}{?}"
         )
-        lines.append(
-            rf"  {_e(item.code)} & {_e(item.criterion)} & {status} \\"
-        )
+        lines.append(rf"  {_e(item.code)} & {_e(item.criterion)} & {status} \\")
     lines += [r"\bottomrule", r"\end{tabular}", ""]
     return lines
 
@@ -252,7 +263,8 @@ def _irf_block(irf) -> list[str]:
         r"\midrule",
         rf"  \textbf{{Composite}} & {irf.composite:.3f} & {verdict} \\",
         r"\bottomrule",
-        r"\end{tabular}", "",
+        r"\end{tabular}",
+        "",
     ]
 
 
@@ -270,13 +282,15 @@ def _hsta_block(hsta) -> list[str]:
         r"\midrule",
         rf"  \textbf{{Composite}} & {hsta.composite:.3f} & Arithmetic mean \\",
         r"\bottomrule",
-        r"\end{tabular}", "",
+        r"\end{tabular}",
+        "",
     ]
 
 
 # ---------------------------------------------------------------------------
 # Optional compilation
 # ---------------------------------------------------------------------------
+
 
 def _compile(tex_path: Path) -> None:
     """Run xelatex twice (for cross-refs). Raises RuntimeError on failure."""
@@ -285,6 +299,4 @@ def _compile(tex_path: Path) -> None:
     for _ in range(2):
         result = subprocess.run(cmd, cwd=cwd, capture_output=True, text=True)
         if result.returncode != 0:
-            raise RuntimeError(
-                f"xelatex failed:\n{result.stdout[-2000:]}\n{result.stderr[-500:]}"
-            )
+            raise RuntimeError(f"xelatex failed:\n{result.stdout[-2000:]}\n{result.stderr[-500:]}")

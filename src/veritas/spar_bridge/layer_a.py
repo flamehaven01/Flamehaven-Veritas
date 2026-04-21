@@ -26,13 +26,16 @@ def build_layer_a(
         _check_a1(subject.get("precheck_mode", "FULL")),
         _check_a2(subject.get("traceability_ratio", 1.0)),
         _check_a3(subject.get("omega_score", 0.0), gate),
-        _check_a4(subject.get("traceability_ratio", 1.0),
-                  subject.get("round_number", 1),
-                  subject.get("not_traceable_count", 0)),
+        _check_a4(
+            subject.get("traceability_ratio", 1.0),
+            subject.get("round_number", 1),
+            subject.get("not_traceable_count", 0),
+        ),
     ]
 
 
 # ── checks ────────────────────────────────────────────────────────────────────
+
 
 def _check_a1(precheck_mode: str) -> CheckResult:
     if precheck_mode == "BLOCKED":
@@ -41,7 +44,7 @@ def _check_a1(precheck_mode: str) -> CheckResult:
             label="Claim Presence Gate",
             status="ANOMALY",
             detail="PRECHECK=BLOCKED: no evaluable claim found. "
-                   "Cannot anchor a review without an extractable claim.",
+            "Cannot anchor a review without an extractable claim.",
         )
     label_map = {"FULL": "CONSISTENT", "PARTIAL": "WARN", "LIMITED": "WARN"}
     status = label_map.get(precheck_mode, "PASS")
@@ -50,8 +53,11 @@ def _check_a1(precheck_mode: str) -> CheckResult:
         label="Claim Presence Gate",
         status=status,
         detail=f"PRECHECK={precheck_mode}. "
-               + ("All required artifacts present." if precheck_mode == "FULL"
-                  else f"Artifact sufficiency reduced ({precheck_mode}) — interpretation scope limited."),
+        + (
+            "All required artifacts present."
+            if precheck_mode == "FULL"
+            else f"Artifact sufficiency reduced ({precheck_mode}) — interpretation scope limited."
+        ),
     )
 
 
@@ -62,7 +68,7 @@ def _check_a2(traceability_ratio: float) -> CheckResult:
             label="Traceability Floor",
             status="ANOMALY",
             detail=f"Traceability ratio {traceability_ratio:.2%} < 30% floor. "
-                   "Findings cannot be anchored to verifiable evidence.",
+            "Findings cannot be anchored to verifiable evidence.",
         )
     if traceability_ratio < 0.60:
         return CheckResult(
@@ -70,7 +76,7 @@ def _check_a2(traceability_ratio: float) -> CheckResult:
             label="Traceability Floor",
             status="WARN",
             detail=f"Traceability ratio {traceability_ratio:.2%} — low coverage. "
-                   "Partial evidence anchoring only.",
+            "Partial evidence anchoring only.",
         )
     return CheckResult(
         check_id="A2",
@@ -88,7 +94,7 @@ def _check_a3(omega: float, gate: str) -> CheckResult:
             label="Omega-Gate Agreement",
             status="ANOMALY",
             detail=f"Gate={gate_upper} but omega={omega:.4f} < 0.60. "
-                   "Acceptance claim contradicts scored quality surface.",
+            "Acceptance claim contradicts scored quality surface.",
         )
     if gate_upper in {"REJECT"} and omega > 0.85:
         return CheckResult(
@@ -96,7 +102,7 @@ def _check_a3(omega: float, gate: str) -> CheckResult:
             label="Omega-Gate Agreement",
             status="WARN",
             detail=f"Gate={gate_upper} but omega={omega:.4f} > 0.85. "
-                   "Rejection stronger than quality surface warrants.",
+            "Rejection stronger than quality surface warrants.",
         )
     return CheckResult(
         check_id="A3",
@@ -113,8 +119,8 @@ def _check_a4(traceability_ratio: float, round_num: int, not_traceable_count: in
             label="Round-1 Integrity",
             status="ANOMALY",
             detail=f"Round {round_num} with {not_traceable_count} NOT_TRACEABLE findings "
-                   f"({traceability_ratio:.2%} traceable). "
-                   "First-round submission lacks minimum evidence anchor.",
+            f"({traceability_ratio:.2%} traceable). "
+            "First-round submission lacks minimum evidence anchor.",
         )
     if not_traceable_count > 0:
         return CheckResult(
@@ -122,7 +128,7 @@ def _check_a4(traceability_ratio: float, round_num: int, not_traceable_count: in
             label="Round-1 Integrity",
             status="GAP",
             detail=f"{not_traceable_count} not-traceable finding(s) in round {round_num}. "
-                   "Each represents an open gap in the evidence anchor.",
+            "Each represents an open gap in the evidence anchor.",
         )
     return CheckResult(
         check_id="A4",

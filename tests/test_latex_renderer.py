@@ -1,4 +1,5 @@
 """Tests for LaTeXRenderer and render_latex()."""
+
 from __future__ import annotations
 
 import pytest
@@ -32,11 +33,14 @@ def _base_report(**kwargs) -> CritiqueReport:
 def test_escape_ampersand():
     assert _e("A & B") == r"A \& B"
 
+
 def test_escape_percent():
     assert _e("50%") == r"50\%"
 
+
 def test_escape_underscore():
     assert _e("a_b") == r"a\_b"
+
 
 def test_escape_hash():
     assert _e("#tag") == r"\#tag"
@@ -113,8 +117,10 @@ def test_render_latex_partially_traceable_finding():
 # ---------------------------------------------------------------------------
 def test_render_latex_with_bibliography_stats():
     stats = BibliographyStats(
-        total_refs=20, recent_ratio=0.6,
-        oldest_year=2010, newest_year=2024,
+        total_refs=20,
+        recent_ratio=0.6,
+        oldest_year=2010,
+        newest_year=2024,
         formats_detected=["Harvard"],
         self_citation_detected=False,
     )
@@ -127,7 +133,8 @@ def test_render_latex_with_bibliography_stats():
 
 def test_bibliography_stats_quality_score_with_self_cite():
     stats = BibliographyStats(
-        total_refs=30, recent_ratio=0.8,
+        total_refs=30,
+        recent_ratio=0.8,
         self_citation_detected=True,
     )
     score = stats.quality_score
@@ -143,11 +150,13 @@ def test_bibliography_stats_quality_score_zero():
 # ReproducibilityChecklist block
 # ---------------------------------------------------------------------------
 def test_render_latex_with_reproducibility_checklist():
-    checklist = ReproducibilityChecklist(items=[
-        ReproducibilityItem("DATA", "Data available", satisfied=True, note="zenodo"),
-        ReproducibilityItem("CODE", "Code available", satisfied=False),
-        ReproducibilityItem("PREREG", "Preregistered", satisfied=None),
-    ])
+    checklist = ReproducibilityChecklist(
+        items=[
+            ReproducibilityItem("DATA", "Data available", satisfied=True, note="zenodo"),
+            ReproducibilityItem("CODE", "Code available", satisfied=False),
+            ReproducibilityItem("PREREG", "Preregistered", satisfied=None),
+        ]
+    )
     report = _base_report(reproducibility_checklist=checklist)
     out = render_latex(report)
     assert "Reproducibility Checklist" in out
@@ -157,20 +166,24 @@ def test_render_latex_with_reproducibility_checklist():
 
 
 def test_reproducibility_checklist_score():
-    cl = ReproducibilityChecklist(items=[
-        ReproducibilityItem("A", "Crit1", satisfied=True),
-        ReproducibilityItem("B", "Crit2", satisfied=False),
-        ReproducibilityItem("C", "Crit3", satisfied=None),
-    ])
+    cl = ReproducibilityChecklist(
+        items=[
+            ReproducibilityItem("A", "Crit1", satisfied=True),
+            ReproducibilityItem("B", "Crit2", satisfied=False),
+            ReproducibilityItem("C", "Crit3", satisfied=None),
+        ]
+    )
     assert cl.score == pytest.approx(0.5)
 
 
 def test_reproducibility_checklist_summary():
-    cl = ReproducibilityChecklist(items=[
-        ReproducibilityItem("A", "Crit1", satisfied=True),
-        ReproducibilityItem("B", "Crit2", satisfied=False),
-        ReproducibilityItem("C", "Crit3", satisfied=None),
-    ])
+    cl = ReproducibilityChecklist(
+        items=[
+            ReproducibilityItem("A", "Crit1", satisfied=True),
+            ReproducibilityItem("B", "Crit2", satisfied=False),
+            ReproducibilityItem("C", "Crit3", satisfied=None),
+        ]
+    )
     assert "1 satisfied" in cl.summary
     assert "1 not satisfied" in cl.summary
     assert "1 unknown" in cl.summary
@@ -181,8 +194,14 @@ def test_reproducibility_checklist_summary():
 # ---------------------------------------------------------------------------
 def test_render_latex_with_irf_scores():
     irf = IRF6DScores(
-        M=0.8, A=0.7, D=0.85, I=0.75, F=0.9, P=0.8,
-        composite=0.80, passed=True,
+        M=0.8,
+        A=0.7,
+        D=0.85,
+        I=0.75,
+        F=0.9,
+        P=0.8,
+        composite=0.80,
+        passed=True,
     )
     report = _base_report(irf_scores=irf)
     out = render_latex(report)
@@ -192,8 +211,14 @@ def test_render_latex_with_irf_scores():
 
 def test_render_latex_with_irf_warn():
     irf = IRF6DScores(
-        M=0.5, A=0.5, D=0.5, I=0.5, F=0.5, P=0.5,
-        composite=0.50, passed=False,
+        M=0.5,
+        A=0.5,
+        D=0.5,
+        I=0.5,
+        F=0.5,
+        P=0.5,
+        composite=0.50,
+        passed=False,
     )
     report = _base_report(irf_scores=irf)
     out = render_latex(report)

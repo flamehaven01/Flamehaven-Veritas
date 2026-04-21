@@ -1,4 +1,5 @@
 """Tests for PRECHECK gate."""
+
 from __future__ import annotations
 
 import sys

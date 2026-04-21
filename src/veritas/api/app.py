@@ -1,4 +1,5 @@
 """FastAPI application — VERITAS — AI Critique Experimental Report Analysis Framework Backend."""
+
 from __future__ import annotations
 
 from pathlib import Path
@@ -44,11 +45,15 @@ async def health():
 
 @app.get("/version", tags=["system"])
 async def version():
-    return {"version": "2.1.0", "protocol": "VERITAS — AI Critique Experimental Report Analysis Framework"}
+    return {
+        "version": "2.1.0",
+        "protocol": "VERITAS — AI Critique Experimental Report Analysis Framework",
+    }
 
 
 def main():
     import uvicorn
+
     uvicorn.run("veritas.api.app:app", host="0.0.0.0", port=8400, reload=True)
 
 

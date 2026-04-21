@@ -15,16 +15,20 @@ def report_to_subject(report: CritiqueReport) -> dict[str, Any]:
     """
     total = sum(len(s.findings) for s in report.steps)
     from veritas.types import TraceabilityClass
+
     traceable = sum(
-        1 for s in report.steps for f in s.findings
-        if f.traceability == TraceabilityClass.TRACEABLE
+        1 for s in report.steps for f in s.findings if f.traceability == TraceabilityClass.TRACEABLE
     )
     partial = sum(
-        1 for s in report.steps for f in s.findings
+        1
+        for s in report.steps
+        for f in s.findings
         if f.traceability == TraceabilityClass.PARTIALLY_TRACEABLE
     )
     not_tr = sum(
-        1 for s in report.steps for f in s.findings
+        1
+        for s in report.steps
+        for f in s.findings
         if f.traceability == TraceabilityClass.NOT_TRACEABLE
     )
     traceability_ratio = traceable / total if total else 1.0
@@ -38,20 +42,20 @@ def report_to_subject(report: CritiqueReport) -> dict[str, Any]:
 
     return {
         # Core VERITAS signals
-        "omega_score":             report.omega_score,
-        "traceability_ratio":      round(traceability_ratio, 4),
-        "not_traceable_count":     not_tr,
+        "omega_score": report.omega_score,
+        "traceability_ratio": round(traceability_ratio, 4),
+        "not_traceable_count": not_tr,
         "partially_traceable_count": partial,
-        "precheck_mode":           report.precheck.mode.value,
-        "round_number":            report.round_number,
-        "experiment_class":        report.experiment_class.value if report.experiment_class else None,
+        "precheck_mode": report.precheck.mode.value,
+        "round_number": report.round_number,
+        "experiment_class": report.experiment_class.value if report.experiment_class else None,
         # LOGOS enrichment (may be None)
-        "irf_composite":           report.irf_scores.composite if report.irf_scores else None,
-        "irf_passed":              report.irf_scores.passed if report.irf_scores else None,
-        "methodology_class":       report.methodology_class.value if report.methodology_class else None,
+        "irf_composite": report.irf_scores.composite if report.irf_scores else None,
+        "irf_passed": report.irf_scores.passed if report.irf_scores else None,
+        "methodology_class": report.methodology_class.value if report.methodology_class else None,
         # Repo-derived
-        "bibliography_quality":    (
+        "bibliography_quality": (
             report.bibliography_stats.quality_score if report.bibliography_stats else None
         ),
-        "repro_completeness":      repro_completeness,
+        "repro_completeness": repro_completeness,
     }

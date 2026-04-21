@@ -1,4 +1,5 @@
 """Document ingestion layer — wraps Flamehaven-Filesearch file_parser + text_chunker."""
+
 from __future__ import annotations
 
 import sys
@@ -52,19 +53,18 @@ def extract_chunks(
 
     chunks = _chunk(text, chunk_size, overlap)
     source = Path(file_path).name
-    return [
-        {"text": c, "chunk_index": i, "source": source}
-        for i, c in enumerate(chunks)
-    ]
+    return [{"text": c, "chunk_index": i, "source": source} for i, c in enumerate(chunks)]
 
 
 # ── private helpers ────────────────────────────────────────────────────────────
+
 
 def _try_flamehaven(path: str, use_cache: bool) -> str | None:
     try:
         if _FF_ROOT not in sys.path:
             sys.path.insert(0, _FF_ROOT)
         from flamehaven_filesearch.engine.file_parser import extract_text as ff_extract
+
         return ff_extract(path, use_cache=use_cache) or None
     except Exception:
         return None
@@ -73,6 +73,7 @@ def _try_flamehaven(path: str, use_cache: bool) -> str | None:
 def _try_pymupdf(path: Path) -> str | None:
     try:
         import fitz
+
         doc = fitz.open(str(path))
         return "\n".join(page.get_text() for page in doc) or None
     except Exception:
@@ -82,6 +83,7 @@ def _try_pymupdf(path: Path) -> str | None:
 def _try_pypdf(path: Path) -> str | None:
     try:
         from pypdf import PdfReader
+
         reader = PdfReader(str(path))
         return "\n".join(p.extract_text() or "" for p in reader.pages) or None
     except Exception:
@@ -91,6 +93,7 @@ def _try_pypdf(path: Path) -> str | None:
 def _try_docx(path: Path) -> str | None:
     try:
         from docx import Document
+
         doc = Document(str(path))
         parts = [p.text for p in doc.paragraphs]
         for table in doc.tables:
@@ -107,6 +110,7 @@ def _chunk(text: str, size: int, overlap: int) -> list[str]:
         if _FF_ROOT not in sys.path:
             sys.path.insert(0, _FF_ROOT)
         from flamehaven_filesearch.engine.text_chunker import chunk_text
+
         chunks = chunk_text(text, max_tokens=size, overlap_tokens=overlap)
         return [c["text"] for c in chunks] if chunks and isinstance(chunks[0], dict) else chunks
     except Exception:
@@ -115,6 +119,6 @@ def _chunk(text: str, size: int, overlap: int) -> list[str]:
     words = text.split()
     result, i = [], 0
     while i < len(words):
-        result.append(" ".join(words[i: i + size]))
+        result.append(" ".join(words[i : i + size]))
         i += max(1, size - overlap)
     return result

@@ -1,4 +1,5 @@
 """Templates sub-package."""
+
 from .base import BaseTemplate, TemplateSection
 from .bmj import BMJTemplate
 from .ku import KUTemplate

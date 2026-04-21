@@ -5,6 +5,7 @@ Provides:
   - LogosBridge   : tries real LOGOS pipeline, falls back to IRFAnalyzer
   - OmegaFusion   : fuses SCI-EXP traceability omega with LOGOS omega
 """
+
 from .irf_analyzer import IRFAnalyzer
 from .logos_bridge import LogosBridge
 from .omega_fusion import OmegaFusion

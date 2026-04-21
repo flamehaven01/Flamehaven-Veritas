@@ -3,6 +3,7 @@
 Compiled from the VERITAS — AI Critique Experimental Report Analysis Framework protocol specification.
 No external imports. All critique types are self-contained.
 """
+
 from __future__ import annotations
 
 from dataclasses import dataclass, field
@@ -11,7 +12,8 @@ from enum import Enum
 
 class SciExpMode(Enum):
     """PRECHECK artifact sufficiency mode."""
-    FULL    = "FULL"
+
+    FULL = "FULL"
     PARTIAL = "PARTIAL"
     LIMITED = "LIMITED"
     BLOCKED = "BLOCKED"
@@ -19,48 +21,53 @@ class SciExpMode(Enum):
 
 class ExperimentClass(Enum):
     """STEP 0 experiment classification."""
-    PARITY    = "PARITY"
+
+    PARITY = "PARITY"
     EXTENSION = "EXTENSION"
-    RCA       = "RCA"
-    ABLATION  = "ABLATION"
+    RCA = "RCA"
+    ABLATION = "ABLATION"
     MULTIAXIS = "MULTIAXIS"
 
 
 class TraceabilityClass(Enum):
     """Evidence traceability verdict — 3 values, no substitutes."""
-    TRACEABLE           = "traceable"
+
+    TRACEABLE = "traceable"
     PARTIALLY_TRACEABLE = "partially traceable"
-    NOT_TRACEABLE       = "not traceable"
+    NOT_TRACEABLE = "not traceable"
 
 
 class EvidenceRank(Enum):
     """Evidence precedence hierarchy (lower = higher authority)."""
+
     MEASURED_ARTIFACT = 1
-    HASH_MANIFEST     = 2
-    INLINE_FIGURE     = 3
-    NARRATIVE         = 4
+    HASH_MANIFEST = 2
+    INLINE_FIGURE = 3
+    NARRATIVE = 4
     CROSS_CYCLE_PROSE = 5
 
 
 class HoldDisposition(Enum):
     """HOLD event disposition state."""
-    ISOLATED        = "isolated"
-    PATCHED         = "patched"
+
+    ISOLATED = "isolated"
+    PATCHED = "patched"
     CARRIED_FORWARD = "carried_forward"
-    UNDOCUMENTED    = "undocumented"
+    UNDOCUMENTED = "undocumented"
 
 
 class MethodologyClass(Enum):
     """Research/experiment methodology type (from paper analysis)."""
-    RCT           = "RCT"
+
+    RCT = "RCT"
     META_ANALYSIS = "META_ANALYSIS"
-    COHORT        = "COHORT"
-    CASE_STUDY    = "CASE_STUDY"
-    SURVEY        = "SURVEY"
-    EXPERIMENTAL  = "EXPERIMENTAL"
+    COHORT = "COHORT"
+    CASE_STUDY = "CASE_STUDY"
+    SURVEY = "SURVEY"
+    EXPERIMENTAL = "EXPERIMENTAL"
     COMPUTATIONAL = "COMPUTATIONAL"
     OBSERVATIONAL = "OBSERVATIONAL"
-    UNKNOWN       = "UNKNOWN"
+    UNKNOWN = "UNKNOWN"
 
 
 @dataclass
@@ -77,6 +84,7 @@ class IRF6DScores:
     composite = geometric mean of all 6 (epsilon-smoothed)
     passed    = composite >= threshold AND all dims >= component_min
     """
+
     M: float
     A: float
     D: float
@@ -88,10 +96,17 @@ class IRF6DScores:
     source: str = "local"  # "local" | "logos_server" | "logos_irf_pipeline"
 
     def as_dict(self) -> dict:
-        return {"M": self.M, "A": self.A, "D": self.D,
-                "I": self.I, "F": self.F, "P": self.P,
-                "composite": self.composite, "passed": self.passed,
-                "source": self.source}
+        return {
+            "M": self.M,
+            "A": self.A,
+            "D": self.D,
+            "I": self.I,
+            "F": self.F,
+            "P": self.P,
+            "composite": self.composite,
+            "passed": self.passed,
+            "source": self.source,
+        }
 
 
 @dataclass
@@ -103,6 +118,7 @@ class HSTA4DScores:
     T: Temporality    — citation/date recency signal
     R: Reproducibility— method detail completeness
     """
+
     N: float
     C: float
     T: float
@@ -116,7 +132,8 @@ class HSTA4DScores:
 @dataclass
 class PrecheckResult:
     """PRECHECK gate output — exactly 2 lines per OUTPUT CONTRACT."""
-    mode:              SciExpMode
+
+    mode: SciExpMode
     missing_artifacts: list[str]
 
     @property
@@ -135,72 +152,77 @@ class PrecheckResult:
 @dataclass
 class EvidenceConflict:
     """Named conflict between same-rank artifacts."""
-    rank:        EvidenceRank
-    artifact_a:  str
-    artifact_b:  str
+
+    rank: EvidenceRank
+    artifact_a: str
+    artifact_b: str
     description: str
 
 
 @dataclass
 class HoldEvent:
     """HOLD event record for STEP 1.4 audit."""
-    event_id:          str
-    cause_stated:      bool
-    disposition:       HoldDisposition
-    characterization:  str
+
+    event_id: str
+    cause_stated: bool
+    disposition: HoldDisposition
+    characterization: str
     traceable_to_data: bool
 
 
 @dataclass
 class StepFinding:
     """Single finding within a critique step."""
-    code:           str
-    description:    str
-    traceability:   TraceabilityClass
+
+    code: str
+    description: str
+    traceability: TraceabilityClass
     verbatim_quote: str | None = None
-    evidence_rank:  EvidenceRank | None = None
-    hold_event:     HoldEvent | None = None
+    evidence_rank: EvidenceRank | None = None
+    hold_event: HoldEvent | None = None
 
 
 @dataclass
 class StepResult:
     """One critique step — enforces OUTPUT CONTRACT prose shape."""
-    step_id:          str
-    weight:           float
-    prose:            str
-    findings:         list[StepFinding] = field(default_factory=list)
+
+    step_id: str
+    weight: float
+    prose: str
+    findings: list[StepFinding] = field(default_factory=list)
     vulnerable_claim: str | None = None
-    not_applicable:   bool = False
+    not_applicable: bool = False
 
 
 @dataclass
 class CritiqueReport:
     """Full VERITAS — AI Critique Experimental Report Analysis Framework output."""
+
     precheck: PrecheckResult
 
-    experiment_class:           ExperimentClass | None = None
+    experiment_class: ExperimentClass | None = None
     experiment_class_secondary: ExperimentClass | None = None
-    experiment_class_reason:    str = ""
+    experiment_class_reason: str = ""
 
-    steps:          list[StepResult] = field(default_factory=list)
-    priority_fix:   str = ""
+    steps: list[StepResult] = field(default_factory=list)
+    priority_fix: str = ""
     next_liability: str | None = None
 
-    round_number:       int   = 1
-    omega_score:        float = 0.0
+    round_number: int = 1
+    omega_score: float = 0.0
     evidence_conflicts: list[EvidenceConflict] = field(default_factory=list)
-    hold_events:        list[HoldEvent] = field(default_factory=list)
+    hold_events: list[HoldEvent] = field(default_factory=list)
 
     # ---- LOGOS / Paper Intelligence (optional, None when not available)
-    irf_scores:       IRF6DScores | None    = None
-    hsta_scores:      HSTA4DScores | None   = None
+    irf_scores: IRF6DScores | None = None
+    hsta_scores: HSTA4DScores | None = None
     methodology_class: MethodologyClass | None = None
-    hypothesis_text:   str | None           = None
-    logos_omega:       float | None         = None  # LOGOS-computed omega
-    hybrid_omega:      float | None         = None  # 0.6*sciexp + 0.4*logos
+    hypothesis_text: str | None = None
+    logos_omega: float | None = None  # LOGOS-computed omega
+    hybrid_omega: float | None = None  # 0.6*sciexp + 0.4*logos
 
     # ---- Repository-derived extensions (BibliographyAnalyzer + ReproducibilityChecklist)
-    bibliography_stats:        BibliographyStats | None        = None
+    bibliography_stats: BibliographyStats | None = None
     reproducibility_checklist: ReproducibilityChecklist | None = None
 
     # ---- SPAR claim-aware review (optional; None when spar-framework not installed)
@@ -214,13 +236,17 @@ class CritiqueReport:
 
     def partially_traceable_count(self) -> int:
         return sum(
-            1 for s in self.steps for f in s.findings
+            1
+            for s in self.steps
+            for f in s.findings
             if f.traceability == TraceabilityClass.PARTIALLY_TRACEABLE
         )
 
     def not_traceable_count(self) -> int:
         return sum(
-            1 for s in self.steps for f in s.findings
+            1
+            for s in self.steps
+            for f in s.findings
             if f.traceability == TraceabilityClass.NOT_TRACEABLE
         )
 
@@ -228,6 +254,7 @@ class CritiqueReport:
 # ---------------------------------------------------------------------------
 # Repository-derived extensions
 # ---------------------------------------------------------------------------
+
 
 @dataclass
 class BibliographyStats:
@@ -237,12 +264,13 @@ class BibliographyStats:
       - latex-scientific-paper-templates (labreport.bst author-year, <=5 authors)
       - Markdown-Templates (Harvard Anglia Ruskin University CSL, author-date)
     """
-    total_refs:             int        = 0
-    recent_ratio:           float      = 0.0   # refs <= 5 years old / total
-    oldest_year:            int | None = None
-    newest_year:            int | None = None
-    formats_detected:       list[str]  = field(default_factory=list)
-    self_citation_detected: bool       = False
+
+    total_refs: int = 0
+    recent_ratio: float = 0.0  # refs <= 5 years old / total
+    oldest_year: int | None = None
+    newest_year: int | None = None
+    formats_detected: list[str] = field(default_factory=list)
+    self_citation_detected: bool = False
 
     @property
     def quality_score(self) -> float:
@@ -251,7 +279,7 @@ class BibliographyStats:
             return 0.0
         recency = self.recent_ratio * 0.5
         breadth = min(self.total_refs / 30.0, 1.0) * 0.5
-        score   = recency + breadth
+        score = recency + breadth
         if self.self_citation_detected:
             score *= 0.9
         return round(score, 4)
@@ -260,10 +288,11 @@ class BibliographyStats:
 @dataclass
 class ReproducibilityItem:
     """Single ARRIVE / CONSORT-style reproducibility criterion."""
-    code:      str
+
+    code: str
     criterion: str
-    satisfied: bool | None = None   # None = cannot determine from text
-    note:      str            = ""
+    satisfied: bool | None = None  # None = cannot determine from text
+    note: str = ""
 
 
 @dataclass
@@ -276,25 +305,28 @@ class ReproducibilityChecklist:
       - STROBE       (observational studies)
       - TOP Guidelines (transparency & openness promotion)
     """
+
     items: list[ReproducibilityItem] = field(default_factory=list)
 
     @classmethod
     def default(cls) -> ReproducibilityChecklist:
-        return cls(items=[
-            ReproducibilityItem("DATA",   "Raw data publicly available"),
-            ReproducibilityItem("CODE",   "Analysis code publicly available"),
-            ReproducibilityItem("PREREG", "Study preregistered (OSF/ClinicalTrials)"),
-            ReproducibilityItem("POWER",  "Sample size / power calculation reported"),
-            ReproducibilityItem("STATS",  "Statistical methods fully described"),
-            ReproducibilityItem("BLIND",  "Blinding / masking procedure described"),
-            ReproducibilityItem("EXCL",   "Inclusion / exclusion criteria stated"),
-            ReproducibilityItem("CONF",   "Conflicts of interest declared"),
-        ])
+        return cls(
+            items=[
+                ReproducibilityItem("DATA", "Raw data publicly available"),
+                ReproducibilityItem("CODE", "Analysis code publicly available"),
+                ReproducibilityItem("PREREG", "Study preregistered (OSF/ClinicalTrials)"),
+                ReproducibilityItem("POWER", "Sample size / power calculation reported"),
+                ReproducibilityItem("STATS", "Statistical methods fully described"),
+                ReproducibilityItem("BLIND", "Blinding / masking procedure described"),
+                ReproducibilityItem("EXCL", "Inclusion / exclusion criteria stated"),
+                ReproducibilityItem("CONF", "Conflicts of interest declared"),
+            ]
+        )
 
     @property
     def score(self) -> float:
         """Ratio of satisfied criteria over determinable criteria."""
-        satisfied    = sum(1 for i in self.items if i.satisfied is True)
+        satisfied = sum(1 for i in self.items if i.satisfied is True)
         determinable = sum(1 for i in self.items if i.satisfied is not None)
         if determinable == 0:
             return 0.0
@@ -303,6 +335,6 @@ class ReproducibilityChecklist:
     @property
     def summary(self) -> str:
         satisfied = sum(1 for i in self.items if i.satisfied is True)
-        not_sat   = sum(1 for i in self.items if i.satisfied is False)
-        unknown   = sum(1 for i in self.items if i.satisfied is None)
+        not_sat = sum(1 for i in self.items if i.satisfied is False)
+        unknown = sum(1 for i in self.items if i.satisfied is None)
         return f"{satisfied} satisfied / {not_sat} not satisfied / {unknown} unknown"

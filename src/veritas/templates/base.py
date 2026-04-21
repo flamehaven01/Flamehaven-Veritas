@@ -1,4 +1,5 @@
 """Base template interface for VERITAS report rendering."""
+
 from __future__ import annotations
 
 from abc import ABC, abstractmethod
@@ -12,18 +13,19 @@ if TYPE_CHECKING:
 @dataclass
 class TemplateSection:
     """One section of a rendered report."""
-    title:    str
-    level:    int              # heading depth (1=H1, 2=H2)
-    body:     str
+
+    title: str
+    level: int  # heading depth (1=H1, 2=H2)
+    body: str
     findings: list[str] = field(default_factory=list)
 
 
 class BaseTemplate(ABC):
     """All output templates implement this interface."""
 
-    TEMPLATE_ID:  str = ""
+    TEMPLATE_ID: str = ""
     DISPLAY_NAME: str = ""
-    SECTIONS:     list[str] = []
+    SECTIONS: list[str] = []
 
     @abstractmethod
     def build(self, report: CritiqueReport) -> list[TemplateSection]:
@@ -34,7 +36,8 @@ class BaseTemplate(ABC):
     def all_templates(cls) -> dict[str, BaseTemplate]:
         from .bmj import BMJTemplate
         from .ku import KUTemplate
+
         return {
             "bmj": BMJTemplate(),
-            "ku":  KUTemplate(),
+            "ku": KUTemplate(),
         }

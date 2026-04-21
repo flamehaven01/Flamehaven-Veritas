@@ -32,6 +32,7 @@ def build_layer_c(
 
 # ── checks ────────────────────────────────────────────────────────────────────
 
+
 def _check_c1(irf_composite: float | None, irf_passed: bool | None) -> CheckResult:
     """IRF-based reasoning maturity: genuine >= 0.78, approximate >= 0.60, partial below."""
     if irf_composite is None:
@@ -40,7 +41,7 @@ def _check_c1(irf_composite: float | None, irf_passed: bool | None) -> CheckResu
             label="IRF Reasoning Maturity",
             status="APPROXIMATION",
             detail="LOGOS IRF-Calc not available. Reasoning maturity is environment_conditional "
-                   "— cannot confirm genuine depth without IRF signal.",
+            "— cannot confirm genuine depth without IRF signal.",
         )
     if irf_composite >= 0.78 and irf_passed:
         return CheckResult(
@@ -48,7 +49,7 @@ def _check_c1(irf_composite: float | None, irf_passed: bool | None) -> CheckResu
             label="IRF Reasoning Maturity",
             status="GENUINE",
             detail=f"irf_composite={irf_composite:.4f} >= 0.78 and passed. "
-                   "Reasoning depth verified across all 6 dimensions (M/A/D/I/F/P).",
+            "Reasoning depth verified across all 6 dimensions (M/A/D/I/F/P).",
         )
     if irf_composite >= 0.60:
         return CheckResult(
@@ -56,14 +57,14 @@ def _check_c1(irf_composite: float | None, irf_passed: bool | None) -> CheckResu
             label="IRF Reasoning Maturity",
             status="APPROXIMATION",
             detail=f"irf_composite={irf_composite:.4f}: reasoning present but below full LOGOS threshold. "
-                   "Some dimensions may be weakly supported.",
+            "Some dimensions may be weakly supported.",
         )
     return CheckResult(
         check_id="C1",
         label="IRF Reasoning Maturity",
         status="PARTIAL",
         detail=f"irf_composite={irf_composite:.4f} < 0.60. "
-               "Reasoning is partial — significant dimension gaps detected.",
+        "Reasoning is partial — significant dimension gaps detected.",
     )
 
 
@@ -75,7 +76,7 @@ def _check_c2(repro_completeness: float | None) -> CheckResult:
             label="Reproducibility Coverage",
             status="APPROXIMATION",
             detail="Reproducibility checklist not available. "
-                   "Coverage maturity is environment_conditional.",
+            "Coverage maturity is environment_conditional.",
         )
     if repro_completeness >= 0.80:
         return CheckResult(
@@ -83,7 +84,7 @@ def _check_c2(repro_completeness: float | None) -> CheckResult:
             label="Reproducibility Coverage",
             status="GENUINE",
             detail=f"Reproducibility completeness {repro_completeness:.2%} >= 80%. "
-                   "Strong method documentation coverage.",
+            "Strong method documentation coverage.",
         )
     if repro_completeness >= 0.50:
         return CheckResult(
@@ -91,14 +92,14 @@ def _check_c2(repro_completeness: float | None) -> CheckResult:
             label="Reproducibility Coverage",
             status="APPROXIMATION",
             detail=f"Reproducibility completeness {repro_completeness:.2%}: partial coverage. "
-                   "Some ARRIVE/CONSORT criteria not met.",
+            "Some ARRIVE/CONSORT criteria not met.",
         )
     return CheckResult(
         check_id="C2",
         label="Reproducibility Coverage",
         status="PARTIAL",
         detail=f"Reproducibility completeness {repro_completeness:.2%} < 50%. "
-               "Insufficient method documentation for independent replication.",
+        "Insufficient method documentation for independent replication.",
     )
 
 
@@ -110,7 +111,7 @@ def _check_c3(bibliography_quality: float | None) -> CheckResult:
             label="Bibliography Adequacy",
             status="APPROXIMATION",
             detail="Bibliography analyzer not available. "
-                   "Reference quality maturity is environment_conditional.",
+            "Reference quality maturity is environment_conditional.",
         )
     if bibliography_quality >= 0.70:
         return CheckResult(
@@ -118,7 +119,7 @@ def _check_c3(bibliography_quality: float | None) -> CheckResult:
             label="Bibliography Adequacy",
             status="GENUINE",
             detail=f"Bibliography quality={bibliography_quality:.4f} >= 0.70. "
-                   "Reference surface supports claimed scope.",
+            "Reference surface supports claimed scope.",
         )
     if bibliography_quality >= 0.40:
         return CheckResult(
@@ -126,14 +127,14 @@ def _check_c3(bibliography_quality: float | None) -> CheckResult:
             label="Bibliography Adequacy",
             status="APPROXIMATION",
             detail=f"Bibliography quality={bibliography_quality:.4f}: reference surface is partial. "
-                   "Recency or breadth below recommended levels.",
+            "Recency or breadth below recommended levels.",
         )
     return CheckResult(
         check_id="C3",
         label="Bibliography Adequacy",
         status="PARTIAL",
         detail=f"Bibliography quality={bibliography_quality:.4f} < 0.40. "
-               "Weak reference surface — claims may lack adequate literature grounding.",
+        "Weak reference surface — claims may lack adequate literature grounding.",
     )
 
 
@@ -145,8 +146,8 @@ def _check_c4(methodology_class: str | None) -> CheckResult:
             label="Methodology Disclosure",
             status="RESEARCH_ONLY",
             detail="Methodology class is UNKNOWN or undetectable. "
-                   "Cannot confirm design validity without disclosed methodology. "
-                   "State is research_only — not ready for governance-level review.",
+            "Cannot confirm design validity without disclosed methodology. "
+            "State is research_only — not ready for governance-level review.",
         )
     standard_methods = {"RCT", "META_ANALYSIS", "COHORT", "EXPERIMENTAL"}
     if methodology_class in standard_methods:
@@ -155,12 +156,12 @@ def _check_c4(methodology_class: str | None) -> CheckResult:
             label="Methodology Disclosure",
             status="GENUINE",
             detail=f"Methodology={methodology_class} — standard design with well-defined "
-                   "validity criteria. Full governance review applicable.",
+            "validity criteria. Full governance review applicable.",
         )
     return CheckResult(
         check_id="C4",
         label="Methodology Disclosure",
         status="APPROXIMATION",
         detail=f"Methodology={methodology_class} — recognised but non-standard design. "
-               "Apply design-specific validity criteria before governance-level conclusions.",
+        "Apply design-specific validity criteria before governance-level conclusions.",
     )

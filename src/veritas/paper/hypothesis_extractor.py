@@ -7,6 +7,7 @@ Attempts to import BioMedical-Paper-Harvester hypothesis_synthesis.py
 (path: D:/Sanctum/BioMedical-Paper-Harvester) for BPH-integrated mode,
 falls back to local pattern extraction otherwise.
 """
+
 from __future__ import annotations
 
 import re
@@ -50,11 +51,12 @@ _FALSIF_PATTERNS = [
 @dataclass
 class ExtractionResult:
     """Hypothesis extraction output."""
-    hypothesis:            list[str] = field(default_factory=list)
-    null_hypothesis:       list[str] = field(default_factory=list)
+
+    hypothesis: list[str] = field(default_factory=list)
+    null_hypothesis: list[str] = field(default_factory=list)
     falsification_criteria: list[str] = field(default_factory=list)
-    primary:               str | None = None  # best-match hypothesis
-    source:                str = "local"
+    primary: str | None = None  # best-match hypothesis
+    source: str = "local"
 
     def summary(self) -> str:
         parts = []
@@ -102,17 +104,18 @@ class HypothesisExtractor:
             from biomedical_harvester.hypothesis_synthesis import (  # type: ignore
                 HypothesisSynthesizer,
             )
+
             self._bph_synthesizer = HypothesisSynthesizer()
         except Exception:
             self._bph_synthesizer = None
 
     def extract(self, text: str) -> ExtractionResult:
         """Extract hypothesis information from report text."""
-        hypotheses    = _extract_patterns(text, _H_PATTERNS)
-        null_h        = _extract_patterns(text, _H0_PATTERNS)
-        falsif        = _extract_patterns(text, _FALSIF_PATTERNS)
-        primary       = hypotheses[0] if hypotheses else None
-        source        = "local"
+        hypotheses = _extract_patterns(text, _H_PATTERNS)
+        null_h = _extract_patterns(text, _H0_PATTERNS)
+        falsif = _extract_patterns(text, _FALSIF_PATTERNS)
+        primary = hypotheses[0] if hypotheses else None
+        source = "local"
 
         # Enrich with BPH synthesizer when available
         if self._bph_synthesizer is not None:

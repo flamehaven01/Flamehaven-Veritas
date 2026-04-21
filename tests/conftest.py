@@ -1,4 +1,5 @@
 """Pytest fixtures shared across tests."""
+
 from __future__ import annotations
 
 import sys
@@ -6,7 +7,7 @@ import sys
 import pytest
 
 # Ensure src is importable
-sys.path.insert(0, str(__import__('pathlib').Path(__file__).parents[1] / "src"))
+sys.path.insert(0, str(__import__("pathlib").Path(__file__).parents[1] / "src"))
 
 SAMPLE_REPORT = """
 Experiment: Effect of temperature on enzyme activity.
@@ -35,6 +36,7 @@ def minimal_text():
 @pytest.fixture
 def engine():
     from veritas.engine import SciExpCritiqueEngine
+
     return SciExpCritiqueEngine()
 
 
@@ -43,4 +45,5 @@ def client():
     from fastapi.testclient import TestClient
 
     from veritas.api.app import app
+
     return TestClient(app)

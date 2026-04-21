@@ -144,8 +144,11 @@ class TestLayerB:
     def test_build_layer_b_returns_four_checks(self):
         subject = {"omega_score": 0.75, "irf_composite": 0.78, "precheck_mode": "FULL"}
         checks = build_layer_b(
-            subject=subject, source="sciexp", gate="ACCEPT",
-            report_text="Standard report.", context=None,
+            subject=subject,
+            source="sciexp",
+            gate="ACCEPT",
+            report_text="Standard report.",
+            context=None,
         )
         assert len(checks) == 4
         assert all(c.check_id.startswith("B") for c in checks)
@@ -238,13 +241,19 @@ class TestLayerC:
 def _make_report(omega: float = 0.75, mode: SciExpMode = SciExpMode.FULL) -> CritiqueReport:
     pc = PrecheckResult(mode=mode, missing_artifacts=[])
     step = StepResult(
-        step_id="1", weight=0.4, prose="Test.",
+        step_id="1",
+        weight=0.4,
+        prose="Test.",
         findings=[
             StepFinding(
-                code="C1.1", description="d", traceability=TraceabilityClass.TRACEABLE,
+                code="C1.1",
+                description="d",
+                traceability=TraceabilityClass.TRACEABLE,
             ),
             StepFinding(
-                code="C1.2", description="d2", traceability=TraceabilityClass.NOT_TRACEABLE,
+                code="C1.2",
+                description="d2",
+                traceability=TraceabilityClass.NOT_TRACEABLE,
             ),
         ],
     )
@@ -293,6 +302,7 @@ class TestRuntime:
 
     def test_full_review_run(self):
         from spar_framework.engine import run_review  # type: ignore[import]
+
         rt = get_review_runtime()
         subject = {
             "omega_score": 0.75,

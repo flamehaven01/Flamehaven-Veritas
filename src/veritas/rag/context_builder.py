@@ -1,4 +1,5 @@
 """RAG Context Builder — assembles per-step context from retrieved chunks."""
+
 from __future__ import annotations
 
 from dataclasses import dataclass, field
@@ -20,9 +21,9 @@ STEP_QUERIES: dict[str, str] = {
 
 @dataclass
 class StepContext:
-    step_id:  str
-    text:     str
-    chunks:   list[str] = field(default_factory=list)
+    step_id: str
+    text: str
+    chunks: list[str] = field(default_factory=list)
 
 
 def build_all_contexts(
@@ -32,7 +33,7 @@ def build_all_contexts(
     """Build RAG context for each pipeline step."""
     contexts: dict[str, StepContext] = {}
     for step_id, query in STEP_QUERIES.items():
-        text  = retriever.build_context(query, top_k=top_k)
+        text = retriever.build_context(query, top_k=top_k)
         ctxobj = StepContext(step_id=step_id, text=text)
         contexts[step_id] = ctxobj
     return contexts

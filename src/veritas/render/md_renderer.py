@@ -1,4 +1,5 @@
 """Markdown renderer — outputs CritiqueReport as structured .md file."""
+
 from __future__ import annotations
 
 from pathlib import Path
@@ -6,11 +7,11 @@ from pathlib import Path
 from ..templates.base import BaseTemplate
 
 _TRACEABILITY_BADGE = {
-    "traceable":           "[+]",
+    "traceable": "[+]",
     "partially traceable": "[~]",
-    "not traceable":       "[-]",
+    "not traceable": "[-]",
 }
-_PAT_TC = __import__("re").compile(r'^\[([^\]]+)\]\s+\[([^\]]+)\]\s+(.+)$')
+_PAT_TC = __import__("re").compile(r"^\[([^\]]+)\]\s+\[([^\]]+)\]\s+(.+)$")
 
 
 def render_md(report, template_id: str = "bmj") -> str:
@@ -20,9 +21,8 @@ def render_md(report, template_id: str = "bmj") -> str:
         raise ValueError(f"Unknown template: {template_id}")
 
     sections = tmpl.build(report)
-    omega_str = (
-        f"{report.omega_score:.4f}"
-        + (f" → hybrid {report.hybrid_omega:.4f}" if report.hybrid_omega is not None else "")
+    omega_str = f"{report.omega_score:.4f}" + (
+        f" → hybrid {report.hybrid_omega:.4f}" if report.hybrid_omega is not None else ""
     )
 
     lines: list[str] = [
@@ -82,7 +82,8 @@ def _format_finding_md(raw: str) -> str:
 def _irf_md(irf) -> list[str]:
     pass_icon = ":white_check_mark:" if irf.passed else ":warning:"
     return [
-        "## IRF-Calc 6D Score (LOGOS)", "",
+        "## IRF-Calc 6D Score (LOGOS)",
+        "",
         "| DIM | SCORE | MEANING |",
         "|-----|------:|---------|",
         f"| M   | {irf.M:.3f} | Methodic Doubt |",
@@ -93,13 +94,15 @@ def _irf_md(irf) -> list[str]:
         f"| P   | {irf.P:.3f} | Paradigm |",
         f"| **COMPOSITE** | **{irf.composite:.3f}** | {pass_icon} {'PASS' if irf.passed else 'WARN'} |",
         "",
-        "---", "",
+        "---",
+        "",
     ]
 
 
 def _hsta_md(hsta) -> list[str]:
     return [
-        "## HSTA 4D Score (BioMedical-Paper-Harvester)", "",
+        "## HSTA 4D Score (BioMedical-Paper-Harvester)",
+        "",
         "| DIM | SCORE | MEANING |",
         "|-----|------:|---------|",
         f"| N   | {hsta.N:.3f} | Novelty |",
@@ -108,16 +111,18 @@ def _hsta_md(hsta) -> list[str]:
         f"| R   | {hsta.R:.3f} | Reproducibility |",
         f"| **COMPOSITE** | **{hsta.composite:.3f}** | Arithmetic mean |",
         "",
-        "---", "",
+        "---",
+        "",
     ]
 
 
 def _biblio_md(b) -> list[str]:
     fmt = ", ".join(b.formats_detected) if b.formats_detected else "Unknown"
-    yr  = f"{b.oldest_year}–{b.newest_year}" if b.oldest_year else "N/A"
+    yr = f"{b.oldest_year}–{b.newest_year}" if b.oldest_year else "N/A"
     self_cite = "Yes" if b.self_citation_detected else "No"
     return [
-        "## Bibliography Analysis", "",
+        "## Bibliography Analysis",
+        "",
         "| METRIC | VALUE |",
         "|--------|-------|",
         f"| Total references | {b.total_refs} |",
@@ -126,16 +131,19 @@ def _biblio_md(b) -> list[str]:
         f"| Self-citation detected | {self_cite} |",
         f"| Quality score | {b.quality_score:.3f} |",
         "",
-        "---", "",
+        "---",
+        "",
     ]
 
 
 def _repro_md(rc) -> list[str]:
-    sat  = sum(1 for i in rc.items if i.satisfied is True)
-    tot  = len(rc.items)
+    sat = sum(1 for i in rc.items if i.satisfied is True)
+    tot = len(rc.items)
     lines: list[str] = [
-        "## Reproducibility Checklist", "",
-        f"**Score:** {rc.score:.3f}  ({sat}/{tot} criteria met)", "",
+        "## Reproducibility Checklist",
+        "",
+        f"**Score:** {rc.score:.3f}  ({sat}/{tot} criteria met)",
+        "",
         "| CRITERION | STATUS | NOTE |",
         "|-----------|--------|------|",
     ]

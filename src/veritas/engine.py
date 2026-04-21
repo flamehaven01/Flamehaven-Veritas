@@ -3,6 +3,7 @@
 Wires PRECHECK → RAG ingestion → STEP 0-5 pipeline → LOGOS IRF reasoning
 → methodology / hypothesis intelligence → report rendering.
 """
+
 from __future__ import annotations
 
 from pathlib import Path
@@ -33,13 +34,15 @@ class SciExpCritiqueEngine:
     """
 
     def __init__(self, rag_retriever=None) -> None:
-        self._rag        = rag_retriever
-        self._logos      = _try_init_component(".logos.logos_bridge",                    "LogosBridge")
-        self._fusion     = _try_init_component(".logos.omega_fusion",                    "OmegaFusion")
-        self._method_det = _try_init_component(".paper.methodology_detector",            "MethodologyDetector")
-        self._hypo_ext   = _try_init_component(".paper.hypothesis_extractor",            "HypothesisExtractor")
-        self._biblio     = _try_init_component(".paper.bibliography_analyzer",           "BibliographyAnalyzer")
-        self._repro      = _try_init_component(".paper.reproducibility_checklist",       "ReproducibilityChecklistExtractor")
+        self._rag = rag_retriever
+        self._logos = _try_init_component(".logos.logos_bridge", "LogosBridge")
+        self._fusion = _try_init_component(".logos.omega_fusion", "OmegaFusion")
+        self._method_det = _try_init_component(".paper.methodology_detector", "MethodologyDetector")
+        self._hypo_ext = _try_init_component(".paper.hypothesis_extractor", "HypothesisExtractor")
+        self._biblio = _try_init_component(".paper.bibliography_analyzer", "BibliographyAnalyzer")
+        self._repro = _try_init_component(
+            ".paper.reproducibility_checklist", "ReproducibilityChecklistExtractor"
+        )
 
     def critique(
         self,
@@ -55,7 +58,8 @@ class SciExpCritiqueEngine:
         if pc.mode == SciExpMode.BLOCKED:
             exp_class, exp_secondary, exp_reason = _pipeline.step0_classify(text)
             step0 = StepResult(
-                step_id="0", weight=0.0,
+                step_id="0",
+                weight=0.0,
                 prose=f"BLOCKED — {pc.line2}. Class best-guess: {exp_class.value}.",
             )
             return CritiqueReport(
@@ -74,7 +78,8 @@ class SciExpCritiqueEngine:
         # ── STEP 0
         exp_class, exp_secondary, exp_reason = _pipeline.step0_classify(text)
         step0 = StepResult(
-            step_id="0", weight=0.0,
+            step_id="0",
+            weight=0.0,
             prose=(
                 f"Experiment class: {exp_class.value}. {exp_reason}"
                 + (f" Secondary class: {exp_secondary.value}." if exp_secondary else "")
@@ -94,7 +99,8 @@ class SciExpCritiqueEngine:
         # ── STEP 5
         fix, next_l = _pipeline.step5_priority_fix(res_claim, res_trace, res_series, res_pub)
         step5 = StepResult(
-            step_id="5", weight=0.0,
+            step_id="5",
+            weight=0.0,
             prose=fix + (f" OPTIONAL — NEXT LIABILITY: {next_l}" if next_l else ""),
         )
 
@@ -153,7 +159,7 @@ class SciExpCritiqueEngine:
         Supported: .pdf, .docx, .doc, .txt, .md
         """
         text = _extract_file_text(Path(file_path))
-        ctx  = self._rag_context(text) if self._rag else None
+        ctx = self._rag_context(text) if self._rag else None
         return self.critique(text, doc_context=ctx, round_number=round_number)
 
     # ── private helpers ────────────────────────────────────────────────────────
@@ -174,18 +180,16 @@ class SciExpCritiqueEngine:
         """
         try:
             # Hypothesis extraction — use primary as central claim
-            hypo_result    = self._hypo_ext.extract(text) if self._hypo_ext else None
+            hypo_result = self._hypo_ext.extract(text) if self._hypo_ext else None
             hypothesis_text = hypo_result.primary if hypo_result else None
-            central_claim   = (
+            central_claim = (
                 hypothesis_text
                 or (claim_step.vulnerable_claim if claim_step else None)
                 or text[:200]
             )
 
             # IRF scoring
-            irf_scores = (
-                self._logos.analyze(text, central_claim) if self._logos else None
-            )
+            irf_scores = self._logos.analyze(text, central_claim) if self._logos else None
 
             # Methodology detection
             methodology_class = None
@@ -202,7 +206,7 @@ class SciExpCritiqueEngine:
                     [s for s in [claim_step] if s is not None],
                 )
                 fusion_result = self._fusion.fuse(sciexp_omega, irf_scores)
-                hybrid_omega  = fusion_result.hybrid_omega
+                hybrid_omega = fusion_result.hybrid_omega
 
             return irf_scores, methodology_class, hypothesis_text, logos_omega, hybrid_omega
 
@@ -215,36 +219,67 @@ class SciExpCritiqueEngine:
             import re as _re
 
             from .types import HSTA4DScores
+
             t = text.lower()
             # N: Novelty — ratio of rare/unique technical terms
             words = set(_re.findall(r"\b[a-z]{5,}\b", t))
-            common = {"the", "and", "that", "this", "with", "from",
-                      "have", "been", "were", "their", "which", "there"}
+            common = {
+                "the",
+                "and",
+                "that",
+                "this",
+                "with",
+                "from",
+                "have",
+                "been",
+                "were",
+                "their",
+                "which",
+                "there",
+            }
             novel_terms = words - common
             N = min(len(novel_terms) / 60, 1.0)
             # C: Consistency — low contradiction marker count = high consistency
             contradictions = sum(
-                1 for m in ["contradict", "inconsist", "however", "despite",
-                             "conflict", "discrepan"]
+                1
+                for m in ["contradict", "inconsist", "however", "despite", "conflict", "discrepan"]
                 if m in t
             )
             C = max(0.0, 1.0 - contradictions * 0.12)
             # T: Temporality — presence of version/date markers
             temporal = sum(
-                1 for m in ["v1.", "v2.", "v3.", "cycle", "iteration",
-                             "round", "2024", "2025", "2026"]
+                1
+                for m in [
+                    "v1.",
+                    "v2.",
+                    "v3.",
+                    "cycle",
+                    "iteration",
+                    "round",
+                    "2024",
+                    "2025",
+                    "2026",
+                ]
                 if m in t
             )
             T = min(temporal / 4, 1.0)
             # R: Reproducibility — method detail completeness
             repro = sum(
-                1 for m in ["protocol", "step-by-step", "method", "procedure",
-                             "config", "parameter", "seed", "reproducib"]
+                1
+                for m in [
+                    "protocol",
+                    "step-by-step",
+                    "method",
+                    "procedure",
+                    "config",
+                    "parameter",
+                    "seed",
+                    "reproducib",
+                ]
                 if m in t
             )
             R = min(repro / 4, 1.0)
-            return HSTA4DScores(N=round(N, 4), C=round(C, 4),
-                                T=round(T, 4), R=round(R, 4))
+            return HSTA4DScores(N=round(N, 4), C=round(C, 4), T=round(T, 4), R=round(R, 4))
         except Exception:
             return None
 
@@ -295,16 +330,16 @@ class SciExpCritiqueEngine:
         if pc.mode == SciExpMode.BLOCKED:
             return 0.0
         from .types import TraceabilityClass
+
         total = sum(len(s.findings) for s in steps)
         if total == 0:
             return 1.0
         traceable = sum(
-            1 for s in steps for f in s.findings
-            if f.traceability == TraceabilityClass.TRACEABLE
+            1 for s in steps for f in s.findings if f.traceability == TraceabilityClass.TRACEABLE
         )
         base = traceable / total
         mode_penalty = {
-            SciExpMode.FULL:    0.0,
+            SciExpMode.FULL: 0.0,
             SciExpMode.PARTIAL: 0.05,
             SciExpMode.LIMITED: 0.15,
         }.get(pc.mode, 0.0)
@@ -313,12 +348,14 @@ class SciExpCritiqueEngine:
 
 # ── Optional-component factory ─────────────────────────────────────────────
 
+
 def _try_init_component(module_path: str, class_name: str):
     """Import and instantiate an optional component; return None on any failure.
 
     Silent failure is by design — LOGOS / BPH enrichment is always opt-in.
     """
     import importlib
+
     try:
         mod = importlib.import_module(module_path, package="veritas")
         return getattr(mod, class_name)()
@@ -330,8 +367,10 @@ def _extract_file_text(path: Path) -> str:
     """Extract text from file — wraps Flamehaven-Filesearch when available."""
     try:
         import sys
+
         sys.path.insert(0, r"D:\Sanctum\Flamehaven-Filesearch")
         from flamehaven_filesearch.engine.file_parser import extract_text
+
         return extract_text(str(path))
     except Exception:
         pass  # flamehaven_filesearch unavailable; fall through to local extraction
@@ -342,6 +381,7 @@ def _extract_file_text(path: Path) -> str:
 
     try:
         import fitz  # pymupdf
+
         doc = fitz.open(str(path))
         return "\n".join(page.get_text() for page in doc)
     except Exception:
@@ -349,6 +389,7 @@ def _extract_file_text(path: Path) -> str:
 
     try:
         from docx import Document
+
         doc = Document(str(path))
         return "\n".join(p.text for p in doc.paragraphs)
     except Exception:

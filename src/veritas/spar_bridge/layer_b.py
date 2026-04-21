@@ -45,19 +45,23 @@ def build_layer_b(
 
 # ── checks ────────────────────────────────────────────────────────────────────
 
+
 def _check_b1(omega: float, report_text: str) -> CheckResult:
-    pub_ready_language = bool(re.search(
-        r"\b(publication.?ready|ready\s+for\s+publish|submit\s+to\s+journal|"
-        r"camera.?ready|final\s+version|accepted\s+for)\b",
-        report_text, re.IGNORECASE,
-    ))
+    pub_ready_language = bool(
+        re.search(
+            r"\b(publication.?ready|ready\s+for\s+publish|submit\s+to\s+journal|"
+            r"camera.?ready|final\s+version|accepted\s+for)\b",
+            report_text,
+            re.IGNORECASE,
+        )
+    )
     if pub_ready_language and omega < 0.70:
         return CheckResult(
             check_id="B1",
             label="Publication-Readiness Claim",
             status="FAIL",
             detail=f"Publication-ready language detected but omega={omega:.4f} < 0.70. "
-                   "Interpretation exceeds what the quality surface justifies.",
+            "Interpretation exceeds what the quality surface justifies.",
         )
     if omega >= 0.80:
         return CheckResult(
@@ -89,8 +93,8 @@ def _check_b2(omega: float, irf_composite: float | None) -> CheckResult:
             label="IRF Alignment",
             status="FAIL",
             detail=f"omega={omega:.4f} vs irf_composite={irf_composite:.4f} (delta={delta:.4f}). "
-                   "VERITAS omega substantially higher than LOGOS IRF reasoning score — "
-                   "surface-level traceability may be overstating confidence.",
+            "VERITAS omega substantially higher than LOGOS IRF reasoning score — "
+            "surface-level traceability may be overstating confidence.",
         )
     if delta > 0.20:
         return CheckResult(
@@ -98,7 +102,7 @@ def _check_b2(omega: float, irf_composite: float | None) -> CheckResult:
             label="IRF Alignment",
             status="WARN",
             detail=f"omega={omega:.4f} vs irf_composite={irf_composite:.4f} (delta={delta:.4f}). "
-                   "Mild divergence between traceability signal and reasoning score.",
+            "Mild divergence between traceability signal and reasoning score.",
         )
     return CheckResult(
         check_id="B2",
@@ -124,7 +128,7 @@ def _check_b3(report_text: str) -> CheckResult:
             label="Overclaiming Language",
             status="WARN",
             detail=f"Overclaiming term(s) detected: {unique_hits}. "
-                   "Soften language to match actual evidence strength.",
+            "Soften language to match actual evidence strength.",
         )
     return CheckResult(
         check_id="B3",
@@ -141,7 +145,7 @@ def _check_b4(precheck_mode: str, omega: float) -> CheckResult:
             label="Precheck Confidence Scope",
             status="FAIL",
             detail=f"omega={omega:.4f} >= 0.80 but PRECHECK={precheck_mode}. "
-                   "High omega claim is not supported under reduced artifact sufficiency.",
+            "High omega claim is not supported under reduced artifact sufficiency.",
         )
     if precheck_mode in {"PARTIAL", "LIMITED"}:
         return CheckResult(
@@ -149,7 +153,7 @@ def _check_b4(precheck_mode: str, omega: float) -> CheckResult:
             label="Precheck Confidence Scope",
             status="WARN",
             detail=f"PRECHECK={precheck_mode}: claim scope should be explicitly bounded "
-                   "by artifact sufficiency (not a complete evidence surface).",
+            "by artifact sufficiency (not a complete evidence surface).",
         )
     return CheckResult(
         check_id="B4",

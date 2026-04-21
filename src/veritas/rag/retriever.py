@@ -1,4 +1,5 @@
 """RAG Retriever — wraps Flamehaven-Filesearch EmbeddingGenerator + in-memory vector store."""
+
 from __future__ import annotations
 
 import math
@@ -11,8 +12,8 @@ class _SimpleVectorStore:
     """Minimal cosine-similarity in-memory store (no external deps)."""
 
     def __init__(self):
-        self._docs:  list[dict]       = []
-        self._vecs:  list[list[float]] = []
+        self._docs: list[dict] = []
+        self._vecs: list[list[float]] = []
 
     def add(self, chunk: dict, vector: list[float]) -> None:
         self._docs.append(chunk)
@@ -30,7 +31,7 @@ class _SimpleVectorStore:
 
     @staticmethod
     def _cosine(a: list[float], b: list[float]) -> float:
-        dot  = sum(x * y for x, y in zip(a, b, strict=False))
+        dot = sum(x * y for x, y in zip(a, b, strict=False))
         norm = math.sqrt(sum(x**2 for x in a)) * math.sqrt(sum(x**2 for x in b))
         return dot / norm if norm else 0.0
 
@@ -85,6 +86,7 @@ def _load_embedder():
         if _FF_ROOT not in sys.path:
             sys.path.insert(0, _FF_ROOT)
         from flamehaven_filesearch.engine.embedding_generator import EmbeddingGenerator
+
         return EmbeddingGenerator()
     except Exception:
         return None
@@ -93,6 +95,7 @@ def _load_embedder():
 def _fallback_embed(text: str, dim: int = 384) -> list[float]:
     """Simple hash-based deterministic embedding (no deps)."""
     import hashlib
+
     words = text.lower().split()[:512]
     vec = [0.0] * dim
     for w in words:

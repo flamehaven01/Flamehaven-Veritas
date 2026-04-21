@@ -9,6 +9,7 @@ Criteria drawn from:
 Each criterion is detected by keyword regex signals in the document text.
 Confidence is binary (satisfied / not satisfied) — no partial scores.
 """
+
 from __future__ import annotations
 
 import re
@@ -84,12 +85,14 @@ class ReproducibilityChecklistExtractor:
         """Return a checklist with each criterion auto-scored from *text*."""
         items: list[ReproducibilityItem] = []
         for code, (pattern, criterion) in _CRITERIA.items():
-            rx    = re.compile(pattern, re.IGNORECASE)
+            rx = re.compile(pattern, re.IGNORECASE)
             match = rx.search(text)
-            items.append(ReproducibilityItem(
-                code      = code,
-                criterion = criterion,
-                satisfied = bool(match),
-                note      = match.group(0)[:80] if match else "",
-            ))
+            items.append(
+                ReproducibilityItem(
+                    code=code,
+                    criterion=criterion,
+                    satisfied=bool(match),
+                    note=match.group(0)[:80] if match else "",
+                )
+            )
         return ReproducibilityChecklist(items=items)

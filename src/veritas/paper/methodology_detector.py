@@ -6,6 +6,7 @@ and extended for SCI-EXP experimental report vocabulary.
 
 Returns MethodologyClass (primary) and confidence score [0.0, 1.0].
 """
+
 from __future__ import annotations
 
 from ..types import MethodologyClass
@@ -14,53 +15,111 @@ from ..types import MethodologyClass
 _PATTERNS: list[tuple[MethodologyClass, list[str], int]] = [
     (
         MethodologyClass.RCT,
-        ["randomized", "randomised", "controlled trial", "placebo",
-         "double-blind", "single-blind", "allocation", "arm ", "arms "],
+        [
+            "randomized",
+            "randomised",
+            "controlled trial",
+            "placebo",
+            "double-blind",
+            "single-blind",
+            "allocation",
+            "arm ",
+            "arms ",
+        ],
         2,
     ),
     (
         MethodologyClass.META_ANALYSIS,
-        ["meta-analysis", "meta analysis", "systematic review",
-         "forest plot", "pooled", "heterogeneity", "funnel plot",
-         "cochrane", "prisma"],
+        [
+            "meta-analysis",
+            "meta analysis",
+            "systematic review",
+            "forest plot",
+            "pooled",
+            "heterogeneity",
+            "funnel plot",
+            "cochrane",
+            "prisma",
+        ],
         2,
     ),
     (
         MethodologyClass.COHORT,
-        ["cohort", "prospective", "retrospective", "longitudinal",
-         "follow-up", "incidence", "participants followed"],
+        [
+            "cohort",
+            "prospective",
+            "retrospective",
+            "longitudinal",
+            "follow-up",
+            "incidence",
+            "participants followed",
+        ],
         2,
     ),
     (
         MethodologyClass.CASE_STUDY,
-        ["case study", "case report", "n=1", "single patient",
-         "single subject", "subject presented"],
+        [
+            "case study",
+            "case report",
+            "n=1",
+            "single patient",
+            "single subject",
+            "subject presented",
+        ],
         1,
     ),
     (
         MethodologyClass.SURVEY,
-        ["survey", "questionnaire", "respondent", "likert",
-         "interview", "focus group", "cross-sectional study"],
+        [
+            "survey",
+            "questionnaire",
+            "respondent",
+            "likert",
+            "interview",
+            "focus group",
+            "cross-sectional study",
+        ],
         2,
     ),
     (
         MethodologyClass.COMPUTATIONAL,
-        ["simulation", "algorithm", "computational", "neural network",
-         "deep learning", "model train", "inference", "benchmark",
-         "dataset", "epoch", "loss curve", "accuracy"],
+        [
+            "simulation",
+            "algorithm",
+            "computational",
+            "neural network",
+            "deep learning",
+            "model train",
+            "inference",
+            "benchmark",
+            "dataset",
+            "epoch",
+            "loss curve",
+            "accuracy",
+        ],
         3,
     ),
     (
         MethodologyClass.EXPERIMENTAL,
-        ["experiment", "laboratory", "in vitro", "in vivo",
-         "ablation", "parity", "rca", "extension", "multiaxis",
-         "test run", "baseline run", "control group"],
+        [
+            "experiment",
+            "laboratory",
+            "in vitro",
+            "in vivo",
+            "ablation",
+            "parity",
+            "rca",
+            "extension",
+            "multiaxis",
+            "test run",
+            "baseline run",
+            "control group",
+        ],
         2,
     ),
     (
         MethodologyClass.OBSERVATIONAL,
-        ["observational", "cross-sectional", "prevalence",
-         "no intervention", "natural experiment"],
+        ["observational", "cross-sectional", "prevalence", "no intervention", "natural experiment"],
         1,
     ),
 ]
@@ -75,9 +134,7 @@ class MethodologyDetector:
         mc, conf = det.detect(text)
     """
 
-    def detect(
-        self, text: str
-    ) -> tuple[MethodologyClass, float]:
+    def detect(self, text: str) -> tuple[MethodologyClass, float]:
         """Return (MethodologyClass, confidence).
 
         Confidence is normalised hit-count in [0, 1].

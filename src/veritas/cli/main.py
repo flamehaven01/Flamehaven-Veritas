@@ -7,6 +7,7 @@ Usage:
   sciexp info                     engine + MICA status
   sciexp playbook                 print MICA playbook for AI agent loading
 """
+
 from __future__ import annotations
 
 import pathlib
@@ -28,11 +29,13 @@ except Exception:
 def _load_engine():
     """Lazy import — keeps startup fast for simple sub-commands."""
     from ..engine import SciExpCritiqueEngine
+
     return SciExpCritiqueEngine()
 
 
 def _load_renderers():
     from ..renderers.md_renderer import MDRenderer
+
     return {"md": MDRenderer}
 
 
@@ -49,6 +52,7 @@ def _read_input(file: str | None, text: str | None, stdin: bool) -> str:
         if p.suffix.lower() == ".pdf":
             try:
                 import fitz  # PyMuPDF
+
                 doc = fitz.open(str(p))
                 return "\n".join(page.get_text() for page in doc)
             except ImportError as err:
@@ -58,6 +62,7 @@ def _read_input(file: str | None, text: str | None, stdin: bool) -> str:
         if p.suffix.lower() in (".docx",):
             try:
                 import docx
+
                 doc = docx.Document(str(p))
                 return "\n".join(p.text for p in doc.paragraphs)
             except ImportError as err:
@@ -72,6 +77,7 @@ def _emit_report(report, fmt: str, out: str | None, template: str) -> None:
     """Route report to the requested output format."""
     if fmt == "md":
         from .formatters import fmt_md
+
         md_text = fmt_md(report)
         if out:
             pathlib.Path(out).write_text(md_text, encoding="utf-8")
@@ -125,7 +131,9 @@ def main():
 @click.option("--text", "-t", default=None, help="Inline text to analyse.")
 @click.option("--stdin", is_flag=True, help="Read input from stdin.")
 @click.option(
-    "--format", "-f", "fmt",
+    "--format",
+    "-f",
+    "fmt",
     type=click.Choice(["md", "pdf", "docx", "tex"], case_sensitive=False),
     default="md",
     show_default=True,
@@ -138,7 +146,9 @@ def main():
     show_default=True,
     help="Report template.",
 )
-@click.option("--round", "round_num", type=int, default=1, show_default=True, help="Critique round.")
+@click.option(
+    "--round", "round_num", type=int, default=1, show_default=True, help="Critique round."
+)
 @click.option("--out", "-o", default=None, help="Output file path. Defaults to stdout for md.")
 @click.option("--quiet", "-q", is_flag=True, help="Suppress progress messages.")
 def critique(file, text, stdin, fmt, template, round_num, out, quiet):
@@ -176,6 +186,7 @@ def precheck(file, text, stdin):
     """Run PRECHECK only — fast artifact validity scan."""
     raw = _read_input(file, text, stdin)
     from ..precheck import run as _precheck_run
+
     pc = _precheck_run(raw)
     click.echo(pc.render())
 
@@ -190,6 +201,7 @@ def info():
     # LOGOS bridge
     try:
         from ..logos.logos_bridge import make_logos_bridge
+
         bridge = make_logos_bridge()
         click.echo(f"LOGOS bridge  : {bridge.mode()}")
     except Exception as exc:

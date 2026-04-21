@@ -1,4 +1,5 @@
 """Tests: LOGOS IRF analyser, methodology detector, hypothesis extractor, omega fusion."""
+
 from __future__ import annotations
 
 import pytest
@@ -40,6 +41,7 @@ aggregated. Interview data collected from 50 focus group participants.
 
 # ── IRFAnalyzer ───────────────────────────────────────────────────────────────
 
+
 class TestIRFAnalyzer:
     def test_returns_irf6d_scores(self):
         analyzer = IRFAnalyzer()
@@ -60,7 +62,7 @@ class TestIRFAnalyzer:
 
     def test_rich_text_scores_higher_than_empty(self):
         analyzer = IRFAnalyzer()
-        rich  = analyzer.score(RICH_TEXT)
+        rich = analyzer.score(RICH_TEXT)
         empty = analyzer.score("nothing here")
         assert rich.composite > empty.composite
 
@@ -78,10 +80,12 @@ class TestIRFAnalyzer:
 
 # ── OmegaFusion ───────────────────────────────────────────────────────────────
 
+
 class TestOmegaFusion:
     def _make_scores(self, **kwargs) -> IRF6DScores:
-        defaults = dict(M=0.6, A=0.6, D=0.6, I=0.6, F=0.6, P=0.6,
-                        composite=0.6, passed=True, source="local")
+        defaults = dict(
+            M=0.6, A=0.6, D=0.6, I=0.6, F=0.6, P=0.6, composite=0.6, passed=True, source="local"
+        )
         defaults.update(kwargs)
         return IRF6DScores(**defaults)
 
@@ -115,6 +119,7 @@ class TestOmegaFusion:
 
 # ── MethodologyDetector ───────────────────────────────────────────────────────
 
+
 class TestMethodologyDetector:
     def test_computational_detected(self):
         det = MethodologyDetector()
@@ -140,6 +145,7 @@ class TestMethodologyDetector:
 
 
 # ── HypothesisExtractor ───────────────────────────────────────────────────────
+
 
 class TestHypothesisExtractor:
     def test_finds_hypothesis(self):

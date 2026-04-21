@@ -4,6 +4,7 @@ Provides:
   fmt_md(report)   -> str   markdown (default, token-efficient)
   fmt_term(report) -> str   ANSI-stripped plain text for terminal display
 """
+
 from __future__ import annotations
 
 import re
@@ -12,9 +13,9 @@ from ..types import CritiqueReport
 
 _HR = "---"
 _TRACEABILITY_BADGE = {
-    "traceable":           "[+]",
+    "traceable": "[+]",
     "partially traceable": "[~]",
-    "not traceable":       "[-]",
+    "not traceable": "[-]",
 }
 _STEP_TITLES = {
     "1": "STEP 1 — Claim Integrity (w=0.40)",
@@ -29,14 +30,17 @@ _STEP_TITLES = {
 # Section builders
 # ---------------------------------------------------------------------------
 
+
 def _hdr(report: CritiqueReport) -> list[str]:
-    omega_str = (
-        f"**Omega:** {report.omega_score:.4f}"
-        + (f" → hybrid {report.hybrid_omega:.4f}" if report.hybrid_omega is not None else "")
+    omega_str = f"**Omega:** {report.omega_score:.4f}" + (
+        f" → hybrid {report.hybrid_omega:.4f}" if report.hybrid_omega is not None else ""
     )
     return [
-        "# VERITAS — AI Critique Experimental Report Analysis Framework — Report", "",
-        f"**Round:** {report.round_number}  ", omega_str, "",
+        "# VERITAS — AI Critique Experimental Report Analysis Framework — Report",
+        "",
+        f"**Round:** {report.round_number}  ",
+        omega_str,
+        "",
     ]
 
 
@@ -49,7 +53,8 @@ def _blocked_body(report: CritiqueReport) -> list[str]:
     if report.steps:
         lines += ["## STEP 0", "", report.steps[0].prose, ""]
     lines += [
-        "> **BLOCKED** — critique halted. Provide required artifacts.", "",
+        "> **BLOCKED** — critique halted. Provide required artifacts.",
+        "",
         f"**Priority fix:** {report.priority_fix}",
     ]
     return lines
@@ -86,7 +91,8 @@ def _irf_block(report: CritiqueReport) -> list[str]:
     pass_icon = ":white_check_mark:" if sc.passed else ":warning:"
     pass_label = "PASS" if sc.passed else "WARN"
     lines = [
-        "### IRF-Calc 6D (LOGOS)", "",
+        "### IRF-Calc 6D (LOGOS)",
+        "",
         "| Dim | Score | Meaning |",
         "|-----|-------|---------|",
         f"| M   | {sc.M:.3f} | Methodic Doubt |",
@@ -115,8 +121,10 @@ def _hsta_block(report: CritiqueReport) -> list[str]:
     h = report.hsta_scores
     return [
         "### HSTA 4D",
-        (f"N(Novelty)={h.N:.3f}  C(Consistency)={h.C:.3f}  "
-         f"T(Temporality)={h.T:.3f}  R(Reproducibility)={h.R:.3f}  composite={h.composite:.3f}"),
+        (
+            f"N(Novelty)={h.N:.3f}  C(Consistency)={h.C:.3f}  "
+            f"T(Temporality)={h.T:.3f}  R(Reproducibility)={h.R:.3f}  composite={h.composite:.3f}"
+        ),
         "",
     ]
 
@@ -162,6 +170,7 @@ def _events_block(report: CritiqueReport) -> list[str]:
 # ---------------------------------------------------------------------------
 # Public formatters
 # ---------------------------------------------------------------------------
+
 
 def fmt_md(report: CritiqueReport) -> str:
     """Full markdown representation of CritiqueReport."""
