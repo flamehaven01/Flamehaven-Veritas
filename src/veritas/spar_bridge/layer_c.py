@@ -10,7 +10,10 @@ from __future__ import annotations
 
 from typing import Any
 
-from spar_framework.result_types import CheckResult
+try:
+    from spar_framework.result_types import CheckResult  # type: ignore[import]
+except ImportError:
+    from ._compat import CheckResult  # type: ignore[no-redef]
 
 
 def build_layer_c(

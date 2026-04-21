@@ -2,6 +2,10 @@
 
 from __future__ import annotations
 
+import importlib.util
+
+import pytest
+
 from veritas.spar_bridge.layer_a import _check_a1, _check_a2, _check_a3, _check_a4, build_layer_a
 from veritas.spar_bridge.layer_b import _check_b1, _check_b2, _check_b3, _check_b4, build_layer_b
 from veritas.spar_bridge.layer_c import _check_c1, _check_c2, _check_c3, _check_c4, build_layer_c
@@ -16,6 +20,8 @@ from veritas.types import (
     StepResult,
     TraceabilityClass,
 )
+
+_SPAR_AVAILABLE = importlib.util.find_spec("spar_framework") is not None
 
 
 class TestLayerA:
@@ -293,6 +299,7 @@ class TestSubjectMapper:
 # ── Runtime integration ────────────────────────────────────────────────────────
 
 
+@pytest.mark.skipif(not _SPAR_AVAILABLE, reason="spar-framework not installed")
 class TestRuntime:
     def test_runtime_builds(self):
         rt = get_review_runtime()

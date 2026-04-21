@@ -11,7 +11,10 @@ from __future__ import annotations
 import re
 from typing import Any
 
-from spar_framework.result_types import CheckResult
+try:
+    from spar_framework.result_types import CheckResult  # type: ignore[import]
+except ImportError:
+    from ._compat import CheckResult  # type: ignore[no-redef]
 
 _OVERCLAIM_PATTERNS = [
     r"\bproves?\b",
