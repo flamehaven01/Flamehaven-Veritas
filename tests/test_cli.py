@@ -167,4 +167,71 @@ class TestVersion:
     def test_version_flag(self, runner):
         result = runner.invoke(main, ["--version"])
         assert result.exit_code == 0
-        assert "2.2" in result.output
+        assert "2.3" in result.output
+
+
+# ---------------------------------------------------------------------------
+# --prev / --save-round multi-round
+# ---------------------------------------------------------------------------
+class TestMultiRoundCLI:
+    def test_save_round_creates_json(self, runner, sample_file, tmp_path):
+        out_md = str(tmp_path / "report_r1.md")
+        result = runner.invoke(
+            main,
+            ["critique", sample_file, "--round", "1", "--save-round", "--out", out_md, "--quiet"],
+        )
+        assert result.exit_code == 0, result.output
+        json_path = tmp_path / "report_r1_r1.json"
+        assert json_path.exists(), "Round summary JSON not created"
+
+    def test_prev_loads_and_no_crash(self, runner, sample_file, tmp_path):
+        # Round 1 with save
+        out_r1 = str(tmp_path / "r1_out.md")
+        runner.invoke(
+            main,
+            ["critique", sample_file, "--round", "1", "--save-round", "--out", out_r1, "--quiet"],
+        )
+        json_path = tmp_path / "r1_out_r1.json"
+        if not json_path.exists():
+            pytest.skip("Round 1 JSON not saved; skip multi-round test")
+        # Round 2 using prev
+        result = runner.invoke(
+            main,
+            ["critique", sample_file, "--round", "2", "--prev", str(json_path), "--quiet"],
+        )
+        assert result.exit_code == 0, result.output
+
+    def test_prev_missing_file_errors(self, runner, sample_file):
+        result = runner.invoke(
+            main,
+            ["critique", sample_file, "--round", "2", "--prev", "nonexistent_r1.json"],
+        )
+        assert result.exit_code != 0
+
+
+# ---------------------------------------------------------------------------
+# batch command
+# ---------------------------------------------------------------------------
+class TestBatch:
+    def test_batch_empty_pattern_fails(self, runner, tmp_path):
+        result = runner.invoke(main, ["batch", "nonexistent_*.xyz", "--output-dir", str(tmp_path)])
+        assert result.exit_code != 0
+
+    def test_batch_single_file_ok(self, runner, sample_file, tmp_path):
+        result = runner.invoke(
+            main,
+            ["batch", sample_file, "--output-dir", str(tmp_path), "--quiet"],
+        )
+        assert result.exit_code == 0, result.output
+        index = tmp_path / "summary_index.json"
+        assert index.exists()
+
+    def test_batch_summary_index_structure(self, runner, sample_file, tmp_path):
+        import json
+
+        runner.invoke(main, ["batch", sample_file, "--output-dir", str(tmp_path), "--quiet"])
+        index = tmp_path / "summary_index.json"
+        data = json.loads(index.read_text(encoding="utf-8"))
+        assert "files" in data
+        assert "total" in data
+        assert data["total"] == 1

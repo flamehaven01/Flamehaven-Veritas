@@ -228,6 +228,11 @@ class CritiqueReport:
     # ---- SPAR claim-aware review (optional; None when spar-framework not installed)
     spar_review: dict | None = None
 
+    # ---- Multi-round drift tracking (v2.3.0)
+    delta_omega: float | None = None  # signed: current - previous round omega
+    drift_metrics: dict | None = None  # DriftMetrics.as_dict() — JSON-serializable
+    jsd_penalized_omega: float | None = None  # JSD-gated omega (multi-round only)
+
     def step(self, step_id: str) -> StepResult | None:
         return next((s for s in self.steps if s.step_id == step_id), None)
 
@@ -248,6 +253,55 @@ class CritiqueReport:
             for s in self.steps
             for f in s.findings
             if f.traceability == TraceabilityClass.NOT_TRACEABLE
+        )
+
+    def to_round_summary(self) -> dict:
+        """Minimal JSON-serializable summary for cross-round drift tracking.
+
+        Saves only the fields needed for next-round DriftEngine computation.
+        Write to ``{stem}_r{N}.json`` for ``--prev`` reload.
+        """
+        return {
+            "round_number": self.round_number,
+            "omega_score": self.omega_score,
+            "hybrid_omega": self.hybrid_omega,
+            "irf_scores": self.irf_scores.as_dict() if self.irf_scores else None,
+            "delta_omega": self.delta_omega,
+            "drift_metrics": self.drift_metrics,
+            "jsd_penalized_omega": self.jsd_penalized_omega,
+        }
+
+    @classmethod
+    def from_round_summary(cls, data: dict) -> CritiqueReport:
+        """Reconstruct minimal CritiqueReport from to_round_summary() dict.
+
+        Only restores the fields required for multi-round drift computation;
+        all other fields are set to safe defaults.
+        """
+        irf_data = data.get("irf_scores")
+        irf_scores: IRF6DScores | None = None
+        if irf_data and isinstance(irf_data, dict):
+            irf_scores = IRF6DScores(
+                M=float(irf_data.get("M", 0.0)),
+                A=float(irf_data.get("A", 0.0)),
+                D=float(irf_data.get("D", 0.0)),
+                I=float(irf_data.get("I", 0.0)),
+                F=float(irf_data.get("F", 0.0)),
+                P=float(irf_data.get("P", 0.0)),
+                composite=float(irf_data.get("composite", 0.0)),
+                passed=bool(irf_data.get("passed", False)),
+                source=str(irf_data.get("source", "loaded")),
+            )
+        hybrid = data.get("hybrid_omega")
+        return cls(
+            precheck=PrecheckResult(mode=SciExpMode.FULL, missing_artifacts=[]),
+            round_number=int(data.get("round_number", 1)),
+            omega_score=float(data.get("omega_score", 0.0)),
+            hybrid_omega=float(hybrid) if hybrid is not None else None,
+            irf_scores=irf_scores,
+            delta_omega=data.get("delta_omega"),
+            drift_metrics=data.get("drift_metrics"),
+            jsd_penalized_omega=data.get("jsd_penalized_omega"),
         )
 
 

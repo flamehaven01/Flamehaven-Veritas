@@ -49,6 +49,7 @@ class SciExpCritiqueEngine:
         report_text: str,
         doc_context: str | None = None,
         round_number: int = 1,
+        prev_report: CritiqueReport | None = None,
     ) -> CritiqueReport:
         """Execute full critique pipeline. Returns CritiqueReport."""
         text = (doc_context + "\n\n" + report_text) if doc_context else report_text
@@ -123,6 +124,28 @@ class SciExpCritiqueEngine:
         # Prefer hybrid_omega if computed; otherwise use sciexp_omega
         final_omega = hybrid_omega if hybrid_omega is not None else sciexp_omega
 
+        # ── Multi-round drift computation (v2.3.0)
+        delta_omega = None
+        drift_metrics_dict = None
+        jsd_penalized_omega = None
+        if (
+            prev_report is not None
+            and irf_scores is not None
+            and prev_report.irf_scores is not None
+        ):
+            from .logos.drift_engine import DriftEngine
+
+            _de = DriftEngine()
+            _dm = _de.compute_round_drift(
+                irf_scores,
+                prev_report.irf_scores,
+                round_from=prev_report.round_number,
+                round_to=round_number,
+            )
+            delta_omega = _dm.delta_omega
+            drift_metrics_dict = _dm.as_dict()
+            jsd_penalized_omega = _de.apply_penalty(final_omega, _dm.jsd)
+
         report = CritiqueReport(
             precheck=pc,
             experiment_class=exp_class,
@@ -143,6 +166,9 @@ class SciExpCritiqueEngine:
             hybrid_omega=hybrid_omega,
             bibliography_stats=bibliography_stats,
             reproducibility_checklist=reproducibility_checklist,
+            delta_omega=delta_omega,
+            drift_metrics=drift_metrics_dict,
+            jsd_penalized_omega=jsd_penalized_omega,
         )
 
         # ── SPAR claim-aware review (post-build; needs complete report as subject)
@@ -153,6 +179,7 @@ class SciExpCritiqueEngine:
         self,
         file_path: str | Path,
         round_number: int = 1,
+        prev_report: CritiqueReport | None = None,
     ) -> CritiqueReport:
         """Parse a file and critique its content.
 
@@ -160,7 +187,9 @@ class SciExpCritiqueEngine:
         """
         text = _extract_file_text(Path(file_path))
         ctx = self._rag_context(text) if self._rag else None
-        return self.critique(text, doc_context=ctx, round_number=round_number)
+        return self.critique(
+            text, doc_context=ctx, round_number=round_number, prev_report=prev_report
+        )
 
     # ── private helpers ────────────────────────────────────────────────────────
 

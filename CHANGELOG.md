@@ -7,6 +7,51 @@ Versioning: [Semantic Versioning](https://semver.org/spec/v2.0.0.html)
 
 ---
 
+## [2.3.0] — 2026-04-22
+
+### Added
+
+#### Multi-Round Drift Tracking
+- **`src/veritas/logos/drift_engine.py`** — NEW: `DriftEngine`, `DriftMetrics`, `DriftLevel`
+  Pure-Python JSD/L2 divergence computation between consecutive IRF-6D score vectors.
+  Algorithms extracted from Flamehaven-LOGOS `DriftController` + `OmegaScorer` — zero new external deps.
+  - `DriftEngine.compute_round_drift(current, previous)` → `DriftMetrics`
+  - `DriftEngine.apply_penalty(omega, jsd)` — SIDRCE JSD-gate: at JSD=0.06 omega collapses to 0
+  - Thresholds: `JSD_MAX=0.06` (CRITICAL), `JSD_WARN=0.04` (WARNING), `L2_MAX=0.20`, `L2_WARN=0.10`
+
+- **`src/veritas/types.py`** — `CritiqueReport` gains 3 new fields:
+  - `delta_omega: float | None` — signed omega change vs previous round
+  - `drift_metrics: dict | None` — `DriftMetrics.as_dict()` JSON-serializable snapshot
+  - `jsd_penalized_omega: float | None` — JSD-gated omega (multi-round only)
+  - `to_round_summary() -> dict` — minimal JSON snapshot for `--prev` reload
+  - `from_round_summary(data) -> CritiqueReport` — reconstruct prev round from JSON
+
+- **`src/veritas/engine.py`** — `critique()` + `critique_from_file()` gain `prev_report: CritiqueReport | None = None` parameter.
+  When `prev_report` is provided and both reports have IRF scores, drift is computed automatically.
+
+#### CLI Enhancements
+- **`veritas critique --prev PATH`** — load previous round summary JSON for drift tracking
+- **`veritas critique --save-round`** — auto-save `{stem}_r{N}.json` alongside output for chained rounds
+- **`veritas batch PATTERN`** — batch critique with `ThreadPoolExecutor`:
+  - `--jobs N` (default: 4) parallel workers
+  - `--output-dir DIR` output directory
+  - emits `summary_index.json` with per-file omega + status
+
+#### Formatters
+- **`src/veritas/cli/formatters.py`** — `_drift_block()` renders ROUND DIFF table in markdown output
+  (JSD, L2, level, omega penalty factor, delta Omega, JSD-penalized Omega; only appears when drift_metrics present)
+
+### Architecture
+- **Zero new external dependencies** — all algorithms are stdlib-only pure Python extracted natively
+- `DriftEngine` replaces future `flamehaven-logos` import risk (hardcoded path eliminated for drift)
+
+### Quality
+- **Tests**: new `tests/test_drift_engine.py` covering JSD math, penalty formula, round-summary I/O, multi-round integration
+- **Tests**: `tests/test_cli.py` updated — `TestVersion` asserts `"2.3"`, `TestMultiRoundCLI`, `TestBatch` added
+- Version gate: `test_version_flag` asserts `"2.3"` in output
+
+---
+
 ## [2.2.1] — 2026-04-21
 
 ### Fixed

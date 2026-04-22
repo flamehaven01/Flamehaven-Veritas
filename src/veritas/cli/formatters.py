@@ -148,6 +148,37 @@ def _steps_block(report: CritiqueReport) -> list[str]:
     return lines
 
 
+def _drift_block(report: CritiqueReport) -> list[str]:
+    """ROUND DIFF section -- only rendered when drift_metrics is populated."""
+    if report.drift_metrics is None:
+        return []
+    dm = report.drift_metrics
+    _icon = {"normal": "[+]", "warning": "[!]", "critical": "[-]"}
+    level_icon = _icon.get(str(dm.get("level", "")), "[?]")
+    lines = [
+        f"## ROUND DIFF -- R{dm.get('round_from')} -> R{dm.get('round_to')}",
+        "",
+        "| Metric | Value |",
+        "|--------|-------|",
+        f"| JSD | {dm.get('jsd', 0.0):.6f} |",
+        f"| L2 | {dm.get('l2', 0.0):.6f} |",
+        f"| Level | {level_icon} {str(dm.get('level', '')).upper()} |",
+        f"| Omega penalty factor | {dm.get('omega_penalty_factor', 1.0):.4f} |",
+        "",
+    ]
+    delta = report.delta_omega
+    if delta is not None:
+        trend = "(+)" if delta > 0 else ("(-)" if delta < 0 else "(=)")
+        lines.append(f"**Delta Omega:** {delta:+.4f} {trend}")
+    if report.jsd_penalized_omega is not None:
+        lines.append(f"**JSD-penalized Omega:** {report.jsd_penalized_omega:.4f}")
+    remediation = dm.get("remediation")
+    if remediation:
+        lines.append(f"**Remediation:** `{remediation}`")
+    lines.append("")
+    return lines
+
+
 def _events_block(report: CritiqueReport) -> list[str]:
     lines: list[str] = []
     if report.hold_events:
@@ -184,6 +215,7 @@ def fmt_md(report: CritiqueReport) -> str:
         + _paper_intel_block(report)
         + _irf_block(report)
         + _hsta_block(report)
+        + _drift_block(report)
         + _steps_block(report)
         + _events_block(report)
     )
