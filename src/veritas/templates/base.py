@@ -41,3 +41,20 @@ class BaseTemplate(ABC):
             "bmj": BMJTemplate(),
             "ku": KUTemplate(),
         }
+
+
+def select_template(report: CritiqueReport) -> str:
+    """Auto-select template ID from experiment classification.
+
+    Rule (plan p2-auto-template):
+      PARITY  | EXTENSION   -> "bmj"   (performance comparison structure)
+      RCA     | ABLATION    -> "ku"    (root-cause / component analysis)
+      MULTIAXIS             -> "bmj"   (multi-dimensional, BMJ handles well)
+      None / unknown        -> "bmj"   (safe default)
+    """
+    from ..types import ExperimentClass
+
+    ec = report.experiment_class
+    if ec in (ExperimentClass.RCA, ExperimentClass.ABLATION):
+        return "ku"
+    return "bmj"

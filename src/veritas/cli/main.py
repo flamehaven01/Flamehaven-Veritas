@@ -31,7 +31,7 @@ for _pkg_name in ("flamehaven-veritas", "veritas"):
     except Exception:
         pass
 if _VERSION == "unknown":
-    _VERSION = "2.3.0"
+    _VERSION = "2.5.0"
 
 
 def _load_engine():
@@ -167,10 +167,10 @@ def main():
 )
 @click.option(
     "--template",
-    type=click.Choice(["bmj", "ku"], case_sensitive=False),
-    default="bmj",
+    type=click.Choice(["auto", "bmj", "ku"], case_sensitive=False),
+    default="auto",
     show_default=True,
-    help="Report template.",
+    help="Report template. 'auto' selects based on experiment class.",
 )
 @click.option(
     "--round", "round_num", type=int, default=1, show_default=True, help="Critique round."
@@ -188,7 +188,8 @@ def main():
 )
 @click.option("--out", "-o", default=None, help="Output file path. Defaults to stdout for md.")
 @click.option("--quiet", "-q", is_flag=True, help="Suppress progress messages.")
-def critique(file, text, stdin, fmt, template, round_num, prev, save_round, out, quiet):
+@click.option("--rag", is_flag=True, help="Enable RAG context enrichment (BM25+cosine+RRF).")
+def critique(file, text, stdin, fmt, template, round_num, prev, save_round, out, quiet, rag):
     """Analyse a document and emit a structured critique report.
 
     Examples:\n
@@ -197,6 +198,7 @@ def critique(file, text, stdin, fmt, template, round_num, prev, save_round, out,
       sciexp critique paper.md --format tex --out report.tex\n
       sciexp critique --text "Abstract: ..." --template ku\n
       sciexp critique paper.pdf --round 2 --prev paper_r1.json --save-round\n
+      sciexp critique paper.pdf --rag\n
       cat paper.txt | sciexp critique --stdin
     """
     # --format docx/pdf/tex requires --out
@@ -207,6 +209,21 @@ def critique(file, text, stdin, fmt, template, round_num, prev, save_round, out,
         click.echo(f"[>] VERITAS v{_VERSION} | fmt={fmt} tpl={template} round={round_num}")
 
     raw = _read_input(file, text, stdin)
+
+    # RAG context enrichment
+    rag_context: str | None = None
+    if rag:
+        try:
+            from ..rag.retriever import SciExpRetriever
+
+            retriever = SciExpRetriever()
+            retriever.index(raw)
+            rag_context = retriever.build_context("hypothesis methodology results")
+            if not quiet:
+                click.echo(f"[>] RAG indexed {len(raw.split())} words")
+        except Exception as exc:
+            if not quiet:
+                click.echo(f"[!] RAG unavailable: {exc}")
 
     # Load previous round for drift tracking
     prev_report = None
@@ -225,7 +242,16 @@ def critique(file, text, stdin, fmt, template, round_num, prev, save_round, out,
             raise click.ClickException(f"Failed to parse previous round JSON: {exc}") from exc
 
     engine = _load_engine()
-    report = engine.critique(raw, round_number=round_num, prev_report=prev_report)
+    # Inject RAG context into raw text when available
+    critique_input = f"{raw}\n\n[RAG CONTEXT]\n{rag_context}" if rag_context else raw
+    report = engine.critique(critique_input, round_number=round_num, prev_report=prev_report)
+
+    # Resolve auto template after classification is known
+    if template == "auto":
+        from ..templates.base import select_template
+
+        template = select_template(report)
+
     _emit_report(report, fmt, out, template)
 
     # Auto-save round summary JSON
@@ -291,16 +317,20 @@ def batch(pattern, fmt, jobs, output_dir, quiet):
         p = pathlib.Path(fp)
         try:
             report = engine.critique_from_file(fp)
+            from ..templates.base import select_template
+
+            tpl = select_template(report)
             stem = p.stem
             ext = {"md": ".md", "pdf": ".pdf", "docx": ".docx", "tex": ".tex"}[fmt]
             dest = out_path / f"{stem}{ext}"
-            _emit_report(report, fmt, str(dest), "bmj")
+            _emit_report(report, fmt, str(dest), tpl)
             return {
                 "file": fp,
                 "status": "ok",
                 "omega": report.omega_score,
                 "hybrid_omega": report.hybrid_omega,
                 "round": report.round_number,
+                "template": tpl,
                 "output": str(dest),
             }
         except Exception as exc:
@@ -349,7 +379,7 @@ def precheck(file, text, stdin):
 # ---------------------------------------------------------------------------
 @main.command()
 def info():
-    """Show engine version, LOGOS status, and MICA state."""
+    """Show engine version, LOGOS status, MICA state, and CR-EP governance state."""
     click.echo(f"VERITAS v{_VERSION}")
     # LOGOS bridge
     try:
@@ -359,13 +389,128 @@ def info():
         click.echo(f"LOGOS bridge  : {bridge.source}")
     except Exception as exc:
         click.echo(f"LOGOS bridge  : unavailable ({exc})")
-    # MICA
-    _mica_root = pathlib.Path(__file__).parent.parent.parent.parent / "memory"
-    mica_yaml = _mica_root / "mica.yaml"
-    if mica_yaml.exists():
-        click.echo(f"MICA contract : {mica_yaml}")
+    # MICA session
+    try:
+        from ..session.mica_store import MICAStore
+
+        store = MICAStore(pathlib.Path("."))
+        status = store.show()
+        click.echo(status.render())
+    except Exception as exc:
+        click.echo(f"MICA          : error ({exc})")
+    # CR-EP governance
+    try:
+        from ..governance.cr_ep_gate import detect_state as _crep_state
+        from ..governance.cr_ep_gate import validate_artifacts
+
+        crep_state = _crep_state(pathlib.Path("."))
+        click.echo(f"CR-EP state   : {crep_state}")
+        errs = validate_artifacts(pathlib.Path("."))
+        if errs:
+            for e in errs:
+                click.echo(f"  [!] {e}")
+    except Exception as exc:
+        click.echo(f"CR-EP         : unavailable ({exc})")
+
+
+# ---------------------------------------------------------------------------
+# session
+# ---------------------------------------------------------------------------
+@main.group()
+def session():
+    """MICA session management (start / show / close)."""
+
+
+@session.command("start")
+def session_start():
+    """Initialize MICA session in current directory."""
+    from ..session.mica_store import MICAStore
+
+    store = MICAStore(pathlib.Path("."))
+    state = store.start()
+    click.echo(f"[+] MICA session started: {state}")
+
+
+@session.command("show")
+def session_show():
+    """Show current MICA session status and DI violation counts."""
+    from ..session.mica_store import MICAStore
+
+    store = MICAStore(pathlib.Path("."))
+    status = store.show()
+    click.echo(status.render())
+    if status.di_list:
+        click.echo(f"\nDI violations ({len(status.di_list)} total):")
+        for di in status.di_list[:10]:
+            click.echo(f"  [{di.get('severity', '?')}] {di.get('origin_episode', '?')}")
+        if len(status.di_list) > 10:
+            click.echo(f"  ... and {len(status.di_list) - 10} more")
+
+
+@session.command("close")
+def session_close():
+    """Close the current MICA session (writes close timestamp)."""
+    from ..session.mica_store import MICAStore
+
+    store = MICAStore(pathlib.Path("."))
+    store.close()
+    click.echo("[+] MICA session closed.")
+
+
+# ---------------------------------------------------------------------------
+# govern
+# ---------------------------------------------------------------------------
+@main.group()
+def govern():
+    """CR-EP governance gate (init / status / log)."""
+
+
+@govern.command("init")
+@click.option(
+    "--profile",
+    type=click.Choice(["nano", "lite", "standard", "full"], case_sensitive=False),
+    default="standard",
+    show_default=True,
+    help="CR-EP profile determines which artifacts are created.",
+)
+def govern_init(profile: str):
+    """Bootstrap .cr-ep/ governance directory in current directory."""
+    from ..governance.cr_ep_gate import bootstrap
+
+    state = bootstrap(pathlib.Path("."), profile=profile)
+    click.echo(f"[+] CR-EP initialized (profile={profile}, state={state})")
+
+
+@govern.command("status")
+def govern_status():
+    """Show current CR-EP state and artifact validation results."""
+    from ..governance.cr_ep_gate import detect_state as _crep_state
+    from ..governance.cr_ep_gate import validate_artifacts
+
+    root = pathlib.Path(".")
+    state = _crep_state(root)
+    click.echo(f"CR-EP state: {state}")
+    errs = validate_artifacts(root)
+    if errs:
+        click.echo("Validation errors:")
+        for e in errs:
+            click.echo(f"  [!] {e}")
     else:
-        click.echo("MICA contract : not found")
+        click.echo("[+] Artifacts valid.")
+
+
+@govern.command("log")
+@click.option("--last", "-n", type=int, default=10, show_default=True, help="Last N events.")
+def govern_log(last: int):
+    """Show recent enforcement log events."""
+    from ..governance.cr_ep_gate import read_log
+
+    events = read_log(pathlib.Path("."))
+    if not events:
+        click.echo("No enforcement log events.")
+        return
+    for ev in events[-last:]:
+        click.echo(f"  {ev.get('ts_utc', '')} [{ev.get('event_type', '')}] {ev.get('reason', '')}")
 
 
 # ---------------------------------------------------------------------------

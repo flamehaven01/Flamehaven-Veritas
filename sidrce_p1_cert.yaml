@@ -1,0 +1,38 @@
+project: SIDRCE Inspection
+generated_at_utc: '2026-04-22T14:47:33.457559+00:00'
+trace_root_hash: d771ab71bc0d2efd5c239742119595381a9a25cf4a1458e8cd24532114c25c76
+strict_mode: false
+metrics:
+  logic_density: 0.9973502524661149
+  entropy: 6.114171921232325
+  dead_code_ratio: 1.0
+  trace_integrity: 1.0
+omega_score: 0.9983
+verdict: CERTIFIED
+trace_chain:
+- trace_id: TRACE-7F1839D4E107
+  timestamp: '2026-04-22T14:47:32.479376+00:00'
+  action: init
+  actor: cli_user
+  evidence_hash: 5f020f3ab762b6581a3b9adb3dd72ec432736301cf38ed50956a9000582064e1
+  previous_hash: '0000000000000000000000000000000000000000000000000000000000000000'
+  chain_hash: 58cdd3e82c69fa02226493ea77c1887f03e727691201e0a90f96637bf62b578d
+  metadata:
+    strict: false
+- trace_id: TRACE-7BC0BEEA5B1E
+  timestamp: '2026-04-22T14:47:33.360814+00:00'
+  action: phase1_complete
+  actor: slop_detector
+  evidence_hash: 185a14da5168eeb94604f057699bf534ec1f2c9bf595e5ecf270b76444291506
+  previous_hash: 58cdd3e82c69fa02226493ea77c1887f03e727691201e0a90f96637bf62b578d
+  chain_hash: 6de3b00662aaf8508d697dc5717455dbee92b5e7f28d256dbbb8c2af64a1ce16
+  metadata:
+    avg_ldr: 0.9973502524661149
+- trace_id: TRACE-2459F75DE717
+  timestamp: '2026-04-22T14:47:33.453367+00:00'
+  action: phase2_complete
+  actor: analyzers
+  evidence_hash: 0de4b0d88ea5a59e7995ce3f51b9b9882b181a90a925b718898d690b9fcddd6b
+  previous_hash: 6de3b00662aaf8508d697dc5717455dbee92b5e7f28d256dbbb8c2af64a1ce16
+  chain_hash: d771ab71bc0d2efd5c239742119595381a9a25cf4a1458e8cd24532114c25c76
+  metadata: {}

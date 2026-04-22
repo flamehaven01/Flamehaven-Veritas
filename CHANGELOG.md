@@ -7,6 +7,38 @@ Versioning: [Semantic Versioning](https://semver.org/spec/v2.0.0.html)
 
 ---
 
+## [2.5.0] - 2026-04-29
+
+### Added
+
+#### Session Memory (MICA v0.2.3 Native Extraction)
+- `src/veritas/session/mica_store.py` — MICA session lifecycle (zero external deps).
+  - `detect_state()`, `resolve_paths()`, `count_invariants()` extracted from MICA v0.2.3
+  - `MICAStore`: `start() / show() / log_di_violation() / close()` lifecycle
+  - `DIViolation` dataclass, `SessionStatus.render()`
+  - CLI: `veritas session start | show | close`
+
+#### CR-EP Governance Gate (v2.7.2 Native Extraction)
+- `src/veritas/governance/cr_ep_gate.py` — CR-EP state machine (zero external deps).
+  - `detect_state()`: INIT -> CONTEXT_RESOLVED -> WHY_VALIDATED -> EXECUTING -> CLOSED
+  - `bootstrap(root, profile)`: nano / lite / standard / full profiles
+  - `append_event()` / `read_log()`: append-only enforcement_log.jsonl
+  - `validate_artifacts()`, `check_violations()` guard conditions
+  - CLI: `veritas govern init | status | log`
+
+#### RAG Retriever (Flamehaven-Filesearch Native Extraction)
+- `src/veritas/rag/retriever.py` — Hybrid BM25 + cosine + RRF retriever (zero external deps).
+  - `BM25`: Robertson formula, k1=1.5, b=0.75, Korean+English tokenizer
+  - `rrf_fusion()`: Reciprocal Rank Fusion, k=60
+  - `chunk_text()`: heading-aware sliding window, word-count fallback for long sentences
+  - `SciExpRetriever`: `index() / retrieve() / build_context()` hybrid pipeline
+  - CLI: `veritas critique --rag` enables RAG context injection
+
+#### Auto-Template Selection
+- `src/veritas/templates/base.py` — `select_template(report)`:
+  - RCA / ABLATION -> "ku" template
+  - PARITY / EXTENSION / MULTIAXIS / None -> "bmj" template (safe default)
+- `veritas critique --template auto` (now the default)
 ## [2.3.0] — 2026-04-22
 
 ### Added
