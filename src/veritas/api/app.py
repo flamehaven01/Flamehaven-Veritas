@@ -13,7 +13,7 @@ from .routes import router
 
 app = FastAPI(
     title="VERITAS API",
-    version="2.1.0",
+    version="3.2.0",
     description="Experimental Report Analysis Engine — upload a document, get a structured critique.",
     docs_url="/docs",
     redoc_url="/redoc",
@@ -28,8 +28,8 @@ app.add_middleware(
 
 app.include_router(router, prefix="/api/v1")
 
-# Serve frontend static files
-_FRONTEND = Path(__file__).parents[4] / "frontend"
+# Serve frontend static files (built by `npm run build` in frontend/)
+_FRONTEND = Path(__file__).parents[3] / "frontend" / "dist"
 if _FRONTEND.exists():
     app.mount("/static", StaticFiles(directory=str(_FRONTEND)), name="static")
 
@@ -40,13 +40,13 @@ if _FRONTEND.exists():
 
 @app.get("/health", tags=["system"])
 async def health():
-    return {"status": "ok", "version": "2.1.0"}
+    return {"status": "ok", "version": "3.2.0"}
 
 
 @app.get("/version", tags=["system"])
 async def version():
     return {
-        "version": "2.1.0",
+        "version": "3.2.0",
         "protocol": "VERITAS — AI Critique Experimental Report Analysis Framework",
     }
 

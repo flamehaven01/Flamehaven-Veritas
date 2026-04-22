@@ -230,4 +230,58 @@ def _to_response(report) -> S.CritiqueResponse:
         logos_omega=report.logos_omega,
         hybrid_omega=report.hybrid_omega,
         spar_review=report.spar_review,
+        delta_omega=getattr(report, "delta_omega", None),
+        drift_level=getattr(report, "drift_level", None),
+    )
+
+
+# ── /review-sim ────────────────────────────────────────────────────────────────
+
+
+@router.post("/review-sim", response_model=S.ReviewSimResponse, tags=["review-sim"])
+async def review_sim(req: S.ReviewSimRequest) -> S.ReviewSimResponse:
+    """Run multi-persona peer-review simulation on report text.
+
+    Args:
+        req.report_text: Full text of the experimental report.
+        req.reviewers: 2 or 3 reviewer personas (STRICT/BALANCED/[LENIENT]).
+
+    Returns:
+        Per-reviewer calibrated scores, consensus result, DR3 resolution.
+    """
+    from ..reviewer.engine import ReviewSimEngine
+
+    engine = ReviewSimEngine()
+    result = engine.run(req.report_text, reviewers=req.reviewers)
+
+    consensus_out = S.ConsensusOut(
+        omegas=result.consensus.omegas,
+        consensus_omega=result.consensus.consensus_omega,
+        variance=result.consensus.variance,
+        spread=result.consensus.spread,
+        reached=result.consensus.reached,
+        recommendation=result.consensus.recommendation,
+    )
+    dr3_out = S.DR3Out(
+        conflict_detected=result.dr3.conflict_detected,
+        tiebreaker_persona=result.dr3.tiebreaker_persona,
+        final_omega=result.dr3.final_omega,
+        resolution_note=result.dr3.resolution_note,
+    )
+    return S.ReviewSimResponse(
+        per_reviewer=[
+            S.PersonaReviewOut(
+                persona=r.persona,
+                min_omega=r.min_omega,
+                base_omega=r.base_omega,
+                calibrated_omega=r.calibrated_omega,
+                recommendation=r.recommendation,
+                irf_dims=r.irf_dims,
+            )
+            for r in result.per_reviewer
+        ],
+        consensus=consensus_out,
+        dr3=dr3_out,
+        final_omega=result.final_omega,
+        final_recommendation=result.final_recommendation,
     )

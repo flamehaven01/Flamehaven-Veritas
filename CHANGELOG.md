@@ -7,7 +7,44 @@ Versioning: [Semantic Versioning](https://semver.org/spec/v2.0.0.html)
 
 ---
 
+## [3.2.0] - 2026-05-01
+
+### Added
+
+#### Multi-Reviewer Peer Simulation (Phase 3 — v3.2.0)
+- `src/veritas/reviewer/` — complete peer-review simulation engine:
+  - `persona.py` — `PersonaConfig`, `calibrate_omega()`, `STRICT/BALANCED/LENIENT` presets,
+    `select_personas(n)`. Calibration formula: `Σ(w_d × irf_d) / Σ(w_d)` per IRF-6D vector.
+  - `consensus.py` — `CrossValidator.check_consensus()` with spread-threshold gating (≤ 0.30).
+    `ConsensusResult`: mean omega, variance, spread, reached flag, ACCEPT/REVISE/REJECT.
+  - `dr3.py` — `DR3Protocol.resolve()` conflict resolution when consensus_omega < 0.60.
+    Tiebreaker: BALANCED persona × 0.90 penalty factor.
+  - `engine.py` — `ReviewSimEngine.run(text, reviewers)`: runs base critique once, applies
+    per-persona calibration, aggregates via CrossValidator + DR3. `ReviewSimResult.render_text()`.
+- `POST /api/v1/review-sim` API endpoint with `ReviewSimRequest/Response` Pydantic schemas.
+- `veritas review-sim <file>` CLI command (JSON / text output, `--reviewers 2|3`).
+- `tests/test_reviewer.py` — 53 tests covering all reviewer package components.
+
+#### React-Compatible Frontend (v3.2.0 UI)
+- `frontend/dist/index.html` — tabbed UI: Critique tab + Review Sim tab.
+- `frontend/dist/app.js` — clean rewrite (no duplicate code), adds Review Sim panel with
+  reviewer cards, CrossValidator consensus display, DR3 conflict banner, final verdict.
+- `frontend/dist/style.css` — shared styles served via FastAPI StaticFiles.
+
+#### API & App Fixes
+- `src/veritas/api/app.py` — fixed frontend path: `parents[4]` → `parents[3] / "frontend" / "dist"`;
+  version bumped `2.1.0 → 3.2.0`.
+- `src/veritas/api/schemas.py` — added `ReviewSimRequest`, `PersonaReviewOut`, `ConsensusOut`,
+  `DR3Out`, `ReviewSimResponse`; added `delta_omega`, `drift_level` to `CritiqueResponse`.
+
+### Changed
+- `pyproject.toml` version `2.5.0 → 3.2.0`
+- CLI fallback version `2.5.0 → 3.2.0`
+
+---
+
 ## [2.5.0] - 2026-04-29
+
 
 ### Added
 

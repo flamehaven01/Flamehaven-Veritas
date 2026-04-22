@@ -371,7 +371,7 @@ class TestVersion250:
 
         runner = CliRunner()
         result = runner.invoke(main, ["--version"])
-        assert "2.5" in result.output
+        assert "3.2" in result.output
 
     def test_session_start(self, tmp_path):
         from click.testing import CliRunner

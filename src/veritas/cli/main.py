@@ -31,7 +31,7 @@ for _pkg_name in ("flamehaven-veritas", "veritas"):
     except Exception:
         pass
 if _VERSION == "unknown":
-    _VERSION = "2.5.0"
+    _VERSION = "3.2.0"
 
 
 def _load_engine():
@@ -524,6 +524,60 @@ def playbook():
     if not pb.exists():
         raise click.ClickException(f"Playbook not found at {pb}")
     click.echo(pb.read_text(encoding="utf-8"))
+
+
+# ---------------------------------------------------------------------------
+# review-sim
+# ---------------------------------------------------------------------------
+@main.command("review-sim")
+@click.argument("file", required=False, default=None)
+@click.option("--text", "-t", default=None, help="Inline text (skips FILE).")
+@click.option("--stdin", is_flag=True, help="Read from STDIN.")
+@click.option(
+    "--reviewers",
+    "-n",
+    type=click.IntRange(2, 3),
+    default=3,
+    show_default=True,
+    help="Number of reviewer personas: 2=STRICT+BALANCED, 3=STRICT+BALANCED+LENIENT.",
+)
+@click.option(
+    "--format",
+    "-f",
+    "fmt",
+    type=click.Choice(["text", "json"], case_sensitive=False),
+    default="text",
+    show_default=True,
+    help="Output format.",
+)
+@click.option("--out", "-o", default=None, help="Save output to this path.")
+def review_sim(file, text, stdin, reviewers, fmt, out):
+    """Simulate multi-persona peer review (STRICT / BALANCED / LENIENT).
+
+    Runs up to 3 reviewer personas with calibrated omega thresholds,
+    computes consensus, and triggers DR3 tiebreaker when consensus < 0.60.
+
+    Examples:\n
+      veritas review-sim paper.pdf\n
+      veritas review-sim --text "Methods: ..." --reviewers 2\n
+      veritas review-sim paper.pdf --format json --out review_result.json
+    """
+    from ..reviewer.engine import ReviewSimEngine
+
+    raw = _read_input(file, text, stdin)
+    engine = ReviewSimEngine()
+    result = engine.run(raw, reviewers=reviewers)
+
+    if fmt == "json":
+        output = json.dumps(result.as_dict(), indent=2, ensure_ascii=False)
+    else:
+        output = result.render_text()
+
+    if out:
+        pathlib.Path(out).write_text(output, encoding="utf-8")
+        click.echo(f"[+] Review simulation saved to {out}")
+    else:
+        click.echo(output)
 
 
 if __name__ == "__main__":

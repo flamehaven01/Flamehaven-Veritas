@@ -17,7 +17,7 @@ def test_health(client):
 
 def test_version(client):
     res = client.get("/version")
-    assert res.json()["version"] == "2.1.0"
+    assert res.json()["version"] == "3.2.0"
 
 
 def test_critique_text_endpoint(client, sample_text):

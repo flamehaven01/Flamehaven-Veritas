@@ -167,7 +167,7 @@ class TestVersion:
     def test_version_flag(self, runner):
         result = runner.invoke(main, ["--version"])
         assert result.exit_code == 0
-        assert "2.5" in result.output
+        assert "3.2" in result.output
 
 
 # ---------------------------------------------------------------------------

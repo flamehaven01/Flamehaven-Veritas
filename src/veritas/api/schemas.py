@@ -96,3 +96,47 @@ class CritiqueResponse(BaseModel):
     hybrid_omega: float | None = None
     # ---- SPAR claim-aware review (optional; requires spar-framework)
     spar_review: dict | None = None
+    # ---- Drift tracking (multi-round)
+    delta_omega: float | None = None
+    drift_level: str | None = None
+
+
+# ── Review simulation schemas ─────────────────────────────────────────────────
+
+
+class ReviewSimRequest(BaseModel):
+    report_text: str = Field(..., description="Full text of the experimental report")
+    reviewers: int = Field(3, ge=2, le=3, description="Number of reviewer personas (2-3)")
+
+
+class PersonaReviewOut(BaseModel):
+    persona: str
+    min_omega: float
+    base_omega: float
+    calibrated_omega: float
+    recommendation: str
+    irf_dims: dict[str, float]
+
+
+class ConsensusOut(BaseModel):
+    omegas: dict[str, float]
+    consensus_omega: float
+    variance: float
+    spread: float
+    reached: bool
+    recommendation: str
+
+
+class DR3Out(BaseModel):
+    conflict_detected: bool
+    tiebreaker_persona: str
+    final_omega: float
+    resolution_note: str
+
+
+class ReviewSimResponse(BaseModel):
+    per_reviewer: list[PersonaReviewOut]
+    consensus: ConsensusOut
+    dr3: DR3Out
+    final_omega: float
+    final_recommendation: str
