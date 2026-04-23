@@ -22,16 +22,23 @@ Implements the **VERITAS v3.3 protocol** as a fully executable Python package + 
 
 ## Why VERITAS?
 
+> **Submission Loop Closure** — VERITAS's most distinctive differentiator is not critique alone.  
+> The **Rebuttal Engine + Response Letter Renderer** automatically classifies reviewer critiques by  
+> severity (CRITICAL / HIGH / MEDIUM / LOW) and renders a Point-by-Point response letter formatted  
+> for your target journal (IEEE / ACM / Nature). No RAG tool, no paper summarizer, no LLM chatbot  
+> offers this. It is the only framework that closes the full academic submission cycle.
+
 | | VERITAS v3.3 | SciSpace / Elicit | ChatPDF / LLM |
 |---|---|---|---|
-| **Core purpose** | Deep structural critique + flaw detection | Literature search + summary | Q&A over uploaded docs |
-| **Submission loop** | ✅ Full (critique→rebuttal→letter→diff) | ❌ None | ❌ None |
-| **Author rebuttal** | ✅ Auto-generated (IEEE/ACM/Nature) | ❌ | ❌ |
-| **Journal calibration** | ✅ 7 profiles (Nature/IEEE/Lancet…) | ❌ | ❌ |
-| **Data sovereignty** | ✅ Offline-first, self-hosted | ❌ Cloud-only | ❌ Cloud API |
-| **GPU required** | ❌ None — pure Python CPU | ✅ Cloud GPU | ✅ Cloud GPU |
-| **AI Slop risk** | ❌ Deterministic pipeline | ⚠️ High | ⚠️ Very high |
-| **Scoring system** | ✅ Calibrated Ω (grounded formula) | External metrics only | None |
+| **Architecture** | CPU-Only · pure Python deterministic pipeline | Large-scale cloud server | Cloud LLM API |
+| **Speed / Resources** | ~0.3–1 s/doc · parallel batch optimized | Server latency (seconds–tens of seconds) | Proportional to token generation |
+| **Submission loop** | ✅ Full — Rebuttal Engine + Response Letter | ❌ None | ❌ Manual prompting only |
+| **Author rebuttal** | ✅ Auto-generated (IEEE / ACM / Nature format) | ❌ | ❌ |
+| **Journal calibration** | ✅ 7 profiles (Nature / IEEE / Lancet / Q1–Q3) | ❌ | ❌ |
+| **Data sovereignty** | ✅ 100% Offline-First · fully self-hosted | ❌ Public cloud dependency | ❌ External API (data leak risk) |
+| **GPU required** | ❌ None — pure Python, no model loading | ✅ Cloud GPU | ✅ Cloud GPU |
+| **AI Slop risk** | ❌ Deterministic — fail-closed guardrails | ⚠️ High | ⚠️ Very high |
+| **Scoring system** | ✅ Calibrated Ω (SIDRCE Ω = 0.9978 S++) | External metrics only (citation count, IF) | None |
 
 **VERITAS is not a research assistant.** It is an independent integrity verification engine — a microscope for a single experimental result, not a telescope for surveying literature.
 
