@@ -11,7 +11,11 @@ from pathlib import Path
 from . import pipeline as _pipeline
 from . import precheck as _precheck
 from .evidence import extract_evidence, resolve
+from .ingest.section_parser import SectionParser
+from .stats.claim_classifier import ClaimClassifier
+from .stats.stat_validator import StatValidator
 from .types import (
+    AnalysisConfidence,
     CritiqueReport,
     PrecheckResult,
     SciExpMode,
@@ -43,6 +47,10 @@ class SciExpCritiqueEngine:
         self._repro = _try_init_component(
             ".paper.reproducibility_checklist", "ReproducibilityChecklistExtractor"
         )
+        # v3.3 — always-available, zero-dependency components
+        self._section_parser = SectionParser()
+        self._claim_classifier = ClaimClassifier()
+        self._stat_validator = StatValidator()
 
     def critique(
         self,
@@ -53,6 +61,14 @@ class SciExpCritiqueEngine:
     ) -> CritiqueReport:
         """Execute full critique pipeline. Returns CritiqueReport."""
         text = (doc_context + "\n\n" + report_text) if doc_context else report_text
+
+        # ── v3.3 early — parse structure, classify, compute confidence
+        #    Run BEFORE BLOCKED check so all fields are always populated.
+        section_map = self._section_parser.parse(text)
+        # Use full text (not just abstract) — abstract rarely contains empirical markers
+        claim_type = self._claim_classifier.classify(text)
+        stat_validity = self._stat_validator.validate(text, section_map)
+        analysis_confidence = self._compute_analysis_confidence(text, section_map)
 
         # ── PRECHECK
         pc = _precheck.run(text)
@@ -74,6 +90,10 @@ class SciExpCritiqueEngine:
                     "Supply required artifacts before re-submitting."
                 ),
                 round_number=round_number,
+                section_map=section_map,
+                claim_type=claim_type,
+                stat_validity=stat_validity,
+                analysis_confidence=analysis_confidence,
             )
 
         # ── STEP 0
@@ -91,8 +111,8 @@ class SciExpCritiqueEngine:
         ev_items = extract_evidence(text)
         ev_result = resolve(ev_items)
 
-        # ── STEP 1-4
-        res_claim, holds = _pipeline.step1_claim_integrity(text)
+        # ── STEP 1-4 (section-aware)
+        res_claim, holds = _pipeline.step1_claim_integrity(text, section_map)
         res_trace = _pipeline.step2_traceability(text, holds)
         res_series = _pipeline.step3_series_continuity(text)
         res_pub = _pipeline.step4_publication_readiness(text)
@@ -109,7 +129,7 @@ class SciExpCritiqueEngine:
 
         # ── LOGOS IRF enrichment (optional; fails silently)
         irf_scores, methodology_class, hypothesis_text, logos_omega, hybrid_omega = (
-            self._enrich_logos(text, res_claim)
+            self._enrich_logos(text, res_claim, stat_validity=stat_validity)
         )
 
         # ── HSTA 4D (optional)
@@ -169,6 +189,11 @@ class SciExpCritiqueEngine:
             delta_omega=delta_omega,
             drift_metrics=drift_metrics_dict,
             jsd_penalized_omega=jsd_penalized_omega,
+            # v3.3
+            section_map=section_map,
+            claim_type=claim_type,
+            stat_validity=stat_validity,
+            analysis_confidence=analysis_confidence,
         )
 
         # ── SPAR claim-aware review (post-build; needs complete report as subject)
@@ -201,7 +226,9 @@ class SciExpCritiqueEngine:
         except Exception:
             return None
 
-    def _enrich_logos(self, text: str, claim_step) -> tuple:
+    def _enrich_logos(
+        self, text: str, claim_step, stat_validity=None
+    ) -> tuple:
         """Run LOGOS IRF, methodology detection, hypothesis extraction.
 
         Returns (irf_scores, methodology_class, hypothesis_text, logos_omega, hybrid_omega).
@@ -217,8 +244,13 @@ class SciExpCritiqueEngine:
                 or text[:200]
             )
 
-            # IRF scoring
-            irf_scores = self._logos.analyze(text, central_claim) if self._logos else None
+            # IRF scoring — pass stat_validity for F-dimension blending (v3.3)
+            irf_scores = None
+            if self._logos is not None:
+                from .logos.irf_analyzer import IRFAnalyzer
+
+                _irf = IRFAnalyzer()
+                irf_scores = _irf.score(text, stat_validity=stat_validity)
 
             # Methodology detection
             methodology_class = None
@@ -353,6 +385,42 @@ class SciExpCritiqueEngine:
             return result.to_dict()
         except Exception:
             return None
+
+    @staticmethod
+    def _compute_analysis_confidence(text: str, section_map) -> AnalysisConfidence:
+        """Derive meta-uncertainty signal from document structure."""
+        from .types import SectionMap
+
+        sm: SectionMap = section_map
+        coverage = sm.coverage if sm is not None else 0.0
+        import re as _re
+
+        artifact_count = len(_re.findall(r"\b[0-9a-fA-F]{64}\b", text))
+        artifact_count += len(_re.findall(r"source_path\s*[:=]\s*\S+", text, _re.I))
+        text_length = len(text)
+
+        if coverage >= 0.70 and artifact_count >= 5:
+            level = "HIGH"
+            reason = "Strong section coverage and multiple traceable artifacts."
+        elif coverage >= 0.40 or artifact_count >= 2:
+            level = "MEDIUM"
+            reason = (
+                f"Partial section coverage ({coverage:.0%}) or limited artifacts ({artifact_count})."
+            )
+        else:
+            level = "LOW"
+            reason = (
+                f"Sparse document: coverage={coverage:.0%}, artifacts={artifact_count}, "
+                f"chars={text_length}."
+            )
+
+        return AnalysisConfidence(
+            level=level,
+            artifact_count=artifact_count,
+            text_length=text_length,
+            section_coverage=round(coverage, 4),
+            reason=reason,
+        )
 
     @staticmethod
     def _compute_omega(pc: PrecheckResult, steps: list[StepResult]) -> float:

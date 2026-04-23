@@ -20,7 +20,7 @@ from __future__ import annotations
 import math
 import re
 
-from ..types import IRF6DScores
+from ..types import IRF6DScores, StatValidity
 
 # Passing thresholds
 COMPOSITE_THRESHOLD: float = 0.65
@@ -150,14 +150,23 @@ class IRFAnalyzer:
         print(scores.composite, scores.passed)
     """
 
-    def score(self, text: str, source: str = "local") -> IRF6DScores:
-        """Return IRF6DScores from free-text experimental report."""
+    def score(
+        self,
+        text: str,
+        source: str = "local",
+        stat_validity: StatValidity | None = None,
+    ) -> IRF6DScores:
+        """Return IRF6DScores from free-text experimental report.
+
+        When *stat_validity* is provided (v3.3+), the F dimension is enriched:
+        ``F = 0.6 * keyword_density + 0.4 * stat_validity.score``
+        """
         t = text.lower()
         M = self._score_M(t)
         A = self._score_A(t)
         D = self._score_D(t)
         I = self._score_I(t)  # noqa: E741
-        F = self._score_F(t)
+        F = self._score_F(t, stat_validity)
         P = self._score_P(t)
         composite = self._geometric_mean([M, A, D, I, F, P])
         passed = composite >= COMPOSITE_THRESHOLD and all(
@@ -197,9 +206,18 @@ class IRFAnalyzer:
         numeric_score = _numeric_density(t)
         return min(1.0, 0.65 * marker_score + 0.35 * numeric_score)
 
-    def _score_F(self, t: str) -> float:
-        """Falsification — testability, control, reproducibility."""
-        return _marker_density(t, _F_MARKERS, 5)
+    def _score_F(
+        self, t: str, stat_validity: StatValidity | None = None
+    ) -> float:
+        """Falsification — testability, control, reproducibility.
+
+        When stat_validity is available (v3.3+):
+          F = 0.6 * keyword_density + 0.4 * stat_validity.score
+        """
+        kw = _marker_density(t, _F_MARKERS, 5)
+        if stat_validity is not None:
+            return min(1.0, 0.6 * kw + 0.4 * stat_validity.score)
+        return kw
 
     def _score_P(self, t: str) -> float:
         """Paradigm — reference / prior-work alignment."""

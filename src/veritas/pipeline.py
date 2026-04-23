@@ -14,6 +14,7 @@ from .types import (
     ExperimentClass,
     HoldDisposition,
     HoldEvent,
+    SectionMap,
     StepFinding,
     StepResult,
     TraceabilityClass,
@@ -66,7 +67,12 @@ _BLOCK_RE = re.compile(r"\bBLOCK(?:_\w+)?\b")
 _NUMBER_RE = re.compile(r"\d+\.?\d*\s*(%|ms|s\b|fps|score|accuracy)")
 
 
-def _extract_central_claim(text: str) -> str:
+def _extract_central_claim(text: str, section_map: SectionMap | None = None) -> str:
+    # Prefer abstract section when available (reduces false positive extraction)
+    if section_map is not None and section_map.has("ABSTRACT"):
+        abstract = section_map.get("ABSTRACT") or ""
+        if len(abstract) > 40:
+            return abstract[:200].replace("\n", " ").strip()
     for marker in ("abstract", "objective", "aim", "purpose", "we report", "we present"):
         idx = text.lower().find(marker)
         if idx != -1:
@@ -74,7 +80,18 @@ def _extract_central_claim(text: str) -> str:
     return text[:200].replace("\n", " ").strip()
 
 
-def _find_scope_violations(text: str) -> list[str]:
+def _find_scope_violations(text: str, section_map: SectionMap | None = None) -> list[str]:
+    """Find scope-overreaching terms.
+
+    When section_map is present, restrict the search to RESULTS and DISCUSSION
+    sections only — these are the sections where overreaching language is
+    meaningful. Checking Methods/Introduction produces false positives because
+    "demonstrates" or "confirms" are valid in those contexts.
+    """
+    if section_map is not None and section_map.coverage > 0.0:
+        scope_text = section_map.combined("RESULTS", "DISCUSSION")
+        if len(scope_text) > 50:
+            return [m.group(0) for m in _SCOPE_VIOLATION.finditer(scope_text)]
     return [m.group(0) for m in _SCOPE_VIOLATION.finditer(text)]
 
 
@@ -106,9 +123,11 @@ def _find_hold_events(text: str) -> list[HoldEvent]:
     return events
 
 
-def step1_claim_integrity(text: str) -> tuple[StepResult, list[HoldEvent]]:
-    claim = _extract_central_claim(text)
-    viols = _find_scope_violations(text)
+def step1_claim_integrity(
+    text: str, section_map: SectionMap | None = None
+) -> tuple[StepResult, list[HoldEvent]]:
+    claim = _extract_central_claim(text, section_map)
+    viols = _find_scope_violations(text, section_map)
     holds = _find_hold_events(text)
     verdicts = _PASS_RE.findall(text) + _BLOCK_RE.findall(text)
     has_numbers_near_verdicts = bool(_NUMBER_RE.search(text))

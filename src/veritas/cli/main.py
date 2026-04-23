@@ -189,7 +189,13 @@ def main():
 @click.option("--out", "-o", default=None, help="Output file path. Defaults to stdout for md.")
 @click.option("--quiet", "-q", is_flag=True, help="Suppress progress messages.")
 @click.option("--rag", is_flag=True, help="Enable RAG context enrichment (BM25+cosine+RRF).")
-def critique(file, text, stdin, fmt, template, round_num, prev, save_round, out, quiet, rag):
+@click.option(
+    "--journal",
+    default=None,
+    metavar="KEY",
+    help="Journal profile for calibrated scoring: nature, ieee, lancet, q1, q2, q3, default.",
+)
+def critique(file, text, stdin, fmt, template, round_num, prev, save_round, out, quiet, rag, journal):
     """Analyse a document and emit a structured critique report.
 
     Examples:\n
@@ -199,6 +205,7 @@ def critique(file, text, stdin, fmt, template, round_num, prev, save_round, out,
       sciexp critique --text "Abstract: ..." --template ku\n
       sciexp critique paper.pdf --round 2 --prev paper_r1.json --save-round\n
       sciexp critique paper.pdf --rag\n
+      sciexp critique paper.pdf --journal nature\n
       cat paper.txt | sciexp critique --stdin
     """
     # --format docx/pdf/tex requires --out
@@ -253,6 +260,22 @@ def critique(file, text, stdin, fmt, template, round_num, prev, save_round, out,
         template = select_template(report)
 
     _emit_report(report, fmt, out, template)
+
+    # Journal calibration (optional)
+    if journal:
+        try:
+            from ..journal.journal_scorer import JournalScorer
+
+            scorer = JournalScorer()
+            jresult = scorer.score(report, journal=journal)
+            click.echo(
+                f"\n[=] Journal [{jresult.journal_name}]"
+                f"  calibrated_omega={jresult.calibrated_omega:.4f}"
+                f"  verdict={jresult.verdict.value}"
+                f"  (raw={jresult.raw_omega:.4f}, delta={jresult.omega_delta:+.4f})"
+            )
+        except KeyError as exc:
+            raise click.ClickException(str(exc)) from exc
 
     # Auto-save round summary JSON
     if save_round:
@@ -578,6 +601,208 @@ def review_sim(file, text, stdin, reviewers, fmt, out):
         click.echo(f"[+] Review simulation saved to {out}")
     else:
         click.echo(output)
+
+
+
+# ---------------------------------------------------------------------------
+# rebuttal
+# ---------------------------------------------------------------------------
+@main.command()
+@click.argument("file", required=False, default=None)
+@click.option("--text", "-t", default=None, help="Inline text (skips FILE).")
+@click.option("--stdin", is_flag=True, help="Read from STDIN.")
+@click.option(
+    "--style",
+    type=click.Choice(["ieee", "acm", "nature"], case_sensitive=False),
+    default="ieee",
+    show_default=True,
+    help="Response letter citation style.",
+)
+@click.option(
+    "--format",
+    "-f",
+    "fmt",
+    type=click.Choice(["text", "json"], case_sensitive=False),
+    default="text",
+    show_default=True,
+    help="Output format.",
+)
+@click.option("--out", "-o", default=None, help="Save output to this path.")
+@click.option(
+    "--render-letter",
+    "render_letter",
+    is_flag=True,
+    default=False,
+    help="Render a formal IEEE/ACM/Nature response letter (Markdown).",
+)
+def rebuttal(file, text, stdin, style, fmt, out, render_letter):
+    """Generate a structured point-by-point rebuttal from a critique report.
+
+    Runs the full critique pipeline, then maps every reviewer finding to a
+    RebuttalItem with category, severity, and author-response template.
+
+    Examples:\n
+      veritas rebuttal paper.pdf\n
+      veritas rebuttal paper.md --style nature\n
+      veritas rebuttal --text "Abstract: ..." --format json --out rebuttal.json\n
+      veritas rebuttal paper.pdf --render-letter --out response.md
+    """
+    from ..rebuttal.rebuttal_engine import RebuttalEngine
+
+    raw = _read_input(file, text, stdin)
+    engine = _load_engine()
+    critique_report = engine.critique(raw)
+
+    rb_engine = RebuttalEngine()
+    rb_report = rb_engine.generate(critique_report, style=style)
+
+    if render_letter:
+        from ..render.response_letter import ResponseLetterRenderer
+        renderer = ResponseLetterRenderer()
+        output = renderer.render(rb_report, style=style)
+        if out:
+            pathlib.Path(out).write_text(output, encoding="utf-8")
+            click.echo(f"[+] Response letter saved to {out}")
+        else:
+            click.echo(output)
+        return
+
+    if fmt == "json":
+        output = json.dumps(rb_report.as_dict(), indent=2, ensure_ascii=False)
+    else:
+        lines = [
+            f"VERITAS Rebuttal Report [{style.upper()}]",
+            f"Generated: {rb_report.generated_at}",
+            f"Total issues: {len(rb_report.items)} | "
+            f"CRITICAL: {rb_report.critical_count} | HIGH: {rb_report.high_count}",
+            f"Rebuttal coverage: {rb_report.rebuttal_coverage:.0%}",
+            "",
+        ]
+        for item in rb_report.items:
+            icon = "[!]" if item.severity in ("CRITICAL", "HIGH") else "[~]"
+            lines.append(f"{icon} [{item.issue_id}] {item.category} ({item.severity})")
+            lines.append(f"   Reviewer: {item.reviewer_text[:120]}")
+            lines.append(f"   Template: {item.author_response_template[:120]}")
+            lines.append("")
+        output = "\n".join(lines)
+
+    if out:
+        pathlib.Path(out).write_text(output, encoding="utf-8")
+        click.echo(f"[+] Rebuttal report saved to {out}")
+    else:
+        click.echo(output)
+
+
+# ---------------------------------------------------------------------------
+# diff
+# ---------------------------------------------------------------------------
+@main.command()
+@click.argument("file_v1")
+@click.argument("file_v2")
+@click.option(
+    "--format",
+    "-f",
+    "fmt",
+    type=click.Choice(["text", "json"], case_sensitive=False),
+    default="text",
+    show_default=True,
+    help="Output format.",
+)
+@click.option("--out", "-o", default=None, help="Save output to this path.")
+def diff(file_v1, file_v2, fmt, out):
+    """Compare two versions of a paper and compute Revision Completeness Score.
+
+    FILE_V1 is the original submission, FILE_V2 is the revised version.
+    Runs critique on both, then computes delta_omega and addressed issues.
+
+    Examples:\n
+      veritas diff paper_v1.pdf paper_v2.pdf\n
+      veritas diff paper_v1.md paper_v2.md --format json --out revision.json
+    """
+    from ..rebuttal.revision_tracker import RevisionTracker
+
+    engine = _load_engine()
+    p1 = pathlib.Path(file_v1)
+    p2 = pathlib.Path(file_v2)
+    if not p1.exists():
+        raise click.ClickException(f"File not found: {file_v1}")
+    if not p2.exists():
+        raise click.ClickException(f"File not found: {file_v2}")
+
+    click.echo(f"[>] Critiquing {p1.name} ...")
+    r1 = engine.critique(p1.read_text(encoding="utf-8", errors="replace"))
+    click.echo(f"[>] Critiquing {p2.name} ...")
+    r2 = engine.critique(p2.read_text(encoding="utf-8", errors="replace"))
+
+    tracker = RevisionTracker()
+    result = tracker.compare(r1, r2)
+
+    if fmt == "json":
+        output = json.dumps(result.as_dict(), indent=2, ensure_ascii=False)
+    else:
+        grade_icon = {"COMPLETE": "[+]", "PARTIAL": "[~]", "INSUFFICIENT": "[!]"}.get(
+            result.revision_grade.value, "[?]"
+        )
+        lines = [
+            "VERITAS Revision Diff",
+            f"  V1 omega: {r1.omega_score:.4f}   V2 omega: {r2.omega_score:.4f}"
+            f"   delta: {result.delta_omega:+.4f}",
+            f"  RCS: {result.rcs:.4f}  "
+            f"  {grade_icon} Grade: {result.revision_grade.value}",
+            f"  Addressed: {result.addressed_count}/{result.total_v1_issues} issues",
+            f"  Improved: {'yes' if result.improved else 'no'}",
+        ]
+        if result.addressed_codes:
+            lines.append(f"  Addressed codes: {', '.join(result.addressed_codes)}")
+        if result.remaining_codes:
+            lines.append(f"  Remaining codes: {', '.join(result.remaining_codes)}")
+        output = "\n".join(lines)
+
+    if out:
+        pathlib.Path(out).write_text(output, encoding="utf-8")
+        click.echo(f"[+] Diff result saved to {out}")
+    else:
+        click.echo(output)
+
+
+# ---------------------------------------------------------------------------
+# journal-profiles
+# ---------------------------------------------------------------------------
+@main.command("journal-profiles")
+@click.option(
+    "--format",
+    "-f",
+    "fmt",
+    type=click.Choice(["text", "json"], case_sensitive=False),
+    default="text",
+    show_default=True,
+    help="Output format.",
+)
+def journal_profiles_cmd(fmt):
+    """List all built-in journal profiles with acceptance thresholds.
+
+    Examples:\n
+      veritas journal-profiles\n
+      veritas journal-profiles --format json
+    """
+    from ..journal.journal_profiles import JOURNAL_PROFILES
+
+    if fmt == "json":
+        output = json.dumps(
+            {k: v.as_dict() for k, v in JOURNAL_PROFILES.items()},
+            indent=2,
+            ensure_ascii=False,
+        )
+    else:
+        lines = ["VERITAS Journal Profiles", ""]
+        for key, profile in JOURNAL_PROFILES.items():
+            lines.append(
+                f"  {key:<10}  accept>={profile.accept_omega:.2f}  "
+                f"revise>={profile.revise_omega:.2f}  — {profile.description}"
+            )
+        output = "\n".join(lines)
+
+    click.echo(output)
 
 
 if __name__ == "__main__":

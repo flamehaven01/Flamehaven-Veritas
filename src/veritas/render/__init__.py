@@ -4,6 +4,7 @@ from .docx_renderer import DocxRenderer, render_docx
 from .latex_renderer import LatexRenderer, render_latex
 from .md_renderer import render_md, save_md
 from .pdf_renderer import PdfRenderer, render_pdf
+from .response_letter import ResponseLetterRenderer
 
 __all__ = [
     "render_md",
@@ -14,4 +15,5 @@ __all__ = [
     "PdfRenderer",
     "render_latex",
     "LatexRenderer",
+    "ResponseLetterRenderer",
 ]

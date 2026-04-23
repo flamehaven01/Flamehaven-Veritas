@@ -145,6 +145,235 @@ async def precheck_only(req: S.CritiqueRequest):
     )
 
 
+# ── /rebuttal (v3.3) ───────────────────────────────────────────────────────────
+
+
+@router.post("/rebuttal", response_model=S.RebuttalResponse, tags=["rebuttal"])
+async def generate_rebuttal(req: S.RebuttalRequest):
+    """Submit report text → receive structured rebuttal with author-response templates.
+
+    Runs full critique pipeline then maps findings to point-by-point RebuttalItems.
+    """
+    from ..rebuttal.rebuttal_engine import RebuttalEngine
+
+    if req.style not in ("ieee", "acm", "nature"):
+        raise HTTPException(400, "style must be one of: ieee, acm, nature")
+
+    report = _engine.critique(req.report_text)
+
+    rb_engine = RebuttalEngine()
+    rb_report = rb_engine.generate(report, style=req.style)
+
+    return S.RebuttalResponse(
+        style=rb_report.style,
+        generated_at=rb_report.generated_at,
+        total_issues=len(rb_report.items),
+        critical_count=rb_report.critical_count,
+        high_count=rb_report.high_count,
+        rebuttal_coverage=round(rb_report.rebuttal_coverage, 4),
+        items=[
+            S.RebuttalItemOut(
+                issue_id=item.issue_id,
+                category=item.category,
+                severity=item.severity,
+                reviewer_text=item.reviewer_text,
+                author_response_template=item.author_response_template,
+                addressed=item.addressed,
+            )
+            for item in rb_report.items
+        ],
+    )
+
+
+@router.post("/rebuttal-upload", response_model=S.RebuttalResponse, tags=["rebuttal"])
+async def generate_rebuttal_upload(
+    file: UploadFile = File(...),  # noqa: B008
+    style: str = Form("ieee"),
+):
+    """Upload a document → receive structured rebuttal. Convenience alias of /rebuttal."""
+    from ..rebuttal.rebuttal_engine import RebuttalEngine
+
+    if style not in ("ieee", "acm", "nature"):
+        raise HTTPException(400, "style must be one of: ieee, acm, nature")
+
+    suffix = Path(file.filename or "upload.txt").suffix.lower()
+    if suffix not in SUPPORTED:
+        raise HTTPException(400, f"Unsupported file type '{suffix}'.")
+
+    tmp_path = _TMP / f"{uuid.uuid4().hex}{suffix}"
+    tmp_path.write_bytes(await file.read())
+
+    try:
+        text = _extract_file_text(tmp_path)
+        if not text.strip():
+            raise HTTPException(422, "Could not extract text from the uploaded file.")
+        report = _engine.critique(text)
+    finally:
+        tmp_path.unlink(missing_ok=True)
+
+    rb_engine = RebuttalEngine()
+    rb_report = rb_engine.generate(report, style=style)
+
+    return S.RebuttalResponse(
+        style=rb_report.style,
+        generated_at=rb_report.generated_at,
+        total_issues=len(rb_report.items),
+        critical_count=rb_report.critical_count,
+        high_count=rb_report.high_count,
+        rebuttal_coverage=round(rb_report.rebuttal_coverage, 4),
+        items=[
+            S.RebuttalItemOut(
+                issue_id=item.issue_id,
+                category=item.category,
+                severity=item.severity,
+                reviewer_text=item.reviewer_text,
+                author_response_template=item.author_response_template,
+                addressed=item.addressed,
+            )
+            for item in rb_report.items
+        ],
+    )
+
+
+# ── /journal-profiles (v3.3) ──────────────────────────────────────────────────
+
+
+@router.get("/journal-profiles", response_model=list[S.JournalProfileOut], tags=["journal"])
+async def list_journal_profiles():
+    """Return all built-in journal profiles with acceptance thresholds."""
+    from ..journal.journal_profiles import JOURNAL_PROFILES
+
+    return [S.JournalProfileOut(**profile.as_dict()) for profile in JOURNAL_PROFILES.values()]
+
+
+# ── /journal-score (v3.3) ─────────────────────────────────────────────────────
+
+
+@router.post("/journal-score", response_model=S.JournalScoreResponse, tags=["journal"])
+async def journal_score(req: S.JournalScoreRequest):
+    """Critique a report and return journal-calibrated omega + verdict."""
+    from ..journal.journal_scorer import JournalScorer
+
+    try:
+        report = _engine.critique(req.report_text)
+        scorer = JournalScorer()
+        result = scorer.score(report, journal=req.journal)
+    except KeyError as exc:
+        raise HTTPException(400, str(exc)) from exc
+
+    return S.JournalScoreResponse(
+        journal_key=result.journal_key,
+        journal_name=result.journal_name,
+        raw_omega=round(result.raw_omega, 4),
+        calibrated_omega=round(result.calibrated_omega, 4),
+        omega_delta=round(result.omega_delta, 4),
+        verdict=result.verdict.value,
+        accept_threshold=result.accept_threshold,
+        revise_threshold=result.revise_threshold,
+        step_contributions={
+            k: S.StepContributionOut(**v)
+            for k, v in result.step_contributions.items()
+        },
+    )
+
+
+@router.post("/journal-score-upload", response_model=S.JournalScoreResponse, tags=["journal"])
+async def journal_score_upload(
+    file: UploadFile = File(...),  # noqa: B008
+    journal: str = Form("default"),
+):
+    """Upload a document → journal-calibrated omega + verdict. Convenience alias."""
+    from ..journal.journal_scorer import JournalScorer
+
+    suffix = Path(file.filename or "upload.txt").suffix.lower()
+    if suffix not in SUPPORTED:
+        raise HTTPException(400, f"Unsupported file type '{suffix}'.")
+
+    tmp_path = _TMP / f"{uuid.uuid4().hex}{suffix}"
+    tmp_path.write_bytes(await file.read())
+
+    try:
+        text = _extract_file_text(tmp_path)
+        if not text.strip():
+            raise HTTPException(422, "Could not extract text from the uploaded file.")
+        report = _engine.critique(text)
+        scorer = JournalScorer()
+        result = scorer.score(report, journal=journal)
+    except KeyError as exc:
+        raise HTTPException(400, str(exc)) from exc
+    finally:
+        tmp_path.unlink(missing_ok=True)
+
+    return S.JournalScoreResponse(
+        journal_key=result.journal_key,
+        journal_name=result.journal_name,
+        raw_omega=round(result.raw_omega, 4),
+        calibrated_omega=round(result.calibrated_omega, 4),
+        omega_delta=round(result.omega_delta, 4),
+        verdict=result.verdict.value,
+        accept_threshold=result.accept_threshold,
+        revise_threshold=result.revise_threshold,
+        step_contributions={
+            k: S.StepContributionOut(**v)
+            for k, v in result.step_contributions.items()
+        },
+    )
+
+
+# ── /diff (v3.3) ──────────────────────────────────────────────────────────────
+
+
+@router.post("/diff", response_model=S.DiffResponse, tags=["rebuttal"])
+async def revision_diff(req: S.DiffRequest):
+    """Compare two report versions and return Revision Completeness Score."""
+    from ..rebuttal.revision_tracker import RevisionTracker
+
+    r1 = _engine.critique(req.report_v1_text)
+    r2 = _engine.critique(req.report_v2_text)
+    tracker = RevisionTracker()
+    result = tracker.compare(r1, r2)
+
+    return S.DiffResponse(
+        delta_omega=round(result.delta_omega, 4),
+        addressed_count=result.addressed_count,
+        total_v1_issues=result.total_v1_issues,
+        rcs=round(result.rcs, 4),
+        revision_grade=result.revision_grade.value,
+        addressed_codes=result.addressed_codes,
+        remaining_codes=result.remaining_codes,
+        priority_overlap_ratio=round(result.priority_overlap_ratio, 4),
+        improved=result.improved,
+    )
+
+
+# ── /response-letter (v3.3) ───────────────────────────────────────────────────
+
+
+@router.post("/response-letter", response_model=S.ResponseLetterResponse, tags=["rebuttal"])
+async def generate_response_letter(req: S.ResponseLetterRequest):
+    """Generate a formal IEEE/ACM/Nature response letter from report text."""
+    from ..rebuttal.rebuttal_engine import RebuttalEngine
+    from ..render.response_letter import ResponseLetterRenderer
+
+    if req.style not in ("ieee", "acm", "nature"):
+        raise HTTPException(400, "style must be one of: ieee, acm, nature")
+
+    report = _engine.critique(req.report_text)
+    rb_engine = RebuttalEngine()
+    rb_report = rb_engine.generate(report, style=req.style)
+
+    renderer = ResponseLetterRenderer()
+    md = renderer.render(rb_report, style=req.style)
+
+    return S.ResponseLetterResponse(
+        style=rb_report.style,
+        markdown=md,
+        total_issues=len(rb_report.items),
+        critical_count=rb_report.critical_count,
+        high_count=rb_report.high_count,
+    )
+
+
 # ── helpers ────────────────────────────────────────────────────────────────────
 
 

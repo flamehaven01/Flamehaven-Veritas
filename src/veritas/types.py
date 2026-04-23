@@ -70,6 +70,23 @@ class MethodologyClass(Enum):
     UNKNOWN = "UNKNOWN"
 
 
+class ClaimType(Enum):
+    """Academic claim typology — determines required traceability evidence.
+
+    EMPIRICAL      — measured data anchor + sha256 required
+    THEORETICAL    — logical derivation chain required
+    COMPARATIVE    — controlled comparison baseline required
+    METHODOLOGICAL — protocol documentation required
+    UNKNOWN        — cannot be classified from text
+    """
+
+    EMPIRICAL = "empirical"
+    THEORETICAL = "theoretical"
+    COMPARATIVE = "comparative"
+    METHODOLOGICAL = "methodological"
+    UNKNOWN = "unknown"
+
+
 @dataclass
 class IRF6DScores:
     """LOGOS IRF-Calc 6D dimension scores for a report.
@@ -194,11 +211,119 @@ class StepResult:
     not_applicable: bool = False
 
 
+# ---------------------------------------------------------------------------
+# v3.3 — Section-Aware Analysis types
+# ---------------------------------------------------------------------------
+
+
+@dataclass
+class DocumentSection:
+    """One parsed section of an academic document."""
+
+    name: str  # ABSTRACT | INTRODUCTION | METHODS | RESULTS | DISCUSSION | CONCLUSION | OTHER
+    text: str
+    start_pos: int
+    end_pos: int
+
+    @property
+    def word_count(self) -> int:
+        return len(self.text.split())
+
+
+@dataclass
+class SectionMap:
+    """Parsed section structure of an academic document.
+
+    ``coverage`` is the fraction of canonical sections detected (0.0–1.0).
+    A coverage of 0.0 means no headers were found; analysis falls back to
+    full-text mode.
+    """
+
+    sections: dict[str, DocumentSection] = field(default_factory=dict)
+    coverage: float = 0.0
+
+    def get(self, name: str) -> str | None:
+        """Return text for a section by canonical name (case-insensitive)."""
+        sec = self.sections.get(name.upper())
+        return sec.text if sec is not None else None
+
+    def has(self, name: str) -> bool:
+        return name.upper() in self.sections
+
+    def combined(self, *names: str) -> str:
+        """Concatenate text of multiple sections."""
+        parts = [self.get(n) or "" for n in names]
+        return " ".join(p for p in parts if p)
+
+
+@dataclass
+class StatValidity:
+    """Statistical reporting completeness score for an academic report.
+
+    Each field reflects whether the criterion was detected in the text.
+    ``score`` is a weighted sum (p*0.30 + effect*0.25 + ci*0.20 + power*0.15 + sample*0.10).
+    ``issues`` lists human-readable descriptions of unmet criteria.
+    """
+
+    p_value_reported: bool = False
+    p_value_numeric: bool = False  # True when "p = 0.032" vs just "significant"
+    effect_size_reported: bool = False
+    ci_reported: bool = False
+    power_reported: bool = False
+    sample_size_stated: bool = False
+    score: float = 0.0
+    issues: list[str] = field(default_factory=list)
+
+    def as_dict(self) -> dict:
+        return {
+            "p_value_reported": self.p_value_reported,
+            "p_value_numeric": self.p_value_numeric,
+            "effect_size_reported": self.effect_size_reported,
+            "ci_reported": self.ci_reported,
+            "power_reported": self.power_reported,
+            "sample_size_stated": self.sample_size_stated,
+            "score": self.score,
+            "issues": list(self.issues),
+        }
+
+
+@dataclass
+class AnalysisConfidence:
+    """Meta-uncertainty signal for the VERITAS engine's own analysis.
+
+    Editors use this to understand how reliable the omega score is given
+    the document structure and artifact density.
+
+    level: HIGH (>=0.70 coverage, >=5 artifacts) |
+           MEDIUM (>=0.40 coverage or >=2 artifacts) |
+           LOW (sparse document)
+    """
+
+    level: str = "LOW"  # HIGH | MEDIUM | LOW
+    artifact_count: int = 0
+    text_length: int = 0
+    section_coverage: float = 0.0
+    reason: str = ""
+
+    def as_dict(self) -> dict:
+        return {
+            "level": self.level,
+            "artifact_count": self.artifact_count,
+            "text_length": self.text_length,
+            "section_coverage": self.section_coverage,
+            "reason": self.reason,
+        }
+
+
 @dataclass
 class CritiqueReport:
     """Full VERITAS — AI Critique Experimental Report Analysis Framework output."""
 
-    precheck: PrecheckResult
+    schema_version: str = "3.3"
+
+    precheck: PrecheckResult = field(
+        default_factory=lambda: PrecheckResult(SciExpMode.BLOCKED, [])
+    )
 
     experiment_class: ExperimentClass | None = None
     experiment_class_secondary: ExperimentClass | None = None
@@ -233,6 +358,12 @@ class CritiqueReport:
     drift_metrics: dict | None = None  # DriftMetrics.as_dict() — JSON-serializable
     jsd_penalized_omega: float | None = None  # JSD-gated omega (multi-round only)
 
+    # ---- v3.3 Section-Aware + Academic Discourse Intelligence
+    section_map: SectionMap | None = None
+    claim_type: ClaimType | None = None
+    stat_validity: StatValidity | None = None
+    analysis_confidence: AnalysisConfidence | None = None
+
     def step(self, step_id: str) -> StepResult | None:
         return next((s for s in self.steps if s.step_id == step_id), None)
 
@@ -262,6 +393,7 @@ class CritiqueReport:
         Write to ``{stem}_r{N}.json`` for ``--prev`` reload.
         """
         return {
+            "schema_version": self.schema_version,
             "round_number": self.round_number,
             "omega_score": self.omega_score,
             "hybrid_omega": self.hybrid_omega,
@@ -294,6 +426,7 @@ class CritiqueReport:
             )
         hybrid = data.get("hybrid_omega")
         return cls(
+            schema_version=str(data.get("schema_version", "3.2")),
             precheck=PrecheckResult(mode=SciExpMode.FULL, missing_artifacts=[]),
             round_number=int(data.get("round_number", 1)),
             omega_score=float(data.get("omega_score", 0.0)),
@@ -328,7 +461,7 @@ class BibliographyStats:
 
     @property
     def quality_score(self) -> float:
-        """0–1 composite: recency (50%) + breadth (50%), penalty for self-cites."""
+        """0-1 composite: recency (50%) + breadth (50%), penalty for self-cites."""
         if self.total_refs == 0:
             return 0.0
         recency = self.recent_ratio * 0.5
@@ -392,3 +525,5 @@ class ReproducibilityChecklist:
         not_sat = sum(1 for i in self.items if i.satisfied is False)
         unknown = sum(1 for i in self.items if i.satisfied is None)
         return f"{satisfied} satisfied / {not_sat} not satisfied / {unknown} unknown"
+
+

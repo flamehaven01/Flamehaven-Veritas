@@ -7,7 +7,72 @@ Versioning: [Semantic Versioning](https://semver.org/spec/v2.0.0.html)
 
 ---
 
-## [3.2.0] - 2026-05-01
+## [3.3.0] - 2026-04-23
+
+### Added
+
+#### Phase 1 — Core Rebuttal Engine
+- `src/veritas/rebuttal/rebuttal_engine.py` — `RebuttalEngine.generate(report, style)` → `RebuttalReport`.
+  Maps each CritiqueReport StepFinding → severity-graded `RebuttalItem` (CRITICAL/HIGH/MEDIUM/LOW)
+  with 8 response templates per category. Issue ID format: `R-{step_id}.{finding_index}`.
+  Computed properties: `rebuttal_coverage`, `critical_count`, `high_count`.
+- `src/veritas/rebuttal/revision_tracker.py` — `RevisionTracker.compare(r1, r2)` → `RevisionResult`.
+  Computes `delta_omega`, `addressed_fixes`, `rcs` (Revision Completeness Score).
+  Grades: COMPLETE (≥0.80) / PARTIAL (≥0.50) / INSUFFICIENT (<0.50).
+- `POST /api/v1/rebuttal` — text → structured RebuttalReport JSON.
+- `POST /api/v1/rebuttal-upload` — file upload variant.
+- `POST /api/v1/diff` — v1 + v2 text → RevisionResult JSON.
+- `veritas rebuttal` CLI command with `--style`, `--format json`, `--render-letter` flags.
+- `veritas diff <file1> <file2>` CLI command.
+- `tests/test_rebuttal.py` — 52 tests (rebuttal engine + revision tracker).
+
+#### Phase 2 — Journal Profiles + Scorer
+- `src/veritas/journal/journal_profiles.py` — 7 built-in journal profiles:
+  `nature` (Ω≥0.92), `ieee` (≥0.85), `lancet` (≥0.90), `q1` (≥0.85),
+  `q2` (≥0.78), `q3` (≥0.70), `default` (≥0.78).
+  Each profile carries per-step multipliers (e.g., `nature` M/F weight × 1.6).
+- `src/veritas/journal/journal_scorer.py` — `JournalScorer.score(report, journal)` →
+  `JournalScoringResult`. Calibrated omega formula:
+  `Σ(q_i × m_i × w_i) / Σ(m_i × w_i)` (q=step quality, m=journal multiplier, w=step weight).
+  Verdict: ACCEPT/REVISE/REJECT vs profile thresholds.
+- `GET /api/v1/journal-profiles` — returns all profile configs + thresholds.
+- `POST /api/v1/journal-score` — text + journal key → calibrated omega + verdict.
+- `POST /api/v1/journal-score-upload` — file upload variant.
+- `veritas critique --journal <key>` flag for journal-calibrated scoring.
+- `veritas journal-profiles` CLI command (table output).
+- `tests/test_journal.py` — 49 tests (profiles + scorer + CLI).
+
+#### Phase 3 — Response Letter Renderer + Web UI
+- `src/veritas/render/response_letter.py` — `ResponseLetterRenderer.render(report, style)` →
+  Markdown response letter. Supports `ieee`, `acm`, `nature` style configs.
+  Groups items by severity, formats point-by-point reviewer–response exchanges.
+  `render_to_file()` convenience method. Zero new dependencies.
+- `POST /api/v1/response-letter` — text + style → full Markdown response letter.
+- `veritas rebuttal --render-letter` flag outputs/saves the formatted letter.
+- Web UI — new tabs: **Rebuttal Builder** (paste text → severity-grouped items + download letter)
+  and **Journal Score** (journal select → calibrated Ω hero + step contribution table).
+- `frontend/dist/style.css` — CSS for result tabs (`.result-tabs`, `.rtab`),
+  rebuttal items (`.rebuttal-item`, severity badges), journal hero + step table.
+- `tests/test_response_letter.py` — 35 tests (renderer, all styles, edge cases, render_to_file).
+- `tests/test_integration.py` — 33 tests (end-to-end critique→rebuttal→journal→diff,
+  CLI smoke tests, API round-trips, ResponseLetterRenderer × 3 styles).
+
+### Changed
+- `src/veritas/api/schemas.py` — added `RebuttalRequest`, `RebuttalResponse`, `DiffRequest`,
+  `DiffResponse`, `JournalScoreRequest`, `JournalScoreResponse`, `JournalProfileOut`,
+  `ResponseLetterRequest`, `ResponseLetterResponse`.
+- `src/veritas/cli/main.py` — added `veritas rebuttal`, `veritas diff`,
+  `veritas journal-profiles` commands; added `--journal` flag to `veritas critique`;
+  added `--render-letter` flag to `veritas rebuttal`.
+- `pyproject.toml` — version bumped `3.2.0 → 3.3.0`.
+
+### Tests
+- **508 tests passing** (up from 440 in v3.2.0), **85.44% coverage** (gate: ≥80%).
+- SIDRCE Ω = 0.9977 S++ (maintained).
+
+---
+
+## [3.2.0] - 2026-04-23
 
 ### Added
 
@@ -43,7 +108,7 @@ Versioning: [Semantic Versioning](https://semver.org/spec/v2.0.0.html)
 
 ---
 
-## [2.5.0] - 2026-04-29
+## [2.5.0] - 2026-04-22
 
 
 ### Added

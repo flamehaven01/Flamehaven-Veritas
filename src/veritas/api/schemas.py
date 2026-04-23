@@ -140,3 +140,100 @@ class ReviewSimResponse(BaseModel):
     dr3: DR3Out
     final_omega: float
     final_recommendation: str
+
+
+# ── Rebuttal schemas (v3.3) ───────────────────────────────────────────────────
+
+
+class RebuttalRequest(BaseModel):
+    report_text: str = Field(..., description="Raw text of the experimental report to rebut")
+    style: str = Field("ieee", description="Response letter style: ieee | acm | nature")
+
+
+class RebuttalItemOut(BaseModel):
+    issue_id: str
+    category: str
+    severity: str
+    reviewer_text: str
+    author_response_template: str
+    addressed: bool
+
+
+class RebuttalResponse(BaseModel):
+    style: str
+    generated_at: str
+    total_issues: int
+    critical_count: int
+    high_count: int
+    rebuttal_coverage: float
+    items: list[RebuttalItemOut]
+
+
+# ── Journal schemas (v3.3) ────────────────────────────────────────────────────
+
+
+class JournalProfileOut(BaseModel):
+    key: str
+    name: str
+    accept_omega: float
+    revise_omega: float
+    step_weights: dict
+    description: str
+
+
+class JournalScoreRequest(BaseModel):
+    report_text: str = Field(..., description="Raw text of the experimental report")
+    journal: str = Field("default", description="Journal key: nature, ieee, lancet, q1, q2, q3, default")
+
+
+class StepContributionOut(BaseModel):
+    raw: float
+    weighted: float
+    multiplier: float
+
+
+class JournalScoreResponse(BaseModel):
+    journal_key: str
+    journal_name: str
+    raw_omega: float
+    calibrated_omega: float
+    omega_delta: float
+    verdict: str
+    accept_threshold: float
+    revise_threshold: float
+    step_contributions: dict[str, StepContributionOut]
+
+
+class DiffRequest(BaseModel):
+    report_v1_text: str = Field(..., description="Original submission text")
+    report_v2_text: str = Field(..., description="Revised submission text")
+
+
+class DiffResponse(BaseModel):
+    delta_omega: float
+    addressed_count: int
+    total_v1_issues: int
+    rcs: float
+    revision_grade: str
+    addressed_codes: list[str]
+    remaining_codes: list[str]
+    priority_overlap_ratio: float
+    improved: bool
+
+
+# ── Response letter schemas (v3.3) ────────────────────────────────────────────
+
+
+class ResponseLetterRequest(BaseModel):
+    report_text: str = Field(..., description="Raw text of the experimental report")
+    style: str = Field("ieee", description="Response letter style: ieee | acm | nature")
+    author_name: str = Field("The Authors", description="Author name / signature for closing")
+
+
+class ResponseLetterResponse(BaseModel):
+    style: str
+    markdown: str
+    total_issues: int
+    critical_count: int
+    high_count: int
+
