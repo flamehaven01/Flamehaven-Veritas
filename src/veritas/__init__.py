@@ -4,4 +4,4 @@ from .engine import SciExpCritiqueEngine
 from .types import CritiqueReport, SciExpMode
 
 __all__ = ["SciExpCritiqueEngine", "CritiqueReport", "SciExpMode"]
-__version__ = "3.4.0"
+__version__ = "3.4.1"

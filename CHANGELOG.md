@@ -7,6 +7,27 @@ Versioning: [Semantic Versioning](https://semver.org/spec/v2.0.0.html)
 
 ---
 
+## [3.4.1] - 2026-04-23
+
+### Fixed
+- `irf_analyzer.py`: added `TYPE_CHECKING` guard for `DomainRuleset` annotation to resolve
+  `F821 Undefined name` ruff error while preserving lazy runtime import. (No behaviour change.)
+- `engine.py`: renamed unused `central_claim` → `_central_claim` (F841).
+- `claim_classifier.py`: removed unused `word_count` local variable (F841).
+- `test_integration.py` / `test_response_letter.py`: replaced bare `open()` calls with
+  `with open(...) as fh:` context managers (SIM115 — 6 sites).
+- `test_integration.py`: added `# noqa: SIM222` on intentional `or True` guard assertion.
+- 38 additional issues auto-fixed by `ruff --fix`: import ordering (I001),
+  unused imports (F401/F811), `typing` → `collections.abc` (UP035),
+  quoted annotations (UP037), f-string without placeholders (F541).
+
+### Stats
+- Tests: 575 passing (unchanged)
+- Coverage: 86.14% (unchanged)
+- ruff: **All checks passed** (0 errors)
+
+---
+
 ## [3.4.0] - 2026-04-23
 
 ### Added

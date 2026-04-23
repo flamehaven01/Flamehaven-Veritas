@@ -1,4 +1,4 @@
-# VERITAS v3.4.0
+# VERITAS v3.4.1
 ## AI Critique Experimental Report Analysis Framework
 
 [![CI](https://github.com/flamehaven01/Flamehaven-Veritas/actions/workflows/ci.yml/badge.svg)](https://github.com/flamehaven01/Flamehaven-Veritas/actions/workflows/ci.yml)
@@ -624,6 +624,7 @@ See [docs/architecture.md](docs/architecture.md).
 | **v3.2** ✅ | 2026 Q2 | Peer-review simulation (`veritas review-sim`), 3-persona consensus, DR3 conflict resolution, tabbed Web UI |
 | **v3.3** ✅ | 2026 Q2 | Rebuttal engine, journal-calibrated scoring (7 profiles), response letter renderer (IEEE/ACM/Nature), Rebuttal + Journal Score Web UI tabs |
 | **v3.4** ✅ | 2026 Q2 | Domain plugin architecture — CS/Math/Biomedical IRF scoring, `veritas domains list`, external plugin entry_points, journal `domain_hint` |
+| **v3.4.1** ✅ | 2026 Q2 | Lint/CI hardening — resolve 49 ruff errors (I001, F401, F821, F841, SIM115, UP035/UP037), `TYPE_CHECKING` guard for `DomainRuleset` annotation |
 
 ---
 
