@@ -10,7 +10,6 @@ is safe to call from multiple threads (batch processing).
 from __future__ import annotations
 
 from dataclasses import dataclass, field
-from typing import Any
 
 from ..types import IRF6DScores
 from .consensus import ConsensusResult, check_consensus
@@ -88,10 +87,7 @@ class ReviewSimResult:
         lines.append(self.consensus.summary_line())
         lines.append(self.dr3.summary_line())
         lines.append("-" * 48)
-        lines.append(
-            f"FINAL  omega={self.final_omega:.4f}  "
-            f"→ [{self.final_recommendation}]"
-        )
+        lines.append(f"FINAL  omega={self.final_omega:.4f}  → [{self.final_recommendation}]")
         return "\n".join(lines)
 
 

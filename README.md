@@ -1,4 +1,4 @@
-# VERITAS v2.2.1
+# VERITAS v3.2.0
 ## AI Critique Experimental Report Analysis Framework
 
 [![CI](https://github.com/flamehaven01/Flamehaven-Veritas/actions/workflows/ci.yml/badge.svg)](https://github.com/flamehaven01/Flamehaven-Veritas/actions/workflows/ci.yml)
@@ -6,12 +6,13 @@
 [![PyPI](https://img.shields.io/pypi/v/flamehaven-veritas.svg)](https://pypi.org/project/flamehaven-veritas/)
 [![Python 3.10+](https://img.shields.io/badge/python-3.10+-blue.svg)](https://www.python.org/downloads/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
-[![Coverage](https://img.shields.io/badge/coverage-82%25-brightgreen.svg)](#development)
-[![Tests](https://img.shields.io/badge/tests-159%20passing-brightgreen.svg)](#development)
+[![Coverage](https://img.shields.io/badge/coverage-84%25-brightgreen.svg)](#development)
+[![Tests](https://img.shields.io/badge/tests-291%20passing-brightgreen.svg)](#development)
 [![SPAR](https://img.shields.io/badge/SPAR-integrated-purple.svg)](#spar-integration)
+[![SIDRCE](https://img.shields.io/badge/SIDRCE-Omega%200.9946-blue.svg)](#quality)
 
 A **sovereignty-grade** experimental report critique engine.  
-Implements the **VERITAS v2.2 protocol** as a fully executable Python package + REST API + CLI.
+Implements the **VERITAS v3.2 protocol** as a fully executable Python package + REST API + CLI.
 
 ---
 
@@ -116,6 +117,24 @@ veritas precheck report.pdf
 
 # MICA Playbook mode — structured JSON for agent/skill pipelines
 veritas critique report.pdf --mica
+
+# Multi-round critique with delta Omega tracking (v2.3+)
+veritas critique report.pdf --round 2 --prev report_r1.json
+
+# Batch processing (v2.4+)
+veritas batch "*.pdf" --format md --jobs 4 --output-dir results/
+
+# Session memory (v2.5+)
+veritas session start
+veritas session show
+
+# CR-EP governance (v2.5+)
+veritas govern init
+veritas govern status
+
+# Peer-review simulation with 3 personas (v3.2+)
+veritas review-sim report.pdf --reviewers 3
+veritas review-sim report.pdf --reviewers 3 --format md --output sim_result.md
 ```
 
 ### REST API
@@ -163,6 +182,7 @@ All outputs use either the **BMJ Scientific Editing** template or the
 | `POST` | `/api/v1/critique/download` | Upload file, receive formatted report |
 | `POST` | `/api/v1/precheck` | PRECHECK gate only |
 | `POST` | `/api/v1/classify` | STEP 0 classification only |
+| `POST` | `/api/v1/review-sim` | Peer-review simulation (v3.2+) |
 | `GET`  | `/health` | Liveness check |
 | `GET`  | `/version` | Package version |
 
@@ -279,6 +299,36 @@ veritas playbook   # prints memory/playbook.md to stdout
 
 ---
 
+## Peer-Review Simulation (v3.2+)
+
+Simulate a 3-member editorial panel, each applying a different calibration stance:
+
+| Persona | CalibrationGate | Bias |
+|---|---|---|
+| `strict` | Omega ≥ 0.85 | Conservative; penalises M/D/F deficits × 1.4 |
+| `balanced` | Omega ≥ 0.78 | Neutral; uniform weighting across 6 IRF dimensions |
+| `lenient` | Omega ≥ 0.70 | Liberal; M/D/F penalties reduced to × 0.85 |
+
+**Algorithm:**
+1. Run the full `SciExpCritiqueEngine` once → base IRF-6D scores  
+2. Per persona: apply weighted `calibrate_omega(irf, weights)` → persona Omega  
+3. `CrossValidator.check_consensus()` — consensus reached when spread ≤ 0.30  
+4. If `consensus_omega < 0.60` → `DR3Protocol.resolve()` applies 0.90 penalty factor  
+5. Final recommendation: ACCEPT ≥ 0.78 / REVISE ≥ 0.60 / REJECT < 0.60
+
+```bash
+# CLI — outputs per-reviewer + consensus table + final recommendation
+veritas review-sim report.pdf
+veritas review-sim report.pdf --reviewers 3 --format md --output peer_review.md
+
+# REST API
+curl -X POST http://localhost:8400/api/v1/review-sim \
+  -H "Content-Type: application/json" \
+  -d '{"report_text": "...", "num_reviewers": 3}'
+```
+
+---
+
 ## Development
 
 ```bash
@@ -334,12 +384,10 @@ See [docs/architecture.md](docs/architecture.md).
 |---|---|---|
 | **v2.2** ✅ | 2026 Q2 | LOGOS IRF-6D, HSTA 4D, BibliographyAnalyzer, ReproducibilityChecklist, LaTeX output, MICA Playbook |
 | **v2.2.1** ✅ | 2026 Q2 | SPAR framework optional import fallback, CI green (159 tests, mypy 0 errors), version string fix |
-| **v2.3** | 2026 Q3 | Multi-round iterative critique (`--round N`), diff-mode between rounds, delta Omega tracking |
-| **v2.4** | 2026 Q3 | Batch processing (`veritas batch *.pdf`), parallel engine execution, JSON summary index |
-| **v2.5** | 2026 Q4 | MICA v0.3 — persistent session memory across critique rounds, agent chain protocol |
-| **v3.0** | 2027 Q1 | Full RAG integration (Flamehaven-Filesearch), domain-specific vocabulary models, auto-template selection |
-| **v3.1** | 2027 Q2 | Web UI (React frontend), drag-and-drop upload, side-by-side diff view |
-| **v3.2** | 2027 Q3 | Peer-review simulation mode — multi-reviewer consensus scoring |
+| **v2.3** ✅ | 2026 Q2 | Multi-round iterative critique (`--round N`), delta Omega tracking, DriftEngine (JSD/L2) |
+| **v2.4** ✅ | 2026 Q2 | Batch processing (`veritas batch *.pdf`), parallel engine execution, JSON summary index |
+| **v2.5** ✅ | 2026 Q2 | MICA persistent session memory, CR-EP governance, BM25+RRF RAG, auto-template selection |
+| **v3.2** ✅ | 2026 Q2 | Peer-review simulation (`veritas review-sim`), 3-persona consensus, DR3 conflict resolution, tabbed Web UI |
 
 ---
 

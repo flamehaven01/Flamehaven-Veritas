@@ -3,10 +3,6 @@
 from __future__ import annotations
 
 import json
-import pathlib
-import tempfile
-
-import pytest
 
 # ── BM25 tests ─────────────────────────────────────────────────────────────────
 
@@ -313,7 +309,7 @@ class TestCREPGate:
 class TestAutoTemplate:
     def _make_report(self, ec):
         from veritas.precheck import run as precheck_run
-        from veritas.types import CritiqueReport, ExperimentClass
+        from veritas.types import CritiqueReport
 
         pc = precheck_run("Abstract: Test.")
         return CritiqueReport(precheck=pc, experiment_class=ec)

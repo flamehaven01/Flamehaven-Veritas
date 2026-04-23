@@ -24,6 +24,9 @@ Thumbs.db
 
 # Internal audit artifacts
 slop_report*.json
+slop_p*.json
+sidrce_p*.yaml
+veritas_v*_sidrce_cert.yaml
 .cr-ep/
 
 *.txt
