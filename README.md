@@ -12,7 +12,7 @@
 [![SIDRCE](https://img.shields.io/badge/SIDRCE-Omega%200.9978-blue.svg)](#quality)
 
 A **sovereignty-grade** experimental report critique engine.  
-Implements the **VERITAS v3.3 protocol** as a fully executable Python package + REST API + CLI.
+Implements the **VERITAS v3.4.1 protocol** as a fully executable Python package + REST API + CLI.
 
 > **VERITAS is the only open framework that closes the full academic submission loop:**  
 > Critique → Rebuttal → Journal Score → Response Letter → Revision Diff  
@@ -28,7 +28,7 @@ Implements the **VERITAS v3.3 protocol** as a fully executable Python package + 
 > for your target journal (IEEE / ACM / Nature). No RAG tool, no paper summarizer, no LLM chatbot  
 > offers this. It is the only framework that closes the full academic submission cycle.
 
-| | VERITAS v3.3 | SciSpace / Elicit | ChatPDF / LLM |
+| | VERITAS v3.4.1 | SciSpace / Elicit | ChatPDF / LLM |
 |---|---|---|---|
 | **Architecture** | CPU-Only · pure Python deterministic pipeline | Large-scale cloud server | Cloud LLM API |
 | **Speed / Resources** | ~0.3–1 s/doc · parallel batch optimized | Server latency (seconds–tens of seconds) | Proportional to token generation |
@@ -108,25 +108,25 @@ flowchart TD
 
 ---
 
-## Academic Submission Loop (v3.3)
+## Academic Submission Loop (v3.3+)
 
 VERITAS is the only tool that covers the complete author workflow from first submission to final acceptance:
 
-```
-[1] CRITIQUE         veritas critique report.pdf --journal ieee
-       |  Omega score, 7-step structured findings, IRF-6D reasoning quality
-       v
-[2] REBUTTAL         veritas rebuttal report.pdf --style ieee
-       |  CRITICAL/HIGH/MEDIUM/LOW severity grading, response templates per finding
-       v
-[3] JOURNAL SCORE    veritas critique report.pdf --journal nature
-       |  Calibrated Omega vs 7 journal profiles (Nature/IEEE/Lancet/Q1/Q2/Q3)
-       v
-[4] RESPONSE LETTER  veritas rebuttal report.pdf --render-letter --output letter.md
-       |  Formal point-by-point letter: IEEE / ACM / Nature formatting
-       v
-[5] REVISION DIFF    veritas diff report_v1.pdf report_v2.pdf
-       |  RCS (Revision Completeness Score): COMPLETE / PARTIAL / INSUFFICIENT
+```mermaid
+flowchart LR
+    A([Document\nPDF / DOCX / TXT]) --> S1
+
+    subgraph Loop [Full Submission Loop]
+        direction LR
+        S1["[1] CRITIQUE\nveritas critique\n────────────\nΩ score + 7-step findings\nIRF-6D · HSTA · Bibliography"]
+        S2["[2] REBUTTAL\nveritas rebuttal\n────────────\nCRITICAL / HIGH / MEDIUM / LOW\nseverity grading"]
+        S3["[3] JOURNAL SCORE\n--journal nature|ieee\n────────────\nCalibrated Ω vs 7 profiles"]
+        S4["[4] RESPONSE LETTER\n--render-letter\n────────────\nPoint-by-Point\nIEEE / ACM / Nature"]
+        S5["[5] REVISION DIFF\nveritas diff v1 v2\n────────────\nRCS: COMPLETE / PARTIAL\n/ INSUFFICIENT"]
+        S1 --> S2 --> S3 --> S4 --> S5
+    end
+
+    S5 --> E([Accepted\nPaper])
 ```
 
 No competing tool (SciSpace, Elicit, ChatPDF, or any LLM chatbot) implements steps 2–5.
@@ -310,6 +310,24 @@ IRF-6D scoring is domain-aware. Built-in domains:
 
 Each domain defines its own marker banks for all 6 IRF dimensions, composite threshold, and saturation points.
 
+```mermaid
+flowchart LR
+    input([critique request\n--domain key]) --> reg
+
+    subgraph Registry ["DomainRegistry (singleton)"]
+        direction TB
+        reg[DomainRegistry._ensure_built_ins]
+        b[biomedical\nDomainRuleset]
+        c[cs\nDomainRuleset]
+        m[math\nDomainRuleset]
+        x[external plugin\nentry_points\nveritas.domains]
+        reg --> b & c & m & x
+    end
+
+    b & c & m & x -->|selected ruleset| ana[IRFAnalyzer\ndomain-aware scoring]
+    ana --> scores[IRF6DScores\nM·A·D·I·F·P\ncomposite]
+```
+
 **Use via CLI:**
 
 ```bash
@@ -453,7 +471,50 @@ veritas playbook   # prints memory/playbook.md to stdout
 
 ---
 
-## Peer-Review Simulation (v3.2+)
+## SPAR Integration
+
+VERITAS ships with an optional **SPAR** (Sovereign Protocol for Academic Review) integration layer
+that maps critique findings directly into the SPAR governance schema.
+
+```bash
+pip install flamehaven-veritas[spar]   # install SPAR extras
+
+veritas critique report.pdf --spar    # emit SPAR-compatible JSON alongside critique
+```
+
+| SPAR Field | Mapped from VERITAS |
+|---|---|
+| `claim_integrity_score` | STEP 1 quality × weight |
+| `traceability_class` | STEP 2 dominant traceability verdict |
+| `reproducibility_index` | `reproducibility_checklist.score` |
+| `irf_composite` | `irf_scores.composite` |
+| `omega_final` | `omega_score` |
+| `governance_verdict` | ACCEPT / REVISE / REJECT derived from Ω |
+
+If SPAR is not installed, all SPAR-specific paths fall back gracefully (no import error).
+
+---
+
+## Web UI
+
+A **Gradio-based tabbed web interface** is included for interactive exploration without writing code.
+
+```bash
+pip install flamehaven-veritas[ui]
+veritas ui                              # starts Gradio on http://localhost:7860
+```
+
+| Tab | Function |
+|---|---|
+| **Critique** | Upload file or paste text → full 7-phase critique + Omega score |
+| **Peer Review** | Simulate 3-reviewer editorial panel (strict / balanced / lenient) |
+| **Rebuttal** | Generate structured rebuttal with severity grading |
+| **Journal Score** | Score document against 7 built-in journal profiles |
+| **Response Letter** | Render formal point-by-point letter (IEEE / ACM / Nature) |
+
+---
+
+
 
 Simulate a 3-member editorial panel, each applying a different calibration stance:
 
@@ -580,35 +641,131 @@ mypy src                        # type check
 ## CI/CD Pipeline
 
 ```mermaid
-flowchart LR
-    A([git push / PR]) --> B{Trigger}
-
-    B -->|push to main<br/>or develop| C[CI — Python 3.10 / 3.11 / 3.12]
-    B -->|push tag<br/>v*.*.*| H[Release]
-
-    subgraph CI [CI Jobs — parallel matrix]
-        direction TB
-        C --> D[🔍 ruff lint]
-        C --> E[🎨 ruff format check]
-        C --> F[🔬 mypy type check]
-        C --> G[🧪 pytest + coverage ≥ 80%]
+flowchart TD
+    subgraph Dev ["Development Branches"]
+        direction LR
+        feat[feature/*] -->|PR| dev[develop]
+        dev -->|PR reviewed + green| main[main]
     end
 
-    D & E & F & G --> Z([✅ CI Green])
-
-    subgraph Release [Release Pipeline]
+    subgraph CI ["CI — github/workflows/ci.yml"]
         direction TB
-        H --> I[python -m build]
-        I --> J[PyPI Trusted Publisher]
-        J --> K[GitHub Release<br/>auto-generated notes]
+        trigger_ci([push: main or develop\nor pull_request])
+        matrix[Python matrix\n3.10 · 3.11 · 3.12]
+        lint[ruff check --select ALL]
+        fmt[ruff format --check]
+        types[mypy --strict src/]
+        test[pytest --cov=src\n--cov-fail-under=80]
+        trigger_ci --> matrix
+        matrix --> lint & fmt & types & test
+        lint & fmt & types & test --> ci_green([CI Green])
     end
+
+    subgraph Release ["Release — github/workflows/release.yml"]
+        direction TB
+        trigger_rel([git tag v*.*.*])
+        build[python -m build\nsdist + wheel]
+        pypi[PyPI Trusted Publisher\nOIDC — no token stored]
+        gh_release[GitHub Release\nauto-generated notes]
+        trigger_rel --> build --> pypi & gh_release
+    end
+
+    main --> trigger_ci
+    main --> trigger_rel
 ```
+
+### Branch Strategy
+
+| Branch | Purpose | Merge target |
+|---|---|---|
+| `main` | Production — every commit is a releasable state | — |
+| `develop` | Integration — feature PRs merge here first | `main` |
+| `feature/*` | Individual feature development | `develop` |
+| `fix/*` | Bug / lint patches | `develop` or `main` (hotfix) |
+
+### Release Process
+
+1. Merge `develop` → `main` (PR, all CI checks must pass)
+2. Update `pyproject.toml` + `src/veritas/__init__.py` + `CHANGELOG.md` + `README.md`
+3. Commit: `chore(release): bump version X.Y.Z`
+4. Tag: `git tag vX.Y.Z && git push --tags`
+5. `release.yml` triggers automatically → PyPI + GitHub Release
+
+### Quality Gates (enforced in CI)
+
+| Gate | Threshold | Workflow |
+|---|---|---|
+| ruff lint | 0 errors | ci.yml |
+| ruff format | diff = 0 | ci.yml |
+| mypy | 0 errors (`--strict`) | ci.yml |
+| pytest coverage | ≥ 80% | ci.yml |
+| All three Python versions | All pass | ci.yml (matrix) |
 
 ---
 
 ## Architecture
 
-See [docs/architecture.md](docs/architecture.md).
+```mermaid
+graph TD
+    subgraph Input ["Input Layer"]
+        I1[PDF] & I2[DOCX] & I3[TXT / MD]
+    end
+
+    subgraph Ingest ["Ingest + Parse"]
+        P[DocumentParser\nPyMuPDF / python-docx]
+        SP[SectionParser\nHeader / Body / References]
+    end
+
+    subgraph Pipeline ["7-Phase Critique Pipeline"]
+        direction TB
+        PC[PRECHECK\nArtifact Sufficiency Gate]
+        S0[STEP 0\nExperiment Classification]
+        S1[STEP 1\nClaim Integrity 40%]
+        S2[STEP 2\nTraceability Audit 30%]
+        S3[STEP 3\nSeries Continuity 20%]
+        S4[STEP 4\nPublication Readiness 10%]
+        S5[STEP 5\nPriority Fix Synthesis]
+        PC --> S0 --> S1 --> S2 --> S3 --> S4 --> S5
+    end
+
+    subgraph Enrichment ["Enrichment Engines"]
+        direction TB
+        E1[LOGOS IRF-Calc 6D\nReasoning Quality\nM·A·D·I·F·P]
+        E2[HSTA 4D\nBibliometric Score\nN·C·T·R]
+        E3[BibliographyAnalyzer\nRef count · format · year]
+        E4[ReproducibilityChecklist\n8-criterion ARRIVE/CONSORT]
+    end
+
+    subgraph DomainPlugin ["Domain Plugin (v3.4+)"]
+        D1[biomedical]
+        D2[cs]
+        D3[math]
+        DX[custom plugin\nentry_points]
+        E1 -->|domain key| D1 & D2 & D3 & DX
+    end
+
+    subgraph Output ["Output Layer"]
+        O1[Markdown CLI]
+        O2[DOCX A4]
+        O3[PDF A4]
+        O4[LaTeX / TEX]
+        O5[MICA JSON\nAgent Pipeline]
+    end
+
+    subgraph API ["REST API + CLI"]
+        A1[FastAPI :8400]
+        A2[Click CLI veritas]
+    end
+
+    Input --> Ingest --> Pipeline
+    Pipeline --> Enrichment
+    Enrichment --> DomainPlugin
+    S5 & DomainPlugin --> OmegaScore[Omega Score\n0.0 – 1.0]
+    OmegaScore --> Output
+    Output --> API
+```
+
+See [docs/architecture.md](docs/architecture.md) for detailed component specifications.
 
 ---
 
