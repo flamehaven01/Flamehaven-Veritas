@@ -217,9 +217,9 @@ class RebuttalEngine:
                 items.append(item)
         elif step.prose and not step.not_applicable:
             # Synthesise a single item from the prose
-            item = self._prose_to_item(step.step_id, step.prose)
-            if item:
-                items.append(item)
+            prose_item: RebuttalItem | None = self._prose_to_item(step.step_id, step.prose)
+            if prose_item:
+                items.append(prose_item)
         return items
 
     def _finding_to_item(self, step_id: str, idx: int, finding: StepFinding) -> RebuttalItem:
