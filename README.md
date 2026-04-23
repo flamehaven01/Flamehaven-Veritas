@@ -1,4 +1,4 @@
-# VERITAS v3.2.0
+# VERITAS v3.3.0
 ## AI Critique Experimental Report Analysis Framework
 
 [![CI](https://github.com/flamehaven01/Flamehaven-Veritas/actions/workflows/ci.yml/badge.svg)](https://github.com/flamehaven01/Flamehaven-Veritas/actions/workflows/ci.yml)
@@ -6,13 +6,13 @@
 [![PyPI](https://img.shields.io/pypi/v/flamehaven-veritas.svg)](https://pypi.org/project/flamehaven-veritas/)
 [![Python 3.10+](https://img.shields.io/badge/python-3.10+-blue.svg)](https://www.python.org/downloads/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
-[![Coverage](https://img.shields.io/badge/coverage-84%25-brightgreen.svg)](#development)
-[![Tests](https://img.shields.io/badge/tests-291%20passing-brightgreen.svg)](#development)
+[![Coverage](https://img.shields.io/badge/coverage-85%25-brightgreen.svg)](#development)
+[![Tests](https://img.shields.io/badge/tests-508%20passing-brightgreen.svg)](#development)
 [![SPAR](https://img.shields.io/badge/SPAR-integrated-purple.svg)](#spar-integration)
-[![SIDRCE](https://img.shields.io/badge/SIDRCE-Omega%200.9946-blue.svg)](#quality)
+[![SIDRCE](https://img.shields.io/badge/SIDRCE-Omega%200.9978-blue.svg)](#quality)
 
 A **sovereignty-grade** experimental report critique engine.  
-Implements the **VERITAS v3.2 protocol** as a fully executable Python package + REST API + CLI.
+Implements the **VERITAS v3.3 protocol** as a fully executable Python package + REST API + CLI.
 
 ---
 
@@ -135,6 +135,19 @@ veritas govern status
 # Peer-review simulation with 3 personas (v3.2+)
 veritas review-sim report.pdf --reviewers 3
 veritas review-sim report.pdf --reviewers 3 --format md --output sim_result.md
+
+# Rebuttal generation (v3.3+)
+veritas rebuttal report.pdf --style ieee
+veritas rebuttal report.pdf --style acm --format json --output rebuttal.json
+veritas rebuttal report.pdf --style nature --render-letter --output letter.md
+
+# Revision diff — compare v1 vs v2 (v3.3+)
+veritas diff report_v1.pdf report_v2.pdf
+
+# Journal-calibrated scoring (v3.3+)
+veritas critique report.pdf --journal nature
+veritas critique report.pdf --journal ieee
+veritas journal-profiles                       # list all 7 built-in profiles
 ```
 
 ### REST API
@@ -183,6 +196,13 @@ All outputs use either the **BMJ Scientific Editing** template or the
 | `POST` | `/api/v1/precheck` | PRECHECK gate only |
 | `POST` | `/api/v1/classify` | STEP 0 classification only |
 | `POST` | `/api/v1/review-sim` | Peer-review simulation (v3.2+) |
+| `POST` | `/api/v1/rebuttal` | Author rebuttal generation (v3.3+) |
+| `POST` | `/api/v1/rebuttal-upload` | Rebuttal generation — file upload (v3.3+) |
+| `POST` | `/api/v1/diff` | Revision comparison v1 vs v2 (v3.3+) |
+| `POST` | `/api/v1/journal-score` | Journal-calibrated omega scoring (v3.3+) |
+| `POST` | `/api/v1/journal-score-upload` | Journal score — file upload (v3.3+) |
+| `POST` | `/api/v1/response-letter` | Render formal response letter as Markdown (v3.3+) |
+| `GET`  | `/api/v1/journal-profiles` | List all built-in journal profiles (v3.3+) |
 | `GET`  | `/health` | Liveness check |
 | `GET`  | `/version` | Package version |
 
@@ -329,6 +349,86 @@ curl -X POST http://localhost:8400/api/v1/review-sim \
 
 ---
 
+## Rebuttal Engine (v3.3+)
+
+Generate a structured author rebuttal directly from a critique report:
+
+```bash
+# CLI
+veritas rebuttal report.pdf --style ieee
+veritas rebuttal report.pdf --style nature --render-letter --output response_letter.md
+
+# REST API
+curl -X POST http://localhost:8400/api/v1/rebuttal \
+  -H "Content-Type: application/json" \
+  -d '{"report_text": "...", "style": "ieee"}'
+```
+
+Each `RebuttalItem` carries:
+
+| Field | Description |
+|---|---|
+| `issue_id` | `R-{step_id}.{finding_index}` (e.g. `R-1.2`) |
+| `severity` | `CRITICAL` / `HIGH` / `MEDIUM` / `LOW` |
+| `category` | `REPRODUCIBILITY` / `METHODOLOGY` / `STATISTICS` / `CLARITY` |
+| `reviewer_text` | Original finding text from critique |
+| `author_response_template` | Pre-filled response scaffold |
+
+### Response Letter Renderer
+
+Converts a `RebuttalReport` into a formal point-by-point response letter:
+
+| Style | Format | Target |
+|---|---|---|
+| `ieee` | "Author Response to Reviewer Comments" | IEEE Transactions / Letters |
+| `acm` | "Response to Reviewer Comments" | ACM journals / conferences |
+| `nature` | "Point-by-Point Response to Referees" | Nature Portfolio journals |
+
+```bash
+# Render and save letter
+veritas rebuttal report.pdf --style ieee --render-letter --output letter.md
+
+# API
+curl -X POST http://localhost:8400/api/v1/response-letter \
+  -H "Content-Type: application/json" \
+  -d '{"report_text": "...", "style": "acm"}'
+```
+
+---
+
+## Journal Profiles + Calibrated Scoring (v3.3+)
+
+Score a report against a target journal's acceptance criteria:
+
+```bash
+# CLI
+veritas critique report.pdf --journal nature
+veritas journal-profiles      # show all profiles
+
+# REST API
+curl -X POST http://localhost:8400/api/v1/journal-score \
+  -H "Content-Type: application/json" \
+  -d '{"report_text": "...", "journal": "ieee"}'
+```
+
+**Calibrated Omega formula:** `Σ(q_i × m_i × w_i) / Σ(m_i × w_i)` where `q_i` = step quality, `m_i` = journal multiplier, `w_i` = step weight.
+
+**7 built-in journal profiles:**
+
+| Key | Accept threshold (Ω) | Notes |
+|---|---|---|
+| `nature` | ≥ 0.92 | Methods × 1.6, Claim × 1.4 |
+| `lancet` | ≥ 0.90 | STATS × 1.5, Reproducibility × 1.5 |
+| `ieee` | ≥ 0.85 | Methods × 1.3, balanced |
+| `q1` | ≥ 0.85 | General Q1 journal profile |
+| `q2` | ≥ 0.78 | General Q2 journal profile |
+| `q3` | ≥ 0.70 | General Q3 journal profile |
+| `default` | ≥ 0.78 | Baseline threshold |
+
+Verdicts: **ACCEPT** / **REVISE** / **REJECT**
+
+---
+
 ## Development
 
 ```bash
@@ -388,6 +488,7 @@ See [docs/architecture.md](docs/architecture.md).
 | **v2.4** ✅ | 2026 Q2 | Batch processing (`veritas batch *.pdf`), parallel engine execution, JSON summary index |
 | **v2.5** ✅ | 2026 Q2 | MICA persistent session memory, CR-EP governance, BM25+RRF RAG, auto-template selection |
 | **v3.2** ✅ | 2026 Q2 | Peer-review simulation (`veritas review-sim`), 3-persona consensus, DR3 conflict resolution, tabbed Web UI |
+| **v3.3** ✅ | 2026 Q2 | Rebuttal engine, journal-calibrated scoring (7 profiles), response letter renderer (IEEE/ACM/Nature), Rebuttal + Journal Score Web UI tabs |
 
 ---
 
