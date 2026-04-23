@@ -74,6 +74,68 @@ All three must pass before opening a PR.
 
 ---
 
+## Writing a Domain Plugin (v3.4+)
+
+VERITAS v3.4 introduces a domain plugin architecture for extending IRF-6D scoring beyond the default
+biomedical domain. You can contribute new domains (physics, economics, social science, etc.) or
+override built-in ones.
+
+### 1. Define a DomainRuleset
+
+```python
+# my_package/veritas_physics.py
+from veritas.logos.domain.base import DomainRuleset
+
+PHYSICS = DomainRuleset(
+    domain_key="physics",                # unique key (lowercase, no spaces)
+    name="Experimental Physics",         # human-readable label
+    # IRF-6D marker banks — tuples of lowercase keyword fragments
+    m_markers=("uncertainty", "systematic error", "measurement"),
+    a_markers=("lagrangian", "hamiltonian", "wave function"),
+    d_markers=("derivation", "proof", "conservation law"),
+    i_markers=("experimental data", "cross-section", "event yield"),
+    f_markers=("exclusion limit", "null hypothesis", "falsifiable"),
+    p_markers=("standard model", "quantum field theory"),
+    composite_threshold=0.78,            # min composite IRF to PASS
+    component_min=0.25,                  # min per-dimension to avoid floor penalty
+    saturate_at={                        # optional — markers needed for saturation (1.0)
+        "M": 4, "A": 4, "D": 4, "I": 5, "F": 5, "P": 4
+    },
+)
+```
+
+### 2. Register via entry_points
+
+In your `pyproject.toml`:
+
+```toml
+[project.entry-points."veritas.domains"]
+physics = "my_package.veritas_physics:PHYSICS"
+```
+
+### 3. Install and verify
+
+```bash
+pip install -e .
+veritas domains list   # physics should appear
+veritas critique paper.pdf --domain physics
+```
+
+### Rules
+
+- `domain_key` must be lowercase, alphanumeric + underscore only, unique across all installed plugins
+- All 6 marker banks (`m_markers` through `p_markers`) must be non-empty tuples of strings
+- `composite_threshold` must be in [0.5, 1.0]
+- Tests: add `tests/test_my_domain.py` with at least one scoring divergence test
+
+### Contribution Pathway
+
+If your domain plugin is general-purpose (e.g. physics, economics, social science), open a PR to
+`flamehaven01/Flamehaven-Veritas` to include it as a built-in domain.
+PRs for built-in domains must include ≥ 10 tests and demonstrate scoring divergence vs biomedical.
+
+---
+
 ## Reporting Issues
 
 Open a GitHub Issue. Include:

@@ -13,7 +13,7 @@ from .routes import router
 
 app = FastAPI(
     title="VERITAS API",
-    version="3.2.0",
+    version="3.4.0",
     description="Experimental Report Analysis Engine — upload a document, get a structured critique.",
     docs_url="/docs",
     redoc_url="/redoc",
@@ -40,13 +40,17 @@ if _FRONTEND.exists():
 
 @app.get("/health", tags=["system"])
 async def health():
-    return {"status": "ok", "version": "3.2.0"}
+    from .. import __version__
+
+    return {"status": "ok", "version": __version__}
 
 
 @app.get("/version", tags=["system"])
 async def version():
+    from .. import __version__
+
     return {
-        "version": "3.2.0",
+        "version": __version__,
         "protocol": "VERITAS — AI Critique Experimental Report Analysis Framework",
     }
 

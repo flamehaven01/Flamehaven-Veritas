@@ -16,8 +16,10 @@ def test_health(client):
 
 
 def test_version(client):
+    from veritas import __version__
+
     res = client.get("/version")
-    assert res.json()["version"] == "3.2.0"
+    assert res.json()["version"] == __version__
 
 
 def test_critique_text_endpoint(client, sample_text):

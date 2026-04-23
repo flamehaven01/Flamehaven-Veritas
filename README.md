@@ -1,4 +1,4 @@
-# VERITAS v3.3.0
+# VERITAS v3.4.0
 ## AI Critique Experimental Report Analysis Framework
 
 [![CI](https://github.com/flamehaven01/Flamehaven-Veritas/actions/workflows/ci.yml/badge.svg)](https://github.com/flamehaven01/Flamehaven-Veritas/actions/workflows/ci.yml)
@@ -6,8 +6,8 @@
 [![PyPI](https://img.shields.io/pypi/v/flamehaven-veritas.svg)](https://pypi.org/project/flamehaven-veritas/)
 [![Python 3.10+](https://img.shields.io/badge/python-3.10+-blue.svg)](https://www.python.org/downloads/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
-[![Coverage](https://img.shields.io/badge/coverage-85%25-brightgreen.svg)](#development)
-[![Tests](https://img.shields.io/badge/tests-508%20passing-brightgreen.svg)](#development)
+[![Coverage](https://img.shields.io/badge/coverage-86%25-brightgreen.svg)](#development)
+[![Tests](https://img.shields.io/badge/tests-575%20passing-brightgreen.svg)](#development)
 [![SPAR](https://img.shields.io/badge/SPAR-integrated-purple.svg)](#spar-integration)
 [![SIDRCE](https://img.shields.io/badge/SIDRCE-Omega%200.9978-blue.svg)](#quality)
 
@@ -204,6 +204,13 @@ veritas diff report_v1.pdf report_v2.pdf
 veritas critique report.pdf --journal nature
 veritas critique report.pdf --journal ieee
 veritas journal-profiles                       # list all 7 built-in profiles
+
+# Domain plugin system (v3.4+)
+veritas domains list                           # show all registered IRF domains
+veritas critique report.pdf --domain cs        # CS/SE domain scoring
+veritas critique report.pdf --domain math      # Formal math domain scoring
+veritas critique report.pdf --domain biomedical  # Biomedical (default)
+veritas rebuttal report.pdf --domain cs --style ieee
 ```
 
 ### REST API
@@ -216,6 +223,14 @@ uvicorn veritas.api.app:app --reload --port 8400
 curl -X POST http://localhost:8400/api/v1/critique/text \
   -H "Content-Type: application/json" \
   -d '{"report_text": "...", "template": "bmj", "round_number": 1}'
+
+# CS domain scoring (v3.4+)
+curl -X POST http://localhost:8400/api/v1/critique/text \
+  -H "Content-Type: application/json" \
+  -d '{"report_text": "...", "domain": "cs"}'
+
+# List registered domains (v3.4+)
+curl http://localhost:8400/api/v1/domains
 
 # Upload a document
 curl -X POST http://localhost:8400/api/v1/critique/upload \
@@ -259,6 +274,7 @@ All outputs use either the **BMJ Scientific Editing** template or the
 | `POST` | `/api/v1/journal-score-upload` | Journal score — file upload (v3.3+) |
 | `POST` | `/api/v1/response-letter` | Render formal response letter as Markdown (v3.3+) |
 | `GET`  | `/api/v1/journal-profiles` | List all built-in journal profiles (v3.3+) |
+| `GET`  | `/api/v1/domains` | List registered IRF scoring domains (v3.4+) |
 | `GET`  | `/health` | Liveness check |
 | `GET`  | `/version` | Package version |
 
@@ -281,6 +297,68 @@ Six-dimensional reasoning quality score computed over the critique text:
 | Falsification | F | Testability and counter-evidence exposure |
 | Paradigm | P | Framework consistency |
 | **Composite** | — | Mean of M+A+D+I+F+P; threshold ≥ 0.78 = PASS |
+
+#### Domain Plugin Architecture (v3.4+)
+
+IRF-6D scoring is domain-aware. Built-in domains:
+
+| Domain Key | Target | IEEE journal hint | Lancet journal hint |
+|---|---|---|---|
+| `biomedical` | Clinical trials, biomedical experiments | — | ✅ |
+| `cs` | CS/SE papers, algorithms, systems | ✅ | — |
+| `math` | Formal mathematics, proofs, theorems | — | — |
+
+Each domain defines its own marker banks for all 6 IRF dimensions, composite threshold, and saturation points.
+
+**Use via CLI:**
+
+```bash
+veritas critique paper.pdf --domain cs
+veritas critique paper.pdf --domain math
+veritas domains list            # show all registered domains
+veritas domains list --format json
+```
+
+**Use via API:**
+
+```bash
+curl -X POST http://localhost:8400/api/v1/critique/text \
+  -H "Content-Type: application/json" \
+  -d '{"report_text": "...", "domain": "cs"}'
+
+curl http://localhost:8400/api/v1/domains
+```
+
+**Write an external domain plugin:**
+
+```python
+# my_veritas_physics/domain.py
+from veritas.logos.domain.base import DomainRuleset
+
+PHYSICS = DomainRuleset(
+    domain_key="physics",
+    name="Experimental Physics",
+    m_markers=("uncertainty principle", "measurement error", "systematic uncertainty"),
+    a_markers=("lagrangian", "hamiltonian", "wave function", "quantum state"),
+    d_markers=("derivation", "proof", "conservation law", "symmetry argument"),
+    i_markers=("experimental data", "cross-section", "scattering amplitude"),
+    f_markers=("falsifiable", "exclusion limit", "null hypothesis"),
+    p_markers=("standard model", "quantum field theory", "general relativity"),
+    composite_threshold=0.78,
+    component_min=0.25,
+)
+```
+
+Register in `pyproject.toml`:
+
+```toml
+[project.entry-points."veritas.domains"]
+physics = "my_veritas_physics.domain:PHYSICS"
+```
+
+After `pip install my-veritas-physics`, the domain appears automatically in `veritas domains list`.
+
+---
 
 ### HSTA 4D (BioMedical-Paper-Harvester)
 
@@ -545,6 +623,7 @@ See [docs/architecture.md](docs/architecture.md).
 | **v2.5** ✅ | 2026 Q2 | MICA persistent session memory, CR-EP governance, BM25+RRF RAG, auto-template selection |
 | **v3.2** ✅ | 2026 Q2 | Peer-review simulation (`veritas review-sim`), 3-persona consensus, DR3 conflict resolution, tabbed Web UI |
 | **v3.3** ✅ | 2026 Q2 | Rebuttal engine, journal-calibrated scoring (7 profiles), response letter renderer (IEEE/ACM/Nature), Rebuttal + Journal Score Web UI tabs |
+| **v3.4** ✅ | 2026 Q2 | Domain plugin architecture — CS/Math/Biomedical IRF scoring, `veritas domains list`, external plugin entry_points, journal `domain_hint` |
 
 ---
 

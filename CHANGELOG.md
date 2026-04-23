@@ -7,6 +7,52 @@ Versioning: [Semantic Versioning](https://semver.org/spec/v2.0.0.html)
 
 ---
 
+## [3.4.0] - 2026-04-23
+
+### Added
+
+#### Phase 1 — Domain Plugin Subsystem (IRF-6D Domain Architecture)
+- `src/veritas/logos/domain/` package — `DomainRuleset` frozen dataclass, `DomainRegistry` singleton,
+  `get_domain`, `register_domain`, `list_domain_keys` module-level helpers.
+- Three built-in domains:
+  - `biomedical` — verbatim migration of prior module-level marker banks (backward-compatible)
+  - `cs` — CS/SE markers: benchmark, ablation, SOTA, arxiv, open-source, Docker
+  - `math` — Formal math markers: axiom, lemma, QED, conjecture, tight bound
+- External plugin support via Python entry_points group `veritas.domains`:
+  third-party packages declare `[project.entry-points."veritas.domains"]` in their `pyproject.toml`
+  and the domain is loaded automatically on registry init.
+- `IRFAnalyzer(domain=None|str|DomainRuleset)` — domain-aware constructor; `None` fast-paths to
+  biomedical for full backward compatibility. All existing `IRFAnalyzer()` callers unchanged.
+- `LogosBridge(domain)` and `SciExpCritiqueEngine(domain)` — domain threaded end-to-end.
+- `tests/test_domain.py` — 39 tests (DomainRuleset, DomainRegistry, entry_points mock,
+  IRFAnalyzer constructor, backward compat, CS/math scoring divergence).
+
+#### Phase 2 — CLI + API + JournalProfile Integration
+- `veritas critique --domain <key>` — select IRF scoring domain per critique run.
+- `veritas rebuttal --domain <key>` — domain-aware rebuttal critique.
+- `veritas domains list` — list all registered domains (text + `--format json`).
+- CLI domain validation: unknown key raises `ClickException` immediately at `_load_engine()`.
+- `GET /api/v1/domains` — returns all registered domains with key, name, thresholds, marker counts.
+- `CritiqueRequest.domain`, `RebuttalRequest.domain`, `JournalScoreRequest.domain` fields added.
+- `DomainOut` Pydantic schema added to `api/schemas.py`.
+- `JournalProfile.domain_hint: str = ""` — hints the preferred IRF domain for each journal:
+  `ieee → "cs"`, `lancet → "biomedical"`, `nature/q1/q2/q3/default → ""` (agnostic).
+- `JournalProfileOut.domain_hint` field added to REST API response.
+- `tests/test_domain_integration.py` — 28 integration tests (CLI + API + JournalProfile.domain_hint).
+
+### Changed
+- `api/routes.py` — `critique/text`, `rebuttal`, `journal-score` endpoints now create per-request
+  `SciExpCritiqueEngine(domain=req.domain)` instead of sharing the module-level `_engine` singleton.
+  Singleton `_engine` kept for non-domain endpoints that do not need per-request domain selection.
+- `_load_engine()` in `cli/main.py` now accepts `domain` parameter.
+
+### Stats
+- Tests: 575 passing (up from 508 at v3.3.0)
+- Coverage: 86.14% (up from 85.44%)
+- All CI checks green (ruff, mypy, pytest)
+
+---
+
 ## [3.3.0] - 2026-04-23
 
 ### Added
