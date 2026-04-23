@@ -367,7 +367,9 @@ class TestVersion250:
 
         runner = CliRunner()
         result = runner.invoke(main, ["--version"])
-        assert "3.2" in result.output
+        from veritas import __version__
+
+        assert __version__ in result.output
 
     def test_session_start(self, tmp_path):
         from click.testing import CliRunner

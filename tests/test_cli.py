@@ -166,8 +166,10 @@ class TestPlaybook:
 class TestVersion:
     def test_version_flag(self, runner):
         result = runner.invoke(main, ["--version"])
+        from veritas import __version__
+
         assert result.exit_code == 0
-        assert "3.2" in result.output
+        assert __version__ in result.output
 
 
 # ---------------------------------------------------------------------------

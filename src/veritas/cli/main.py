@@ -16,22 +16,13 @@ import json
 import pathlib
 import sys
 from concurrent.futures import ThreadPoolExecutor, as_completed
-from importlib.metadata import version as _pkg_version
 
 import click
 
 # ---------------------------------------------------------------------------
 # Version helper
 # ---------------------------------------------------------------------------
-_VERSION = "unknown"
-for _pkg_name in ("flamehaven-veritas", "veritas"):
-    try:
-        _VERSION = _pkg_version(_pkg_name)
-        break
-    except Exception:
-        pass
-if _VERSION == "unknown":
-    _VERSION = "3.2.0"
+from veritas import __version__ as _VERSION
 
 
 def _load_engine(domain: str = "biomedical"):
