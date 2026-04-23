@@ -73,7 +73,9 @@ class LogosBridge:
     def source(self) -> str:
         return "logos_irf_pipeline" if self._pipeline is not None else "local"
 
-    def analyze(self, text: str, central_claim: str | None = None, domain_override: str | None = None) -> IRF6DScores:
+    def analyze(
+        self, text: str, central_claim: str | None = None, domain_override: str | None = None
+    ) -> IRF6DScores:
         """Return IRF6DScores using best available backend.
 
         Args:

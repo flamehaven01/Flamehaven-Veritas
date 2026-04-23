@@ -25,11 +25,11 @@ class JournalScoringResult:
     journal_name: str
     raw_omega: float
     calibrated_omega: float
-    omega_delta: float         # calibrated - raw; positive means journal rewards paper
+    omega_delta: float  # calibrated - raw; positive means journal rewards paper
     verdict: JournalVerdict
     accept_threshold: float
     revise_threshold: float
-    step_contributions: dict   # step_id -> {"raw": float, "weighted": float, "multiplier": float}
+    step_contributions: dict  # step_id -> {"raw": float, "weighted": float, "multiplier": float}
 
     def as_dict(self) -> dict:
         return {
@@ -57,9 +57,7 @@ class JournalScorer:
         print(result.verdict.value, result.calibrated_omega)
     """
 
-    def score(
-        self, report: CritiqueReport, journal: str = "default"
-    ) -> JournalScoringResult:
+    def score(self, report: CritiqueReport, journal: str = "default") -> JournalScoringResult:
         """Score a CritiqueReport against a journal profile.
 
         Args:
@@ -110,7 +108,7 @@ class JournalScorer:
 
         for step in active_steps:
             multiplier = profile.step_weights.get(step.step_id, 1.0)
-            step_quality = self._step_quality(step)          # [0.0, 1.0]
+            step_quality = self._step_quality(step)  # [0.0, 1.0]
             effective_weight = step.weight * multiplier
             weighted_sum += step_quality * effective_weight
             weight_total += effective_weight

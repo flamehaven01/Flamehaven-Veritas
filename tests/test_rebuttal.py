@@ -93,8 +93,12 @@ class TestRebuttalItem:
         )
         d = item.as_dict()
         assert set(d.keys()) == {
-            "issue_id", "category", "severity",
-            "reviewer_text", "author_response_template", "addressed",
+            "issue_id",
+            "category",
+            "severity",
+            "reviewer_text",
+            "author_response_template",
+            "addressed",
         }
 
     def test_as_dict_addressed_default_false(self):
@@ -213,21 +217,27 @@ class TestRebuttalEngineFromFindings:
         assert result.items[0].severity == "LOW"
 
     def test_step1_not_traceable_is_critical(self, engine):
-        finding = _make_finding("1.1", "Claim absent — not traceable.", TraceabilityClass.NOT_TRACEABLE)
+        finding = _make_finding(
+            "1.1", "Claim absent — not traceable.", TraceabilityClass.NOT_TRACEABLE
+        )
         step = _make_step("1", findings=[finding])
         report = _make_report(steps=[step])
         result = engine.generate(report)
         assert result.items[0].severity == "CRITICAL"
 
     def test_stat_description_maps_statistical_category(self, engine):
-        finding = _make_finding("1.2", "Missing p-value and effect size.", TraceabilityClass.PARTIALLY_TRACEABLE)
+        finding = _make_finding(
+            "1.2", "Missing p-value and effect size.", TraceabilityClass.PARTIALLY_TRACEABLE
+        )
         step = _make_step("1", findings=[finding])
         report = _make_report(steps=[step])
         result = engine.generate(report)
         assert result.items[0].category == "STATISTICAL"
 
     def test_scope_description_maps_scope_violation_category(self, engine):
-        finding = _make_finding("2.1", "Overclaiming: 'proves superiority'", TraceabilityClass.TRACEABLE)
+        finding = _make_finding(
+            "2.1", "Overclaiming: 'proves superiority'", TraceabilityClass.TRACEABLE
+        )
         step = _make_step("2", findings=[finding])
         report = _make_report(steps=[step])
         result = engine.generate(report)

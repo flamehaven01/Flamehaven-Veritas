@@ -321,9 +321,7 @@ class CritiqueReport:
 
     schema_version: str = "3.3"
 
-    precheck: PrecheckResult = field(
-        default_factory=lambda: PrecheckResult(SciExpMode.BLOCKED, [])
-    )
+    precheck: PrecheckResult = field(default_factory=lambda: PrecheckResult(SciExpMode.BLOCKED, []))
 
     experiment_class: ExperimentClass | None = None
     experiment_class_secondary: ExperimentClass | None = None
@@ -525,5 +523,3 @@ class ReproducibilityChecklist:
         not_sat = sum(1 for i in self.items if i.satisfied is False)
         unknown = sum(1 for i in self.items if i.satisfied is None)
         return f"{satisfied} satisfied / {not_sat} not satisfied / {unknown} unknown"
-
-

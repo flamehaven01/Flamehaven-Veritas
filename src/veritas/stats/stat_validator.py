@@ -106,9 +106,7 @@ class StatValidator:
 
     # ------------------------------------------------------------------
 
-    def _select_text(
-        self, text: str, section_map: SectionMap | None
-    ) -> str:
+    def _select_text(self, text: str, section_map: SectionMap | None) -> str:
         """Focus on METHODS + RESULTS when section map is available."""
         if section_map is not None and section_map.coverage > 0.0:
             focused = section_map.combined("METHODS", "RESULTS")
@@ -138,9 +136,7 @@ class StatValidator:
         if not p_reported:
             issues.append("No significance testing reported")
         elif not p_numeric:
-            issues.append(
-                "Significance stated in words only — use numeric p-values (e.g. p=0.032)"
-            )
+            issues.append("Significance stated in words only — use numeric p-values (e.g. p=0.032)")
         if not effect:
             issues.append("Effect size not reported")
         if not ci:

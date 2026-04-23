@@ -86,7 +86,15 @@ class TestJournalProfiles:
 
     def test_as_dict_keys(self):
         d = JOURNAL_PROFILES["ieee"].as_dict()
-        assert set(d.keys()) == {"key", "name", "accept_omega", "revise_omega", "step_weights", "description", "domain_hint"}
+        assert set(d.keys()) == {
+            "key",
+            "name",
+            "accept_omega",
+            "revise_omega",
+            "step_weights",
+            "description",
+            "domain_hint",
+        }
 
     def test_get_profile_valid_key(self):
         p = get_profile("nature")
@@ -270,6 +278,7 @@ class TestJournalScorerIntegration:
 
     def test_as_dict_serializable(self, scorer, engine):
         import json
+
         report = engine.critique(PAPER_TEXT)
         result = scorer.score(report, journal="ieee")
         d = result.as_dict()

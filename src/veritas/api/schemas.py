@@ -189,7 +189,9 @@ class JournalProfileOut(BaseModel):
 
 class JournalScoreRequest(BaseModel):
     report_text: str = Field(..., description="Raw text of the experimental report")
-    journal: str = Field("default", description="Journal key: nature, ieee, lancet, q1, q2, q3, default")
+    journal: str = Field(
+        "default", description="Journal key: nature, ieee, lancet, q1, q2, q3, default"
+    )
     domain: str = Field("biomedical", description="IRF scoring domain: biomedical | cs | math")
 
 
@@ -259,4 +261,3 @@ class ResponseLetterResponse(BaseModel):
     total_issues: int
     critical_count: int
     high_count: int
-

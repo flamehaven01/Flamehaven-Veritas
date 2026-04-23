@@ -227,9 +227,7 @@ class SciExpCritiqueEngine:
         except Exception:
             return None
 
-    def _enrich_logos(
-        self, text: str, claim_step, stat_validity=None
-    ) -> tuple:
+    def _enrich_logos(self, text: str, claim_step, stat_validity=None) -> tuple:
         """Run LOGOS IRF, methodology detection, hypothesis extraction.
 
         Returns (irf_scores, methodology_class, hypothesis_text, logos_omega, hybrid_omega).
@@ -405,9 +403,7 @@ class SciExpCritiqueEngine:
             reason = "Strong section coverage and multiple traceable artifacts."
         elif coverage >= 0.40 or artifact_count >= 2:
             level = "MEDIUM"
-            reason = (
-                f"Partial section coverage ({coverage:.0%}) or limited artifacts ({artifact_count})."
-            )
+            reason = f"Partial section coverage ({coverage:.0%}) or limited artifacts ({artifact_count})."
         else:
             level = "LOW"
             reason = (

@@ -126,9 +126,7 @@ class TestCritiqueDomainCLI:
         from veritas.cli.main import main
 
         runner = CliRunner()
-        result = runner.invoke(
-            main, ["critique", "--text", _SAMPLE_TEXT, "--domain", "biomedical"]
-        )
+        result = runner.invoke(main, ["critique", "--text", _SAMPLE_TEXT, "--domain", "biomedical"])
         assert result.exit_code == 0, result.output
 
     def test_critique_default_domain_unchanged(self):
@@ -137,9 +135,7 @@ class TestCritiqueDomainCLI:
 
         runner = CliRunner()
         r_default = runner.invoke(main, ["critique", "--text", _SAMPLE_TEXT])
-        r_bio = runner.invoke(
-            main, ["critique", "--text", _SAMPLE_TEXT, "--domain", "biomedical"]
-        )
+        r_bio = runner.invoke(main, ["critique", "--text", _SAMPLE_TEXT, "--domain", "biomedical"])
         assert r_default.exit_code == 0, r_default.output
         assert r_bio.exit_code == 0, r_bio.output
 
@@ -167,9 +163,7 @@ class TestRebuttalDomainCLI:
         from veritas.cli.main import main
 
         runner = CliRunner()
-        result = runner.invoke(
-            main, ["rebuttal", "--text", _SAMPLE_TEXT, "--domain", "cs"]
-        )
+        result = runner.invoke(main, ["rebuttal", "--text", _SAMPLE_TEXT, "--domain", "cs"])
         assert result.exit_code == 0, result.output
 
 

@@ -102,9 +102,7 @@ class SectionParser:
     # Private: header detection
     # ------------------------------------------------------------------
 
-    def _find_anchors(
-        self, text: str
-    ) -> list[tuple[int, str]]:
+    def _find_anchors(self, text: str) -> list[tuple[int, str]]:
         """Return list of (char_pos, canonical_name) sorted by position."""
         found: list[tuple[int, str]] = []
         for name, pattern in _CANONICAL:
@@ -173,8 +171,6 @@ class SectionParser:
         for name, s, e in splits:
             body = text[s:e].strip()
             if len(body) >= _MIN_SECTION_CHARS:
-                sections[name] = DocumentSection(
-                    name=name, text=body, start_pos=s, end_pos=e
-                )
+                sections[name] = DocumentSection(name=name, text=body, start_pos=s, end_pos=e)
         coverage = min(len(sections) / len(_CANONICAL_NAMES), 0.40)
         return SectionMap(sections=sections, coverage=round(coverage, 4))

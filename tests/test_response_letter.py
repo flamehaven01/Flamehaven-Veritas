@@ -27,6 +27,7 @@ from veritas.render.response_letter import ResponseLetterRenderer
 # Helpers
 # ---------------------------------------------------------------------------
 
+
 def _make_item(
     issue_id: str = "R-1.1",
     severity: str = "HIGH",
@@ -273,6 +274,7 @@ class TestRenderToFile:
 class TestRenderFromEngine:
     def test_engine_report_renderable(self):
         from veritas.engine import SciExpCritiqueEngine
+
         engine = SciExpCritiqueEngine()
         report = engine.critique(
             "Abstract: Drug X effect studied. N=20. p=0.03. t-test applied. "
@@ -286,6 +288,7 @@ class TestRenderFromEngine:
 
     def test_engine_report_nature_style(self):
         from veritas.engine import SciExpCritiqueEngine
+
         engine = SciExpCritiqueEngine()
         report = engine.critique(
             "Abstract: Drug X inhibition. N=20. Results: 45% inhibition. p=0.05."

@@ -37,32 +37,96 @@ COMPONENT_MIN: float = 0.30
 # Legacy module-level marker banks — preserved for backward compat.
 # The canonical source is now veritas.logos.domain.biomedical.BIOMEDICAL.
 _M_MARKERS = [
-    "limitation", "uncertain", "assumption", "caveat", "unknown", "unclear",
-    "may ", "might ", "possibly", "open question", "not yet confirmed",
-    "incomplete", "pending", "cannot confirm",
+    "limitation",
+    "uncertain",
+    "assumption",
+    "caveat",
+    "unknown",
+    "unclear",
+    "may ",
+    "might ",
+    "possibly",
+    "open question",
+    "not yet confirmed",
+    "incomplete",
+    "pending",
+    "cannot confirm",
 ]
 _A_MARKERS = [
-    "hypothesis", "rationale", "expected", "theoretical", "premise",
-    "research question", "we propose", "based on", "prior work", "background",
-    "motivated by", "our assumption",
+    "hypothesis",
+    "rationale",
+    "expected",
+    "theoretical",
+    "premise",
+    "research question",
+    "we propose",
+    "based on",
+    "prior work",
+    "background",
+    "motivated by",
+    "our assumption",
 ]
 _D_MARKERS = [
-    "therefore", "hence", "thus", "consequently", "it follows", "implies",
-    "conclude", "shows that", "demonstrates", "establishes", "proving", "proof",
+    "therefore",
+    "hence",
+    "thus",
+    "consequently",
+    "it follows",
+    "implies",
+    "conclude",
+    "shows that",
+    "demonstrates",
+    "establishes",
+    "proving",
+    "proof",
 ]
 _I_MARKERS = [
-    "result", "data", "measure", "observ", "collect", "n=", "sample", "trial",
-    "iteration", "recorded", "experiment", "test ", "run ", "epoch",
+    "result",
+    "data",
+    "measure",
+    "observ",
+    "collect",
+    "n=",
+    "sample",
+    "trial",
+    "iteration",
+    "recorded",
+    "experiment",
+    "test ",
+    "run ",
+    "epoch",
 ]
 _F_MARKERS = [
-    "reproducib", "replicate", "protocol", "control", "null ", "p-value",
-    "p value", "confidence interval", "blind", "randomiz", "falsif", "method",
-    "step-by-step", "procedure",
+    "reproducib",
+    "replicate",
+    "protocol",
+    "control",
+    "null ",
+    "p-value",
+    "p value",
+    "confidence interval",
+    "blind",
+    "randomiz",
+    "falsif",
+    "method",
+    "step-by-step",
+    "procedure",
 ]
 _P_MARKERS = [
-    "reference", "doi:", "doi.org", "et al", "cite", "cited", "prior cycle",
-    "baseline", "previous version", "v1.", "v2.", "v3.",
-    "prior experiment", "earlier work",
+    "reference",
+    "doi:",
+    "doi.org",
+    "et al",
+    "cite",
+    "cited",
+    "prior cycle",
+    "baseline",
+    "previous version",
+    "v1.",
+    "v2.",
+    "v3.",
+    "prior experiment",
+    "earlier work",
 ]
 
 
@@ -116,14 +180,13 @@ class IRFAnalyzer:
         if domain is None or domain == "biomedical":
             # Fast path: avoid registry import for default domain
             from .domain.biomedical import BIOMEDICAL
+
             return BIOMEDICAL
         if isinstance(domain, _DR):
             return domain
         if isinstance(domain, str):
             return _get(domain)
-        raise TypeError(
-            f"domain must be str, DomainRuleset, or None; got {type(domain).__name__}"
-        )
+        raise TypeError(f"domain must be str, DomainRuleset, or None; got {type(domain).__name__}")
 
     def score(
         self,
@@ -182,9 +245,7 @@ class IRFAnalyzer:
         numeric_score = _numeric_density(t)
         return min(1.0, 0.65 * marker_score + 0.35 * numeric_score)
 
-    def _score_F(
-        self, t: str, stat_validity: StatValidity | None = None
-    ) -> float:
+    def _score_F(self, t: str, stat_validity: StatValidity | None = None) -> float:
         """Falsification — testability, control, reproducibility.
 
         When stat_validity is available (v3.3+):

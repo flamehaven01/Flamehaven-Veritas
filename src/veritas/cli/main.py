@@ -43,9 +43,7 @@ def _load_engine(domain: str = "biomedical"):
     if domain not in valid:
         import click
 
-        raise click.ClickException(
-            f"Unknown domain '{domain}'. Valid: {', '.join(valid)}"
-        )
+        raise click.ClickException(f"Unknown domain '{domain}'. Valid: {', '.join(valid)}")
     return SciExpCritiqueEngine(domain=domain)
 
 
@@ -210,7 +208,9 @@ def main():
     show_default=True,
     help="IRF scoring domain: biomedical (default), cs, math, or any registered plugin domain.",
 )
-def critique(file, text, stdin, fmt, template, round_num, prev, save_round, out, quiet, rag, journal, domain):
+def critique(
+    file, text, stdin, fmt, template, round_num, prev, save_round, out, quiet, rag, journal, domain
+):
     """Analyse a document and emit a structured critique report.
 
     Examples:\n
@@ -618,7 +618,6 @@ def review_sim(file, text, stdin, reviewers, fmt, out):
         click.echo(output)
 
 
-
 # ---------------------------------------------------------------------------
 # rebuttal
 # ---------------------------------------------------------------------------
@@ -680,6 +679,7 @@ def rebuttal(file, text, stdin, style, fmt, out, render_letter, domain):
 
     if render_letter:
         from ..render.response_letter import ResponseLetterRenderer
+
         renderer = ResponseLetterRenderer()
         output = renderer.render(rb_report, style=style)
         if out:
@@ -769,8 +769,7 @@ def diff(file_v1, file_v2, fmt, out):
             "VERITAS Revision Diff",
             f"  V1 omega: {r1.omega_score:.4f}   V2 omega: {r2.omega_score:.4f}"
             f"   delta: {result.delta_omega:+.4f}",
-            f"  RCS: {result.rcs:.4f}  "
-            f"  {grade_icon} Grade: {result.revision_grade.value}",
+            f"  RCS: {result.rcs:.4f}    {grade_icon} Grade: {result.revision_grade.value}",
             f"  Addressed: {result.addressed_count}/{result.total_v1_issues} issues",
             f"  Improved: {'yes' if result.improved else 'no'}",
         ]
@@ -876,9 +875,7 @@ def domains_list(fmt):
         lines = ["VERITAS Registered IRF Domains", ""]
         for k in sorted(keys):
             rs = get_domain(k)
-            counts = "/".join(
-                str(len(rs.markers_for(d))) for d in ("M", "A", "D", "I", "F", "P")
-            )
+            counts = "/".join(str(len(rs.markers_for(d))) for d in ("M", "A", "D", "I", "F", "P"))
             lines.append(
                 f"  {k:<14}  [{rs.name}]  "
                 f"threshold={rs.composite_threshold:.2f}  "

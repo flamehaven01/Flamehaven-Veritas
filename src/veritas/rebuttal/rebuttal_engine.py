@@ -268,8 +268,9 @@ class RebuttalEngine:
         template = _RESPONSE_TEMPLATES.get(category, _RESPONSE_TEMPLATES["DEFAULT"])
         # Substitute artifact placeholder if detectable
         if "{artifact}" in template:
-            art_match = re.search(r"\b(sha256|hash|artifact|data\s+file|figure|table)\b",
-                                  context, re.IGNORECASE)
+            art_match = re.search(
+                r"\b(sha256|hash|artifact|data\s+file|figure|table)\b", context, re.IGNORECASE
+            )
             placeholder = art_match.group(0) if art_match else "required artifact"
             template = template.replace("{artifact}", placeholder)
         return template

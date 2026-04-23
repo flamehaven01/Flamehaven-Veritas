@@ -30,6 +30,7 @@ from veritas.logos.irf_analyzer import IRFAnalyzer
 # Helpers
 # ---------------------------------------------------------------------------
 
+
 def _make_ruleset(key: str = "test_domain") -> DomainRuleset:
     return DomainRuleset(
         domain_key=key,
@@ -46,6 +47,7 @@ def _make_ruleset(key: str = "test_domain") -> DomainRuleset:
 # ---------------------------------------------------------------------------
 # DomainRuleset — base.py
 # ---------------------------------------------------------------------------
+
 
 class TestDomainRuleset:
     def test_frozen(self):
@@ -96,9 +98,9 @@ class TestDomainRuleset:
             f_markers=("e",),
             p_markers=("f",),
         )
-        assert rs2.saturation("I") == 5   # factory default
-        assert rs2.saturation("F") == 5   # factory default
-        assert rs2.saturation("M") == 4   # factory default
+        assert rs2.saturation("I") == 5  # factory default
+        assert rs2.saturation("F") == 5  # factory default
+        assert rs2.saturation("M") == 4  # factory default
 
     def test_composite_threshold_default(self):
         rs = _make_ruleset()
@@ -128,6 +130,7 @@ class TestDomainRuleset:
 # ---------------------------------------------------------------------------
 # DomainRegistry — registry.py
 # ---------------------------------------------------------------------------
+
 
 class TestDomainRegistry:
     def setup_method(self):
@@ -212,6 +215,7 @@ class TestModuleLevelHelpers:
 # Entry_points mock — registry scans external plugins
 # ---------------------------------------------------------------------------
 
+
 class TestEntryPointsScan:
     def test_entry_points_plugin_loaded(self):
         """Entry_points group 'veritas.domains' correctly loads DomainRuleset."""
@@ -253,6 +257,7 @@ class TestEntryPointsScan:
 # ---------------------------------------------------------------------------
 # IRFAnalyzer — domain-aware constructor
 # ---------------------------------------------------------------------------
+
 
 class TestIRFAnalyzerDomainConstructor:
     def test_default_is_biomedical(self):
@@ -310,6 +315,7 @@ class TestBackwardCompat:
 
     def test_stat_validity_compat(self):
         from veritas.types import StatValidity
+
         sv = StatValidity(score=0.8, p_value_reported=True, ci_reported=True)
         default = IRFAnalyzer()
         s = default.score(_BIOMEDICAL_SAMPLE, stat_validity=sv)

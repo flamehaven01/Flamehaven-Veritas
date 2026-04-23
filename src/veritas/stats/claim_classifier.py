@@ -24,7 +24,7 @@ from ..types import ClaimType
 # ---------------------------------------------------------------------------
 
 _EMPIRICAL_MARKERS: list[str] = [
-    r"p\s*[=<>]\s*0\.\d+",          # p-value expressions
+    r"p\s*[=<>]\s*0\.\d+",  # p-value expressions
     r"\bsignificant(?:ly)?\b",
     r"\bobserved\b",
     r"\bmeasured\b",
@@ -91,8 +91,7 @@ _BANKS: dict[ClaimType, list[str]] = {
 }
 
 _COMPILED: dict[ClaimType, list[re.Pattern[str]]] = {
-    ct: [re.compile(m, re.I) for m in markers]
-    for ct, markers in _BANKS.items()
+    ct: [re.compile(m, re.I) for m in markers] for ct, markers in _BANKS.items()
 }
 
 # Tie threshold: if top two scores differ by <= this, result is UNKNOWN

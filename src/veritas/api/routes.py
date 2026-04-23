@@ -33,6 +33,7 @@ async def critique_text(req: S.CritiqueRequest):
     """Submit raw text and receive structured VERITAS."""
     from ..engine import SciExpCritiqueEngine
     from ..logos.domain.registry import get_domain
+
     try:
         get_domain(req.domain)
     except KeyError as exc:
@@ -54,6 +55,7 @@ async def critique_upload(
 ):
     """Upload a document (PDF, DOCX, DOC, TXT, MD) and receive critique."""
     from ..logos.domain.registry import get_domain
+
     try:
         get_domain(domain)
     except KeyError as exc:
@@ -99,6 +101,7 @@ async def critique_download(
 ):
     """Upload document → receive downloadable critique report in chosen format."""
     from ..logos.domain.registry import get_domain
+
     try:
         get_domain(domain)
     except KeyError as exc:
@@ -299,8 +302,7 @@ async def list_domains():
                 composite_threshold=rs.composite_threshold,
                 component_min=rs.component_min,
                 marker_counts={
-                    dim: len(rs.markers_for(dim))
-                    for dim in ("M", "A", "D", "I", "F", "P")
+                    dim: len(rs.markers_for(dim)) for dim in ("M", "A", "D", "I", "F", "P")
                 },
             )
         )
@@ -334,8 +336,7 @@ async def journal_score(req: S.JournalScoreRequest):
         accept_threshold=result.accept_threshold,
         revise_threshold=result.revise_threshold,
         step_contributions={
-            k: S.StepContributionOut(**v)
-            for k, v in result.step_contributions.items()
+            k: S.StepContributionOut(**v) for k, v in result.step_contributions.items()
         },
     )
 
@@ -386,8 +387,7 @@ async def journal_score_upload(
         accept_threshold=result.accept_threshold,
         revise_threshold=result.revise_threshold,
         step_contributions={
-            k: S.StepContributionOut(**v)
-            for k, v in result.step_contributions.items()
+            k: S.StepContributionOut(**v) for k, v in result.step_contributions.items()
         },
     )
 
@@ -432,6 +432,7 @@ async def generate_response_letter(req: S.ResponseLetterRequest):
 
     from ..engine import SciExpCritiqueEngine
     from ..logos.domain.registry import get_domain
+
     try:
         get_domain(req.domain)
     except KeyError as exc:

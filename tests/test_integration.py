@@ -50,6 +50,7 @@ _SAMPLE_TEXT_V2 = (
 def critique_report():
     """Run critique once and reuse across tests."""
     from veritas.engine import SciExpCritiqueEngine
+
     engine = SciExpCritiqueEngine()
     return engine.critique(_SAMPLE_TEXT)
 
@@ -97,6 +98,7 @@ class TestCritiqueToRebuttalPipeline:
     def test_diff_two_reports(self, critique_report):
         from veritas.engine import SciExpCritiqueEngine
         from veritas.rebuttal.revision_tracker import RevisionTracker
+
         engine = SciExpCritiqueEngine()
         r2 = engine.critique(_SAMPLE_TEXT_V2)
         tracker = RevisionTracker()
@@ -190,7 +192,9 @@ class TestAPIRebuttalEndpoints:
         assert resp.json()["style"] == "acm"
 
     def test_post_rebuttal_nature(self):
-        resp = CLIENT.post("/api/v1/rebuttal", json={"report_text": _SAMPLE_TEXT, "style": "nature"})
+        resp = CLIENT.post(
+            "/api/v1/rebuttal", json={"report_text": _SAMPLE_TEXT, "style": "nature"}
+        )
         assert resp.status_code == 200
 
     def test_post_rebuttal_invalid_style(self):
@@ -304,6 +308,7 @@ class TestCLISmoke:
         from click.testing import CliRunner
 
         from veritas.cli.main import main
+
         runner = CliRunner()
         result = runner.invoke(main, ["rebuttal", "--text", _SAMPLE_TEXT, "--style", "ieee"])
         assert result.exit_code == 0, result.output
@@ -313,6 +318,7 @@ class TestCLISmoke:
         from click.testing import CliRunner
 
         from veritas.cli.main import main
+
         runner = CliRunner()
         result = runner.invoke(
             main, ["rebuttal", "--text", _SAMPLE_TEXT, "--style", "ieee", "--render-letter"]
@@ -324,6 +330,7 @@ class TestCLISmoke:
         from click.testing import CliRunner
 
         from veritas.cli.main import main
+
         runner = CliRunner()
         result = runner.invoke(main, ["journal-profiles"])
         assert result.exit_code == 0, result.output
@@ -333,6 +340,7 @@ class TestCLISmoke:
         from click.testing import CliRunner
 
         from veritas.cli.main import main
+
         runner = CliRunner()
         result = runner.invoke(main, ["critique", "--text", _SAMPLE_TEXT, "--journal", "default"])
         assert result.exit_code == 0, result.output
@@ -341,6 +349,7 @@ class TestCLISmoke:
         from click.testing import CliRunner
 
         from veritas.cli.main import main
+
         runner = CliRunner()
         result = runner.invoke(
             main, ["rebuttal", "--text", _SAMPLE_TEXT, "--style", "acm", "--format", "json"]
@@ -354,6 +363,7 @@ class TestCLISmoke:
         from click.testing import CliRunner
 
         from veritas.cli.main import main
+
         f1 = tmp_path / "v1.txt"
         f2 = tmp_path / "v2.txt"
         f1.write_text(_SAMPLE_TEXT, encoding="utf-8")

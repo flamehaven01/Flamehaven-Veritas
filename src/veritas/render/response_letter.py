@@ -118,9 +118,7 @@ class ResponseLetterRenderer:
         sections = self._build_sections(report, cfg)
         return self._assemble(cfg, sections, report, style.upper())
 
-    def render_to_file(
-        self, report: RebuttalReport, path: str, style: str = "ieee"
-    ) -> str:
+    def render_to_file(self, report: RebuttalReport, path: str, style: str = "ieee") -> str:
         """Render and write to file. Returns path."""
         content = self.render(report, style=style)
         with open(path, "w", encoding="utf-8") as fh:
@@ -157,9 +155,8 @@ class ResponseLetterRenderer:
     def _format_item(item: RebuttalItem, n: int, cfg: dict) -> list[str]:
         """Format one RebuttalItem as a reviewer–response exchange."""
         severity_tag = cfg["severity_note"].get(item.severity, "")
-        reviewer_line = (
-            cfg["reviewer_prefix"].format(n=n, category=item.category)
-            + (f" {severity_tag}" if severity_tag else "")
+        reviewer_line = cfg["reviewer_prefix"].format(n=n, category=item.category) + (
+            f" {severity_tag}" if severity_tag else ""
         )
         response_line = cfg["response_prefix"].format(n=n, category=item.category)
 
@@ -177,7 +174,9 @@ class ResponseLetterRenderer:
         ]
 
     @staticmethod
-    def _assemble(cfg: dict, sections: list[str], report: RebuttalReport, style_label: str = "") -> str:
+    def _assemble(
+        cfg: dict, sections: list[str], report: RebuttalReport, style_label: str = ""
+    ) -> str:
         """Combine header, preamble, sections, and closing into final string."""
         ts = datetime.now(tz=timezone.utc).strftime("%Y-%m-%d")
         label = style_label or report.style.upper()

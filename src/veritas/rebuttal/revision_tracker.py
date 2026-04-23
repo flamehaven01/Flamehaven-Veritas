@@ -31,8 +31,8 @@ from ..types import CritiqueReport
 class RevisionGrade(Enum):
     """Revision completeness assessment grade."""
 
-    COMPLETE = "COMPLETE"       # RCS >= 0.80
-    PARTIAL = "PARTIAL"         # RCS >= 0.50
+    COMPLETE = "COMPLETE"  # RCS >= 0.80
+    PARTIAL = "PARTIAL"  # RCS >= 0.50
     INSUFFICIENT = "INSUFFICIENT"  # RCS < 0.50
 
 
