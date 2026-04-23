@@ -32,6 +32,11 @@ _TMP.mkdir(exist_ok=True)
 async def critique_text(req: S.CritiqueRequest):
     """Submit raw text and receive structured VERITAS."""
     from ..engine import SciExpCritiqueEngine
+    from ..logos.domain.registry import get_domain
+    try:
+        get_domain(req.domain)
+    except KeyError as exc:
+        raise HTTPException(400, str(exc)) from exc
     eng = SciExpCritiqueEngine(domain=req.domain)
     report = eng.critique(req.report_text, round_number=req.round_number)
     return _to_response(report)
@@ -45,6 +50,7 @@ async def critique_upload(
     file: UploadFile = File(...),  # noqa: B008
     template: str = Form("bmj"),
     round_number: int = Form(1),
+    domain: str = Form("biomedical"),
 ):
     """Upload a document (PDF, DOCX, DOC, TXT, MD) and receive critique."""
     suffix = Path(file.filename or "upload.txt").suffix.lower()
@@ -66,7 +72,7 @@ async def critique_upload(
         retriever.index_chunks(chunks)
         ctx = retriever.build_context(text[:500])
 
-        eng = SciExpCritiqueEngine(rag_retriever=retriever)
+        eng = SciExpCritiqueEngine(domain=domain, rag_retriever=retriever)
         report = eng.critique(text, doc_context=ctx, round_number=round_number)
     finally:
         tmp_path.unlink(missing_ok=True)

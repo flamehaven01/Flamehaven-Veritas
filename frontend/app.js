@@ -1,4 +1,4 @@
-/* VERITAS v2.2 — Frontend App Logic */
+﻿/* VERITAS v2.2 — Frontend App Logic */
 
 const API = '/api/v1';
 
@@ -102,6 +102,7 @@ submitBtn.addEventListener('click', async () => {
   const format   = outputFormat.value;
   const template = templateSel.value;
   const round    = parseInt(roundInput.value) || 1;
+  const domain   = $('domainSelect') ? $('domainSelect').value : 'biomedical';
 
   showProgress(0);
 
@@ -109,6 +110,7 @@ submitBtn.addEventListener('click', async () => {
   fd.append('file', selectedFile);
   fd.append('template', template);
   fd.append('round_number', round);
+  fd.append('domain', domain);
 
   try {
     if (format === 'preview') {
@@ -123,6 +125,16 @@ submitBtn.addEventListener('click', async () => {
 });
 
 async function runPreview(fd) {
+  // Capture plain-text files for rebuttal/journal/review-sim tab APIs
+  try {
+    const file = fd.get('file');
+    if (file && (file.type === 'text/plain' || file.name.endsWith('.md'))) {
+      const txt = await file.text();
+      if (!lastReport) lastReport = {};
+      lastReport._source_text = txt;
+    }
+  } catch { /* binary files (PDF/DOCX) — skip */ }
+
   await animateProgress(0, 2);  // precheck + classify
   const res = await fetch(`${API}/critique/upload`, { method: 'POST', body: fd });
   await animateProgress(2, 3);  // pipeline
@@ -131,12 +143,12 @@ async function runPreview(fd) {
     throw new Error(err.detail || `Server error ${res.status}`);
   }
   const report = await res.json();
-  lastReport = report;
+  lastReport = { ...report, _source_text: lastReport?._source_text };
   lastMd = buildMarkdown(report);
   await animateProgress(3, 4);  // enrich
   await animateProgress(4, 5);  // render
   await sleep(200);
-  renderReport(report);
+  renderReportFull(report);
 }
 
 async function runDownload(fd, format) {
@@ -210,7 +222,7 @@ function easeOut(t) { return 1 - Math.pow(1 - t, 2); }
 function sleep(ms) { return new Promise(r => setTimeout(r, ms)); }
 
 // ── Render report ─────────────────────────────────────────────────────────────
-function renderReport(r) {
+function renderReportFull(r) {
   clearInterval(spinInterval);
   hideAll();
   resultPanel.classList.remove('hidden');
@@ -445,229 +457,263 @@ function escHtml(s) {
     .replace(/>/g,'&gt;').replace(/"/g,'&quot;');
 }
 
-
-// ── DOM refs ──────────────────────────────────────────────────────────────────
-const dropZone     = document.getElementById('dropZone');
-const fileInput    = document.getElementById('fileInput');
-const fileInfo     = document.getElementById('fileInfo');
-const fileName     = document.getElementById('fileName');
-const clearFile    = document.getElementById('clearFile');
-const submitBtn    = document.getElementById('submitBtn');
-const templateSel  = document.getElementById('templateSelect');
-const roundInput   = document.getElementById('roundInput');
-const outputFormat = document.getElementById('outputFormat');
-
-const uploadPanel   = document.getElementById('uploadPanel');
-const progressPanel = document.getElementById('progressPanel');
-const resultPanel   = document.getElementById('resultPanel');
-const errorPanel    = document.getElementById('errorPanel');
-
-const progressLabel  = document.getElementById('progressLabel');
-const progressBar    = document.getElementById('progressBar');
-const resultMeta     = document.getElementById('resultMeta');
-const downloadGroup  = document.getElementById('downloadGroup');
-const precheckRow    = document.getElementById('precheckRow');
-const stepsContainer = document.getElementById('stepsContainer');
-const priorityBox    = document.getElementById('priorityBox');
-const errorMsg       = document.getElementById('errorMsg');
-
-let selectedFile = null;
-let lastReport   = null;
-
-// ── File selection ────────────────────────────────────────────────────────────
-dropZone.addEventListener('click', () => fileInput.click());
-dropZone.addEventListener('dragover', e => { e.preventDefault(); dropZone.classList.add('drag-over'); });
-dropZone.addEventListener('dragleave', () => dropZone.classList.remove('drag-over'));
-dropZone.addEventListener('drop', e => {
-  e.preventDefault();
-  dropZone.classList.remove('drag-over');
-  const f = e.dataTransfer.files[0];
-  if (f) setFile(f);
+// ── Tab switching ──────────────────────────────────────────────────────────────
+document.querySelectorAll('.rtab').forEach(btn => {
+  btn.addEventListener('click', () => {
+    document.querySelectorAll('.rtab').forEach(b => b.classList.remove('active'));
+    document.querySelectorAll('.rtab-pane').forEach(p => p.classList.add('hidden'));
+    btn.classList.add('active');
+    const pane = document.getElementById('rtab-' + btn.dataset.tab);
+    if (pane) pane.classList.remove('hidden');
+  });
 });
-fileInput.addEventListener('change', () => { if (fileInput.files[0]) setFile(fileInput.files[0]); });
-clearFile.addEventListener('click', clearSelection);
 
-function setFile(f) {
-  selectedFile = f;
-  fileName.textContent = f.name;
-  fileInfo.classList.remove('hidden');
-  dropZone.classList.add('hidden');
-  submitBtn.disabled = false;
-}
+// ── Domain selector ───────────────────────────────────────────────────────────
+const domainSelect = $('domainSelect');
 
-function clearSelection() {
-  selectedFile = null;
-  fileInput.value = '';
-  fileInfo.classList.add('hidden');
-  dropZone.classList.remove('hidden');
-  submitBtn.disabled = true;
-}
+// Populate domain selector from API on page load
+(async () => {
+  try {
+    const res = await fetch(`${API}/domains`);
+    if (!res.ok) return;
+    const domains = await res.json();
+    if (!domains.length) return;
+    domainSelect.innerHTML = domains
+      .map(d => `<option value="${d.key}"${d.key === 'biomedical' ? ' selected' : ''}>${d.name}</option>`)
+      .join('');
+  } catch { /* keep static fallback options */ }
+})();
 
-// ── Submit ────────────────────────────────────────────────────────────────────
-submitBtn.addEventListener('click', async () => {
-  if (!selectedFile) return;
-  const format   = outputFormat.value;
-  const template = templateSel.value;
-  const round    = parseInt(roundInput.value) || 1;
+// ── Rebuttal tab ──────────────────────────────────────────────────────────────
+const rebuttalRunBtn    = $('rebuttalRunBtn');
+const rebuttalSummary   = $('rebuttalSummary');
+const rebuttalItems     = $('rebuttalItems');
+const rebuttalActions   = $('rebuttalActions');
+const downloadLetterBtn = $('downloadLetterBtn');
+let lastRebuttalReport  = null;
 
-  showProgress('Running PRECHECK...', 10);
+rebuttalRunBtn.addEventListener('click', async () => {
+  if (!lastReport) { alert('Run a critique first.'); return; }
+  const style  = $('rebuttalStyle').value;
+  const domain = domainSelect ? domainSelect.value : 'biomedical';
 
-  const fd = new FormData();
-  fd.append('file', selectedFile);
-  fd.append('template', template);
-  fd.append('round_number', round);
+  rebuttalRunBtn.disabled = true;
+  rebuttalRunBtn.textContent = 'Generating...';
 
   try {
-    if (format === 'preview') {
-      await runPreview(fd);
-    } else {
-      fd.append('format', format);
-      await runDownload(fd, format);
+    const res = await fetch(`${API}/rebuttal`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        report_text: lastReport._source_text || '',
+        style,
+        domain,
+      }),
+    });
+    if (!res.ok) {
+      const err = await res.json().catch(() => ({}));
+      throw new Error(err.detail || `Server error ${res.status}`);
     }
-  } catch (err) {
-    showError(err.message || 'Unexpected error. Check server logs.');
+    lastRebuttalReport = await res.json();
+    renderRebuttal(lastRebuttalReport, style);
+  } catch (e) {
+    alert('Rebuttal error: ' + e.message);
+  } finally {
+    rebuttalRunBtn.disabled = false;
+    rebuttalRunBtn.textContent = 'Generate Rebuttal';
   }
 });
 
-async function runPreview(fd) {
-  setProgress('Uploading & extracting text...', 30);
-  const res = await fetch(`${API}/critique/upload`, { method: 'POST', body: fd });
-  setProgress('Running STEP 0-5 pipeline...', 70);
-  if (!res.ok) {
-    const err = await res.json().catch(() => ({}));
-    throw new Error(err.detail || `Server error ${res.status}`);
-  }
-  const report = await res.json();
-  lastReport = report;
-  setProgress('Rendering report...', 95);
-  await new Promise(r => setTimeout(r, 300));
-  renderReport(report);
-}
+function renderRebuttal(rb, style) {
+  const severity_color = { CRITICAL: '#ef4444', HIGH: '#f97316', MEDIUM: '#f59e0b', LOW: '#6b7280' };
+  rebuttalSummary.innerHTML = `
+    <div class="rebuttal-meta">
+      <span class="rebuttal-chip">Total: ${rb.total_issues} issues</span>
+      <span class="rebuttal-chip" style="color:${severity_color.CRITICAL}">${rb.critical_count} CRITICAL</span>
+      <span class="rebuttal-chip" style="color:${severity_color.HIGH}">${rb.high_count} HIGH</span>
+      <span class="rebuttal-chip">Style: ${rb.style.toUpperCase()}</span>
+      <span class="rebuttal-chip">Coverage: ${(rb.rebuttal_coverage * 100).toFixed(0)}%</span>
+    </div>`;
+  rebuttalSummary.classList.remove('hidden');
 
-async function runDownload(fd, format) {
-  setProgress(`Generating ${format.toUpperCase()} report...`, 40);
-  const res = await fetch(`${API}/critique/download`, { method: 'POST', body: fd });
-  if (!res.ok) {
-    const err = await res.json().catch(() => ({}));
-    throw new Error(err.detail || `Server error ${res.status}`);
-  }
-  setProgress('Download ready!', 100);
-  const blob = await res.blob();
-  const url  = URL.createObjectURL(blob);
-  const a    = document.createElement('a');
-  a.href     = url;
-  a.download = `sciexp_critique.${format}`;
-  a.click();
-  URL.revokeObjectURL(url);
-  showUpload();
-}
-
-// ── Render report (preview mode) ─────────────────────────────────────────────
-function renderReport(r) {
-  hideAll();
-  resultPanel.classList.remove('hidden');
-
-  // Meta line
-  resultMeta.innerHTML = `
-    <strong>Template:</strong> ${r.experiment_class || '—'} &nbsp;|&nbsp;
-    <strong>Omega:</strong> ${r.omega_score.toFixed(4)} &nbsp;|&nbsp;
-    <strong>Round:</strong> ${r.round_number} &nbsp;|&nbsp;
-    <strong>Not-Traceable:</strong> ${r.not_traceable_count} &nbsp;
-    <strong>Partial:</strong> ${r.partially_traceable_count}
-  `;
-
-  // Download buttons
-  downloadGroup.innerHTML = ['md','docx','pdf'].map(fmt =>
-    `<button class="btn-download" data-format="${fmt}">↓ ${fmt.toUpperCase()}</button>`
-  ).join('');
-  downloadGroup.querySelectorAll('.btn-download').forEach(btn => {
-    btn.addEventListener('click', () => reDownload(btn.dataset.format));
-  });
-
-  // PRECHECK badge
-  const mode = r.precheck.mode;
-  const badgeClass = { FULL:'badge-full', PARTIAL:'badge-partial', LIMITED:'badge-limited', BLOCKED:'badge-blocked' }[mode] || 'badge-partial';
-  const missing = r.precheck.missing_artifacts.length ? ` — Missing: ${r.precheck.missing_artifacts.join(', ')}` : '';
-  precheckRow.innerHTML = `<span class="precheck-badge ${badgeClass}">${r.precheck.line1}${missing}</span>`;
-
-  // Steps
-  stepsContainer.innerHTML = '';
-  const stepNames = { '0':'Experiment Class', '1':'Claim Integrity (40%)', '2':'Traceability Audit (30%)',
-                      '3':'Series Continuity (20%)', '4':'Publication Readiness (10%)', '5':'Priority Fix' };
-  r.steps.forEach(step => {
-    const card  = document.createElement('div');
-    card.className = 'step-card';
-    card.innerHTML = `
-      <div class="step-header" onclick="this.nextElementSibling.classList.toggle('hidden')">
-        <span class="step-title">STEP ${step.step_id} — ${stepNames[step.step_id] || ''}</span>
-        <span class="step-weight">${step.weight > 0 ? (step.weight*100)+'%' : ''}</span>
+  rebuttalItems.innerHTML = rb.items.map(item => `
+    <div class="rebuttal-item severity-${item.severity.toLowerCase()}">
+      <div class="ri-header">
+        <span class="ri-id">${escHtml(item.issue_id)}</span>
+        <span class="ri-severity" style="color:${severity_color[item.severity] || '#888'}">${item.severity}</span>
+        <span class="ri-cat">${escHtml(item.category)}</span>
+        ${item.addressed ? '<span class="ri-addressed">Addressed</span>' : ''}
       </div>
-      <div class="step-body ${step.step_id !== '1' ? 'hidden' : ''}">
-        <p class="step-prose">${escHtml(step.prose)}</p>
-        ${step.findings.length ? `
-          <ul class="findings-list">
-            ${step.findings.map(f => `
-              <li class="finding-item tc-${f.traceability.replace(/ /g,'-')}">
-                <b>[${f.code}]</b> ${escHtml(f.description)}
-                ${f.verbatim_quote ? `<em> — "${escHtml(f.verbatim_quote)}"</em>` : ''}
-              </li>
-            `).join('')}
-          </ul>
-        ` : ''}
-      </div>
-    `;
-    stepsContainer.appendChild(card);
-  });
+      <div class="ri-reviewer"><strong>Reviewer:</strong> ${escHtml(item.reviewer_text)}</div>
+      <details class="ri-response">
+        <summary>Author Response Template</summary>
+        <pre>${escHtml(item.author_response_template)}</pre>
+      </details>
+    </div>`).join('');
 
-  // Priority Fix
-  priorityBox.innerHTML = `
-    <div class="priority-label">[!] PRIORITY FIX</div>
-    <div>${escHtml(r.priority_fix)}</div>
-    ${r.next_liability ? `<div class="next-liability">Next Liability: ${escHtml(r.next_liability)}</div>` : ''}
-  `;
+  rebuttalActions.classList.remove('hidden');
 }
 
-async function reDownload(format) {
-  if (!selectedFile) return;
-  const fd = new FormData();
-  fd.append('file', selectedFile);
-  fd.append('template', templateSel.value);
-  fd.append('round_number', parseInt(roundInput.value) || 1);
-  fd.append('format', format);
+downloadLetterBtn.addEventListener('click', async () => {
+  if (!lastReport) return;
+  const style  = $('rebuttalStyle').value;
+
+  downloadLetterBtn.disabled = true;
+  downloadLetterBtn.textContent = 'Rendering...';
   try {
-    const res = await fetch(`${API}/critique/download`, { method: 'POST', body: fd });
+    const res = await fetch(`${API}/response-letter`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ report_text: lastReport._source_text || '', style }),
+    });
     if (!res.ok) throw new Error(`Server error ${res.status}`);
-    const blob = await res.blob();
-    const url  = URL.createObjectURL(blob);
-    const a    = document.createElement('a');
-    a.href = url; a.download = `sciexp_critique.${format}`; a.click();
-    URL.revokeObjectURL(url);
-  } catch (e) { alert('Download failed: ' + e.message); }
+    const data = await res.json();
+    const blob = new Blob([data.markdown], { type: 'text/markdown' });
+    triggerDownload(blob, `response_letter_${style}.md`);
+  } catch (e) {
+    alert('Letter render error: ' + e.message);
+  } finally {
+    downloadLetterBtn.disabled = false;
+    downloadLetterBtn.textContent = 'Download Response Letter';
+  }
+});
+
+// ── Journal tab ───────────────────────────────────────────────────────────────
+const journalRunBtn  = $('journalRunBtn');
+const journalResult  = $('journalResult');
+
+journalRunBtn.addEventListener('click', async () => {
+  if (!lastReport) { alert('Run a critique first.'); return; }
+  const journal = $('journalSelect').value;
+  const domain  = domainSelect ? domainSelect.value : 'biomedical';
+
+  journalRunBtn.disabled = true;
+  journalRunBtn.textContent = 'Scoring...';
+
+  try {
+    const res = await fetch(`${API}/journal-score`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ report_text: lastReport._source_text || '', journal, domain }),
+    });
+    if (!res.ok) {
+      const err = await res.json().catch(() => ({}));
+      throw new Error(err.detail || `Server error ${res.status}`);
+    }
+    const data = await res.json();
+    renderJournalScore(data);
+  } catch (e) {
+    alert('Journal score error: ' + e.message);
+  } finally {
+    journalRunBtn.disabled = false;
+    journalRunBtn.textContent = 'Score Against Journal';
+  }
+});
+
+function renderJournalScore(js) {
+  const verdictColor = { ACCEPT: '#22c55e', REVISE: '#f59e0b', REJECT: '#ef4444' };
+  const color = verdictColor[js.verdict] || '#888';
+  journalResult.innerHTML = `
+    <div class="js-hero" style="border-left:4px solid ${color}">
+      <div class="js-verdict" style="color:${color}">${js.verdict}</div>
+      <div class="js-journal">${escHtml(js.journal_name)}</div>
+      <div class="js-omegas">
+        <span>Raw Omega: <strong>${js.raw_omega.toFixed(4)}</strong></span>
+        <span>Calibrated Omega: <strong>${js.calibrated_omega.toFixed(4)}</strong></span>
+        <span>Delta Omega: <strong>${js.omega_delta >= 0 ? '+' : ''}${js.omega_delta.toFixed(4)}</strong></span>
+      </div>
+      <div class="js-thresholds">
+        Accept >= ${js.accept_threshold.toFixed(2)} | Revise >= ${js.revise_threshold.toFixed(2)}
+      </div>
+    </div>
+    <div class="js-steps">
+      ${Object.entries(js.step_contributions).map(([sid, sc]) => `
+        <div class="js-step-row">
+          <span class="js-step-id">STEP ${sid}</span>
+          <span class="js-step-vals">raw ${sc.raw.toFixed(3)} x ${sc.multiplier.toFixed(2)} = <strong>${sc.weighted.toFixed(3)}</strong></span>
+        </div>`).join('')}
+    </div>`;
+  journalResult.classList.remove('hidden');
 }
 
-// ── UI helpers ────────────────────────────────────────────────────────────────
-document.getElementById('newAnalysisBtn').addEventListener('click', showUpload);
-document.getElementById('errorRetryBtn').addEventListener('click', showUpload);
+// ── Peer Review Simulation tab ────────────────────────────────────────────────
+const reviewSimRunBtn  = $('reviewSimRunBtn');
+const reviewSimResult  = $('reviewSimResult');
 
-function showUpload() { hideAll(); uploadPanel.classList.remove('hidden'); clearSelection(); }
-function hideAll() {
-  [uploadPanel, progressPanel, resultPanel, errorPanel].forEach(p => p.classList.add('hidden'));
+reviewSimRunBtn.addEventListener('click', async () => {
+  if (!lastReport) { alert('Run a critique first.'); return; }
+  const reviewers = parseInt($('reviewerCount').value) || 3;
+
+  reviewSimRunBtn.disabled = true;
+  reviewSimRunBtn.textContent = 'Simulating...';
+
+  try {
+    const res = await fetch(`${API}/review-sim`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ report_text: lastReport._source_text || '', reviewers }),
+    });
+    if (!res.ok) {
+      const err = await res.json().catch(() => ({}));
+      throw new Error(err.detail || `Server error ${res.status}`);
+    }
+    const data = await res.json();
+    renderReviewSim(data);
+  } catch (e) {
+    alert('Review sim error: ' + e.message);
+  } finally {
+    reviewSimRunBtn.disabled = false;
+    reviewSimRunBtn.textContent = 'Run Peer Review Simulation';
+  }
+});
+
+function renderReviewSim(rs) {
+  const recColor = { ACCEPT: '#22c55e', REVISE: '#f59e0b', REJECT: '#ef4444' };
+  const finalColor = recColor[rs.final_recommendation] || '#888';
+
+  const reviewerRows = rs.per_reviewer.map(r => `
+    <div class="rs-reviewer">
+      <span class="rs-persona">${r.persona}</span>
+      <span class="rs-omega">Omega ${r.calibrated_omega.toFixed(4)}</span>
+      <span class="rs-rec" style="color:${recColor[r.recommendation] || '#888'}">${r.recommendation}</span>
+    </div>`).join('');
+
+  reviewSimResult.innerHTML = `
+    <div class="rs-final" style="border-left:4px solid ${finalColor}">
+      <span class="rs-verdict" style="color:${finalColor}">${rs.final_recommendation}</span>
+      <span class="rs-omega-final">Final Omega: <strong>${rs.final_omega.toFixed(4)}</strong></span>
+      <span class="rs-consensus ${rs.consensus.reached ? 'reached' : 'no-consensus'}">
+        ${rs.consensus.reached ? 'Consensus' : 'No consensus'} - spread ${rs.consensus.spread.toFixed(3)}
+      </span>
+    </div>
+    <div class="rs-reviewers">${reviewerRows}</div>
+    ${rs.dr3.conflict_detected ? `
+    <div class="rs-dr3">
+      <strong>DR3 Resolution:</strong> ${escHtml(rs.dr3.resolution_note)}
+      (tiebreaker: ${rs.dr3.tiebreaker_persona})
+    </div>` : ''}`;
+  reviewSimResult.classList.remove('hidden');
 }
-function showProgress(label, pct) {
-  hideAll();
-  progressPanel.classList.remove('hidden');
-  progressLabel.textContent = label;
-  progressBar.style.width = pct + '%';
+
+// ── Hybrid omega display ──────────────────────────────────────────────────────
+function maybeRenderHybridOmega(r) {
+  if (!r.hybrid_omega && !r.logos_omega) return;
+  const chip = document.createElement('div');
+  chip.className = 'score-card';
+  chip.innerHTML = `
+    <div class="score-card-title">Hybrid Omega</div>
+    <div class="score-dims">
+      ${r.logos_omega != null ? `<span class="dim-chip">LOGOS: ${r.logos_omega.toFixed(4)}</span>` : ''}
+      ${r.hybrid_omega != null ? `<span class="dim-chip pass">Hybrid: ${r.hybrid_omega.toFixed(4)}</span>` : ''}
+    </div>`;
+  scoreGrid.appendChild(chip);
 }
-function setProgress(label, pct) {
-  progressLabel.textContent = label;
-  progressBar.style.width = pct + '%';
-}
-function showError(msg) {
-  hideAll();
-  errorPanel.classList.remove('hidden');
-  errorMsg.textContent = 'Error: ' + msg;
-}
-function escHtml(s) {
-  return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+
+// ── renderReport wrapper ──────────────────────────────────────────────────────
+function renderReport(r) {
+  if (!r._source_text && lastReport && lastReport._source_text) {
+    r._source_text = lastReport._source_text;
+  }
+  renderReportFull(r);
+  maybeRenderHybridOmega(r);
 }

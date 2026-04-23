@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>VERITAS v2.2 — AI Critique Engine</title>
+  <title>VERITAS v3.4.1 — AI Critique Engine</title>
   <link rel="stylesheet" href="/static/style.css" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" />
@@ -18,7 +18,7 @@
           <span class="logo-emoji">🔬</span>
           <div class="logo-text-group">
             <span class="logo-name">VERITAS</span>
-            <span class="logo-version">v2.2</span>
+            <span class="logo-version">v3.4.1</span>
           </div>
         </div>
         <p class="tagline">AI Critique · Experimental Report Analysis Framework</p>
@@ -81,6 +81,14 @@
             <option value="tex">🔤 LaTeX (.tex)</option>
           </select>
         </div>
+        <div class="option-group">
+          <label for="domainSelect">🧬 IRF Domain</label>
+          <select id="domainSelect">
+            <option value="biomedical">Biomedical (default)</option>
+            <option value="cs">CS / Software Engineering</option>
+            <option value="math">Formal Mathematics</option>
+          </select>
+        </div>
       </div>
 
       <button class="btn-primary" id="submitBtn" disabled>
@@ -131,6 +139,7 @@
         <button class="rtab active" data-tab="critique">🔬 Critique</button>
         <button class="rtab" data-tab="rebuttal">✍️ Rebuttal</button>
         <button class="rtab" data-tab="journal">📊 Journal</button>
+        <button class="rtab" data-tab="peer-review">👥 Peer Review</button>
       </div>
 
       <!-- ── Critique tab ─────────────────────────────────────────────── -->
@@ -207,6 +216,19 @@
         <div class="journal-result hidden" id="journalResult"></div>
       </div><!-- /rtab-journal -->
 
+      <!-- ── Peer Review tab ──────────────────────────────────────────── -->
+      <div class="rtab-pane hidden" id="rtab-peer-review">
+        <div class="review-sim-controls">
+          <label for="reviewerCount">👥 Reviewer Personas</label>
+          <select id="reviewerCount">
+            <option value="3">3 Personas (Strict / Balanced / Lenient)</option>
+            <option value="2">2 Personas (Strict / Balanced)</option>
+          </select>
+          <button class="btn-primary small" id="reviewSimRunBtn">Run Peer Review Simulation</button>
+        </div>
+        <div class="review-sim-result hidden" id="reviewSimResult"></div>
+      </div><!-- /rtab-peer-review -->
+
     </section>
 
     <!-- ── Error Panel ───────────────────────────────────────────────────── -->
@@ -225,7 +247,7 @@
 
   <footer class="app-footer">
     <div class="footer-inner">
-      <span class="footer-brand">🔬 VERITAS v2.2 · Flamehaven Sovereign Stack</span>
+      <span class="footer-brand">🔬 VERITAS v3.4.1 · Flamehaven Sovereign Stack</span>
       <div class="footer-links">
         <a href="/docs" target="_blank">📄 API</a>
         <a href="https://github.com/flamehaven01/Flamehaven-Veritas" target="_blank">🐙 Source</a>
