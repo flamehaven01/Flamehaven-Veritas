@@ -48,12 +48,16 @@ class LogosBridge:
     Priority:
       1. Flamehaven-LOGOS IRFPipeline (requires numpy + local install)
       2. IRFAnalyzer (offline heuristic — always available)
+
+    Pass ``domain`` to select marker vocabulary for IRF-6D scoring.
+    Built-in keys: ``"biomedical"`` (default), ``"cs"``, ``"math"``.
     """
 
-    def __init__(self) -> None:
+    def __init__(self, domain: str = "biomedical") -> None:
+        self._domain = domain
         self._pipeline: Any | None = None
         self._try_load_pipeline()
-        self._local = IRFAnalyzer()
+        self._local = IRFAnalyzer(domain=domain)
 
     def _try_load_pipeline(self) -> None:
         try:
@@ -69,14 +73,17 @@ class LogosBridge:
     def source(self) -> str:
         return "logos_irf_pipeline" if self._pipeline is not None else "local"
 
-    def analyze(self, text: str, central_claim: str | None = None) -> IRF6DScores:
+    def analyze(self, text: str, central_claim: str | None = None, domain_override: str | None = None) -> IRF6DScores:
         """Return IRF6DScores using best available backend.
 
         Args:
-            text:          Full report text for context extraction.
-            central_claim: Primary claim or hypothesis text (used as query).
+            text:            Full report text for context extraction.
+            central_claim:   Primary claim or hypothesis text (used as query).
+            domain_override: Temporarily use a different domain for this call.
         """
         query = central_claim or (text[:200] if text else "experimental report")
+        if domain_override is not None and domain_override != self._domain:
+            return IRFAnalyzer(domain=domain_override).score(text, source="local")
         if self._pipeline is not None:
             return self._run_pipeline(query, text)
         return self._local.score(text, source="local")

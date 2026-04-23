@@ -37,8 +37,9 @@ class SciExpCritiqueEngine:
         report = engine.critique(report_text, doc_context=context_chunks)
     """
 
-    def __init__(self, rag_retriever=None) -> None:
+    def __init__(self, rag_retriever=None, domain: str = "biomedical") -> None:
         self._rag = rag_retriever
+        self._domain = domain
         self._logos = _try_init_component(".logos.logos_bridge", "LogosBridge")
         self._fusion = _try_init_component(".logos.omega_fusion", "OmegaFusion")
         self._method_det = _try_init_component(".paper.methodology_detector", "MethodologyDetector")
@@ -249,7 +250,7 @@ class SciExpCritiqueEngine:
             if self._logos is not None:
                 from .logos.irf_analyzer import IRFAnalyzer
 
-                _irf = IRFAnalyzer()
+                _irf = IRFAnalyzer(domain=self._domain)
                 irf_scores = _irf.score(text, stat_validity=stat_validity)
 
             # Methodology detection

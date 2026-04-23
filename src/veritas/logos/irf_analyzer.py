@@ -13,115 +13,57 @@ Dimensions (all in [0.0, 1.0]):
   P  Paradigm         — reference / prior-work alignment
 
 composite = epsilon-smoothed geometric mean; threshold 0.65
+
+v3.4: IRFAnalyzer is domain-aware.  Pass ``domain="cs"`` or ``domain="math"``
+to use domain-specific marker banks.  Default (``"biomedical"``) preserves
+all prior scoring behaviour exactly.
 """
 
 from __future__ import annotations
 
 import math
 import re
+from typing import Union
 
 from ..types import IRF6DScores, StatValidity
 
-# Passing thresholds
+# Passing thresholds (kept for backward compat — actual values come from ruleset)
 COMPOSITE_THRESHOLD: float = 0.65
 COMPONENT_MIN: float = 0.30
 
-# Pattern banks (lower-cased; matched against lower-cased text)
+# Legacy module-level marker banks — preserved for backward compat.
+# The canonical source is now veritas.logos.domain.biomedical.BIOMEDICAL.
 _M_MARKERS = [
-    "limitation",
-    "uncertain",
-    "assumption",
-    "caveat",
-    "unknown",
-    "unclear",
-    "may ",
-    "might ",
-    "possibly",
-    "open question",
-    "not yet confirmed",
-    "incomplete",
-    "pending",
-    "cannot confirm",
+    "limitation", "uncertain", "assumption", "caveat", "unknown", "unclear",
+    "may ", "might ", "possibly", "open question", "not yet confirmed",
+    "incomplete", "pending", "cannot confirm",
 ]
 _A_MARKERS = [
-    "hypothesis",
-    "rationale",
-    "expected",
-    "theoretical",
-    "premise",
-    "research question",
-    "we propose",
-    "based on",
-    "prior work",
-    "background",
-    "motivated by",
-    "our assumption",
+    "hypothesis", "rationale", "expected", "theoretical", "premise",
+    "research question", "we propose", "based on", "prior work", "background",
+    "motivated by", "our assumption",
 ]
 _D_MARKERS = [
-    "therefore",
-    "hence",
-    "thus",
-    "consequently",
-    "it follows",
-    "implies",
-    "conclude",
-    "shows that",
-    "demonstrates",
-    "establishes",
-    "proving",
-    "proof",
+    "therefore", "hence", "thus", "consequently", "it follows", "implies",
+    "conclude", "shows that", "demonstrates", "establishes", "proving", "proof",
 ]
 _I_MARKERS = [
-    "result",
-    "data",
-    "measure",
-    "observ",
-    "collect",
-    "n=",
-    "sample",
-    "trial",
-    "iteration",
-    "recorded",
-    "experiment",
-    "test ",
-    "run ",
-    "epoch",
+    "result", "data", "measure", "observ", "collect", "n=", "sample", "trial",
+    "iteration", "recorded", "experiment", "test ", "run ", "epoch",
 ]
 _F_MARKERS = [
-    "reproducib",
-    "replicate",
-    "protocol",
-    "control",
-    "null ",
-    "p-value",
-    "p value",
-    "confidence interval",
-    "blind",
-    "randomiz",
-    "falsif",
-    "method",
-    "step-by-step",
-    "procedure",
+    "reproducib", "replicate", "protocol", "control", "null ", "p-value",
+    "p value", "confidence interval", "blind", "randomiz", "falsif", "method",
+    "step-by-step", "procedure",
 ]
 _P_MARKERS = [
-    "reference",
-    "doi:",
-    "doi.org",
-    "et al",
-    "cite",
-    "cited",
-    "prior cycle",
-    "baseline",
-    "previous version",
-    "v1.",
-    "v2.",
-    "v3.",
-    "prior experiment",
-    "earlier work",
+    "reference", "doi:", "doi.org", "et al", "cite", "cited", "prior cycle",
+    "baseline", "previous version", "v1.", "v2.", "v3.",
+    "prior experiment", "earlier work",
 ]
 
 
-def _marker_density(text: str, markers: list[str], saturate_at: int = 5) -> float:
+def _marker_density(text: str, markers: "list[str] | tuple[str, ...]", saturate_at: int = 5) -> float:
     """Count distinct marker hits; saturate at *saturate_at* → 1.0."""
     hits = sum(1 for m in markers if m in text)
     return min(hits / saturate_at, 1.0)
@@ -145,10 +87,40 @@ class IRFAnalyzer:
 
     Usage::
 
-        analyzer = IRFAnalyzer()
+        analyzer = IRFAnalyzer()                  # biomedical (default)
+        analyzer = IRFAnalyzer(domain="cs")       # CS/software engineering
+        analyzer = IRFAnalyzer(domain="math")     # formal mathematics
         scores = analyzer.score(text)
         print(scores.composite, scores.passed)
+
+    *domain* may be a registered key string (``"biomedical"``, ``"cs"``,
+    ``"math"``), a :class:`DomainRuleset` instance, or ``None`` (defaults
+    to ``"biomedical"``).  All prior callers using ``IRFAnalyzer()`` are
+    fully backward-compatible.
     """
+
+    def __init__(
+        self,
+        domain: "str | DomainRuleset | None" = None,
+    ) -> None:
+        self.ruleset = self._resolve_ruleset(domain)
+
+    @staticmethod
+    def _resolve_ruleset(domain) -> "DomainRuleset":
+        from .domain.base import DomainRuleset as _DR
+        from .domain.registry import get_domain as _get
+
+        if domain is None or domain == "biomedical":
+            # Fast path: avoid registry import for default domain
+            from .domain.biomedical import BIOMEDICAL
+            return BIOMEDICAL
+        if isinstance(domain, _DR):
+            return domain
+        if isinstance(domain, str):
+            return _get(domain)
+        raise TypeError(
+            f"domain must be str, DomainRuleset, or None; got {type(domain).__name__}"
+        )
 
     def score(
         self,
@@ -169,8 +141,9 @@ class IRFAnalyzer:
         F = self._score_F(t, stat_validity)
         P = self._score_P(t)
         composite = self._geometric_mean([M, A, D, I, F, P])
-        passed = composite >= COMPOSITE_THRESHOLD and all(
-            v >= COMPONENT_MIN for v in [M, A, D, I, F, P]
+        rs = self.ruleset
+        passed = composite >= rs.composite_threshold and all(
+            v >= rs.component_min for v in [M, A, D, I, F, P]
         )
         return IRF6DScores(
             M=round(M, 4),
@@ -190,19 +163,19 @@ class IRFAnalyzer:
 
     def _score_M(self, t: str) -> float:
         """Methodic Doubt — uncertainty acknowledgment & premise clarity."""
-        return _marker_density(t, _M_MARKERS, 4)
+        return _marker_density(t, self.ruleset.m_markers, self.ruleset.saturation("M"))
 
     def _score_A(self, t: str) -> float:
         """Axiom — foundational grounding & hypothesis quality."""
-        return _marker_density(t, _A_MARKERS, 4)
+        return _marker_density(t, self.ruleset.a_markers, self.ruleset.saturation("A"))
 
     def _score_D(self, t: str) -> float:
         """Deduction — logical rigor & inference chain."""
-        return _marker_density(t, _D_MARKERS, 4)
+        return _marker_density(t, self.ruleset.d_markers, self.ruleset.saturation("D"))
 
     def _score_I(self, t: str) -> float:
         """Induction — empirical support combined with numeric density."""
-        marker_score = _marker_density(t, _I_MARKERS, 5)
+        marker_score = _marker_density(t, self.ruleset.i_markers, self.ruleset.saturation("I"))
         numeric_score = _numeric_density(t)
         return min(1.0, 0.65 * marker_score + 0.35 * numeric_score)
 
@@ -214,14 +187,14 @@ class IRFAnalyzer:
         When stat_validity is available (v3.3+):
           F = 0.6 * keyword_density + 0.4 * stat_validity.score
         """
-        kw = _marker_density(t, _F_MARKERS, 5)
+        kw = _marker_density(t, self.ruleset.f_markers, self.ruleset.saturation("F"))
         if stat_validity is not None:
             return min(1.0, 0.6 * kw + 0.4 * stat_validity.score)
         return kw
 
     def _score_P(self, t: str) -> float:
         """Paradigm — reference / prior-work alignment."""
-        return _marker_density(t, _P_MARKERS, 4)
+        return _marker_density(t, self.ruleset.p_markers, self.ruleset.saturation("P"))
 
     # ------------------------------------------------------------------ #
     #  Utility                                                             #
