@@ -76,6 +76,8 @@ reproducibility assessment.
 
 ## Workflow
 
+### 7-Phase Critique Pipeline
+
 ```mermaid
 flowchart TD
     A([Document Input<br/>PDF / DOCX / MD / TXT]) --> B[PRECHECK<br/>Artifact Sufficiency Gate]
@@ -106,9 +108,7 @@ flowchart TD
     O --> T[MICA JSON<br/>Skill / Agent Pipeline]
 ```
 
----
-
-## Academic Submission Loop (v3.3+)
+### Academic Submission Loop (v3.3+)
 
 VERITAS is the only tool that covers the complete author workflow from first submission to final acceptance:
 
@@ -451,6 +451,118 @@ Conflicting artifacts are resolved by rank:
 
 ---
 
+## Submission Loop — Features
+
+### Peer Review Simulation (v3.2+)
+
+Simulate a 3-member editorial panel, each applying a different calibration stance:
+
+| Persona | CalibrationGate | Bias |
+|---|---|---|
+| `strict` | Omega ≥ 0.85 | Conservative; penalises M/D/F deficits × 1.4 |
+| `balanced` | Omega ≥ 0.78 | Neutral; uniform weighting across 6 IRF dimensions |
+| `lenient` | Omega ≥ 0.70 | Liberal; M/D/F penalties reduced to × 0.85 |
+
+**Algorithm:**
+1. Run the full `SciExpCritiqueEngine` once → base IRF-6D scores  
+2. Per persona: apply weighted `calibrate_omega(irf, weights)` → persona Omega  
+3. `CrossValidator.check_consensus()` — consensus reached when spread ≤ 0.30  
+4. If `consensus_omega < 0.60` → `DR3Protocol.resolve()` applies 0.90 penalty factor  
+5. Final recommendation: ACCEPT ≥ 0.78 / REVISE ≥ 0.60 / REJECT < 0.60
+
+```bash
+# CLI — outputs per-reviewer + consensus table + final recommendation
+veritas review-sim report.pdf
+veritas review-sim report.pdf --reviewers 3 --format md --output peer_review.md
+
+# REST API
+curl -X POST http://localhost:8400/api/v1/review-sim \
+  -H "Content-Type: application/json" \
+  -d '{"report_text": "...", "num_reviewers": 3}'
+```
+
+---
+
+### Rebuttal Engine (v3.3+)
+
+Generate a structured author rebuttal directly from a critique report:
+
+```bash
+# CLI
+veritas rebuttal report.pdf --style ieee
+veritas rebuttal report.pdf --style nature --render-letter --output response_letter.md
+
+# REST API
+curl -X POST http://localhost:8400/api/v1/rebuttal \
+  -H "Content-Type: application/json" \
+  -d '{"report_text": "...", "style": "ieee"}'
+```
+
+Each `RebuttalItem` carries:
+
+| Field | Description |
+|---|---|
+| `issue_id` | `R-{step_id}.{finding_index}` (e.g. `R-1.2`) |
+| `severity` | `CRITICAL` / `HIGH` / `MEDIUM` / `LOW` |
+| `category` | `REPRODUCIBILITY` / `METHODOLOGY` / `STATISTICS` / `CLARITY` |
+| `reviewer_text` | Original finding text from critique |
+| `author_response_template` | Pre-filled response scaffold |
+
+#### Response Letter Renderer
+
+Converts a `RebuttalReport` into a formal point-by-point response letter:
+
+| Style | Format | Target |
+|---|---|---|
+| `ieee` | "Author Response to Reviewer Comments" | IEEE Transactions / Letters |
+| `acm` | "Response to Reviewer Comments" | ACM journals / conferences |
+| `nature` | "Point-by-Point Response to Referees" | Nature Portfolio journals |
+
+```bash
+# Render and save letter
+veritas rebuttal report.pdf --style ieee --render-letter --output letter.md
+
+# API
+curl -X POST http://localhost:8400/api/v1/response-letter \
+  -H "Content-Type: application/json" \
+  -d '{"report_text": "...", "style": "acm"}'
+```
+
+---
+
+### Journal Profiles + Calibrated Scoring (v3.3+)
+
+Score a report against a target journal's acceptance criteria:
+
+```bash
+# CLI
+veritas critique report.pdf --journal nature
+veritas journal-profiles      # show all profiles
+
+# REST API
+curl -X POST http://localhost:8400/api/v1/journal-score \
+  -H "Content-Type: application/json" \
+  -d '{"report_text": "...", "journal": "ieee"}'
+```
+
+**Calibrated Omega formula:** `Σ(q_i × m_i × w_i) / Σ(m_i × w_i)` where `q_i` = step quality, `m_i` = journal multiplier, `w_i` = step weight.
+
+**7 built-in journal profiles:**
+
+| Key | Accept threshold (Ω) | Notes |
+|---|---|---|
+| `nature` | ≥ 0.92 | Methods × 1.6, Claim × 1.4 |
+| `lancet` | ≥ 0.90 | STATS × 1.5, Reproducibility × 1.5 |
+| `ieee` | ≥ 0.85 | Methods × 1.3, balanced |
+| `q1` | ≥ 0.85 | General Q1 journal profile |
+| `q2` | ≥ 0.78 | General Q2 journal profile |
+| `q3` | ≥ 0.70 | General Q3 journal profile |
+| `default` | ≥ 0.78 | Baseline threshold |
+
+Verdicts: **ACCEPT** / **REVISE** / **REJECT**
+
+---
+
 ## MICA Playbook Mode
 
 The CLI supports **MICA** (Memory Invocation & Context Archive) structured output for
@@ -514,114 +626,6 @@ veritas ui                              # starts Gradio on http://localhost:7860
 
 ---
 
-
-
-Simulate a 3-member editorial panel, each applying a different calibration stance:
-
-| Persona | CalibrationGate | Bias |
-|---|---|---|
-| `strict` | Omega ≥ 0.85 | Conservative; penalises M/D/F deficits × 1.4 |
-| `balanced` | Omega ≥ 0.78 | Neutral; uniform weighting across 6 IRF dimensions |
-| `lenient` | Omega ≥ 0.70 | Liberal; M/D/F penalties reduced to × 0.85 |
-
-**Algorithm:**
-1. Run the full `SciExpCritiqueEngine` once → base IRF-6D scores  
-2. Per persona: apply weighted `calibrate_omega(irf, weights)` → persona Omega  
-3. `CrossValidator.check_consensus()` — consensus reached when spread ≤ 0.30  
-4. If `consensus_omega < 0.60` → `DR3Protocol.resolve()` applies 0.90 penalty factor  
-5. Final recommendation: ACCEPT ≥ 0.78 / REVISE ≥ 0.60 / REJECT < 0.60
-
-```bash
-# CLI — outputs per-reviewer + consensus table + final recommendation
-veritas review-sim report.pdf
-veritas review-sim report.pdf --reviewers 3 --format md --output peer_review.md
-
-# REST API
-curl -X POST http://localhost:8400/api/v1/review-sim \
-  -H "Content-Type: application/json" \
-  -d '{"report_text": "...", "num_reviewers": 3}'
-```
-
----
-
-## Rebuttal Engine (v3.3+)
-
-Generate a structured author rebuttal directly from a critique report:
-
-```bash
-# CLI
-veritas rebuttal report.pdf --style ieee
-veritas rebuttal report.pdf --style nature --render-letter --output response_letter.md
-
-# REST API
-curl -X POST http://localhost:8400/api/v1/rebuttal \
-  -H "Content-Type: application/json" \
-  -d '{"report_text": "...", "style": "ieee"}'
-```
-
-Each `RebuttalItem` carries:
-
-| Field | Description |
-|---|---|
-| `issue_id` | `R-{step_id}.{finding_index}` (e.g. `R-1.2`) |
-| `severity` | `CRITICAL` / `HIGH` / `MEDIUM` / `LOW` |
-| `category` | `REPRODUCIBILITY` / `METHODOLOGY` / `STATISTICS` / `CLARITY` |
-| `reviewer_text` | Original finding text from critique |
-| `author_response_template` | Pre-filled response scaffold |
-
-### Response Letter Renderer
-
-Converts a `RebuttalReport` into a formal point-by-point response letter:
-
-| Style | Format | Target |
-|---|---|---|
-| `ieee` | "Author Response to Reviewer Comments" | IEEE Transactions / Letters |
-| `acm` | "Response to Reviewer Comments" | ACM journals / conferences |
-| `nature` | "Point-by-Point Response to Referees" | Nature Portfolio journals |
-
-```bash
-# Render and save letter
-veritas rebuttal report.pdf --style ieee --render-letter --output letter.md
-
-# API
-curl -X POST http://localhost:8400/api/v1/response-letter \
-  -H "Content-Type: application/json" \
-  -d '{"report_text": "...", "style": "acm"}'
-```
-
----
-
-## Journal Profiles + Calibrated Scoring (v3.3+)
-
-Score a report against a target journal's acceptance criteria:
-
-```bash
-# CLI
-veritas critique report.pdf --journal nature
-veritas journal-profiles      # show all profiles
-
-# REST API
-curl -X POST http://localhost:8400/api/v1/journal-score \
-  -H "Content-Type: application/json" \
-  -d '{"report_text": "...", "journal": "ieee"}'
-```
-
-**Calibrated Omega formula:** `Σ(q_i × m_i × w_i) / Σ(m_i × w_i)` where `q_i` = step quality, `m_i` = journal multiplier, `w_i` = step weight.
-
-**7 built-in journal profiles:**
-
-| Key | Accept threshold (Ω) | Notes |
-|---|---|---|
-| `nature` | ≥ 0.92 | Methods × 1.6, Claim × 1.4 |
-| `lancet` | ≥ 0.90 | STATS × 1.5, Reproducibility × 1.5 |
-| `ieee` | ≥ 0.85 | Methods × 1.3, balanced |
-| `q1` | ≥ 0.85 | General Q1 journal profile |
-| `q2` | ≥ 0.78 | General Q2 journal profile |
-| `q3` | ≥ 0.70 | General Q3 journal profile |
-| `default` | ≥ 0.78 | Baseline threshold |
-
-Verdicts: **ACCEPT** / **REVISE** / **REJECT**
-
 ---
 
 ## Development
@@ -636,9 +640,7 @@ ruff check src tests            # lint
 mypy src                        # type check
 ```
 
----
-
-## CI/CD Pipeline
+### CI/CD Pipeline
 
 ```mermaid
 flowchart TD
