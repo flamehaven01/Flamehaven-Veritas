@@ -1,4 +1,4 @@
-﻿/* VERITAS v2.2 — Frontend App Logic */
+﻿/* VERITAS v3.4.2 — Frontend App Logic */
 
 const API = '/api/v1';
 
@@ -80,6 +80,13 @@ function setFile(f) {
   fileInfo.classList.remove('hidden');
   dropZone.classList.add('hidden');
   submitBtn.disabled = false;
+
+  // Warn: binary files can't be forwarded to rebuttal/journal/review-sim tabs
+  const binaryExts = ['pdf', 'docx', 'doc'];
+  const binaryWarning = document.getElementById('binaryFileWarning');
+  if (binaryWarning) {
+    binaryWarning.classList.toggle('hidden', !binaryExts.includes(ext));
+  }
 }
 
 function clearSelection() {
@@ -390,11 +397,13 @@ async function reDownload(format) {
     triggerDownload(blob, 'veritas_critique.md');
     return;
   }
+  const domain = $('domainSelect') ? $('domainSelect').value : 'biomedical';
   const fd = new FormData();
   fd.append('file', selectedFile);
   fd.append('template', templateSel.value);
   fd.append('round_number', parseInt(roundInput.value) || 1);
   fd.append('format', format);
+  fd.append('domain', domain);
   try {
     const res = await fetch(`${API}/critique/download`, { method: 'POST', body: fd });
     if (!res.ok) throw new Error(`Server error ${res.status}`);

@@ -247,6 +247,7 @@ class DiffResponse(BaseModel):
 
 
 class ResponseLetterRequest(BaseModel):
+    domain: str = Field("biomedical", description="IRF scoring domain: biomedical | cs | math")
     report_text: str = Field(..., description="Raw text of the experimental report")
     style: str = Field("ieee", description="Response letter style: ieee | acm | nature")
     author_name: str = Field("The Authors", description="Author name / signature for closing")

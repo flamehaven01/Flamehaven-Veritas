@@ -7,6 +7,38 @@ Versioning: [Semantic Versioning](https://semver.org/spec/v2.0.0.html)
 
 ---
 
+## [3.4.2] - 2026-04-23
+
+### Added
+- **`frontend/index.html`**: domain selector (`#domainSelect`) dynamically populated
+  from `/api/v1/domains` on page load; static fallback (biomedical/cs/math) when API
+  unavailable. Peer Review Simulation tab (`👥 Peer Review`) added to result tabs.
+  Binary file warning banner shown for PDF/DOCX uploads (text tabs require TXT/MD).
+- **`frontend/app.js`**: Full frontend v3.4.1 feature parity — tab switching, domain
+  forwarding in submit/reDownload/rebuttal/journal calls, Rebuttal/Journal/Peer Review
+  tab handlers wired, `hybrid_omega` chip in score grid, Response Letter download button,
+  `_source_text` capture for text files.
+- **`tests/test_e2e_api.py`**: 46 E2E contract tests covering all endpoints (critique,
+  precheck, review-sim, rebuttal, response-letter, journal-score, diff, journal-profiles,
+  domains, health, version).
+
+### Fixed
+- **API domain coverage** — 6 routes previously used global `_engine` (domain-unaware):
+  `/critique/download`, `/critique/upload`, `/rebuttal-upload`, `/journal-score-upload`,
+  `/response-letter` now accept `domain` parameter and instantiate per-request engines.
+- **`ResponseLetterRequest`** schema: added `domain` field (`default: "biomedical"`).
+- **Domain validation** on `/critique/text` and `/critique/upload` and `/critique/download`:
+  unknown domain key now returns HTTP 400 with `KeyError` message.
+- **`rebuttal-upload` domain validation**: style + domain both validated before engine init.
+- **`app.js` version comment**: `v2.2` → `v3.4.2`.
+
+### Stats
+- Tests: **621 passing** (575 unit + 46 E2E)
+- Coverage: **86.37%** (gate = 80%)
+- ruff: **All checks passed** (0 errors)
+
+---
+
 ## [3.4.1] - 2026-04-23
 
 ### Fixed

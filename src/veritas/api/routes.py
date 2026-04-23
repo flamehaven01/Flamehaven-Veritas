@@ -53,6 +53,12 @@ async def critique_upload(
     domain: str = Form("biomedical"),
 ):
     """Upload a document (PDF, DOCX, DOC, TXT, MD) and receive critique."""
+    from ..logos.domain.registry import get_domain
+    try:
+        get_domain(domain)
+    except KeyError as exc:
+        raise HTTPException(400, str(exc)) from exc
+
     suffix = Path(file.filename or "upload.txt").suffix.lower()
     if suffix not in SUPPORTED:
         raise HTTPException(400, f"Unsupported file type '{suffix}'. Supported: {SUPPORTED}")
@@ -89,8 +95,15 @@ async def critique_download(
     format: str = Form("pdf"),  # pdf | docx | md
     template: str = Form("bmj"),
     round_number: int = Form(1),
+    domain: str = Form("biomedical"),
 ):
     """Upload document → receive downloadable critique report in chosen format."""
+    from ..logos.domain.registry import get_domain
+    try:
+        get_domain(domain)
+    except KeyError as exc:
+        raise HTTPException(400, str(exc)) from exc
+
     suffix = Path(file.filename or "upload.txt").suffix.lower()
     if suffix not in SUPPORTED:
         raise HTTPException(400, f"Unsupported file type '{suffix}'.")
@@ -114,7 +127,7 @@ async def critique_download(
         retriever.index_chunks(chunks)
         ctx = retriever.build_context(text[:500])
 
-        eng = SciExpCritiqueEngine(rag_retriever=retriever)
+        eng = SciExpCritiqueEngine(domain=domain, rag_retriever=retriever)
         report = eng.critique(text, doc_context=ctx, round_number=round_number)
 
         if format == "md":
@@ -199,12 +212,19 @@ async def generate_rebuttal(req: S.RebuttalRequest):
 async def generate_rebuttal_upload(
     file: UploadFile = File(...),  # noqa: B008
     style: str = Form("ieee"),
+    domain: str = Form("biomedical"),
 ):
     """Upload a document → receive structured rebuttal. Convenience alias of /rebuttal."""
+    from ..engine import SciExpCritiqueEngine
+    from ..logos.domain.registry import get_domain
     from ..rebuttal.rebuttal_engine import RebuttalEngine
 
     if style not in ("ieee", "acm", "nature"):
         raise HTTPException(400, "style must be one of: ieee, acm, nature")
+    try:
+        get_domain(domain)
+    except KeyError as exc:
+        raise HTTPException(400, str(exc)) from exc
 
     suffix = Path(file.filename or "upload.txt").suffix.lower()
     if suffix not in SUPPORTED:
@@ -217,7 +237,8 @@ async def generate_rebuttal_upload(
         text = _extract_file_text(tmp_path)
         if not text.strip():
             raise HTTPException(422, "Could not extract text from the uploaded file.")
-        report = _engine.critique(text)
+        eng = SciExpCritiqueEngine(domain=domain)
+        report = eng.critique(text)
     finally:
         tmp_path.unlink(missing_ok=True)
 
@@ -323,9 +344,17 @@ async def journal_score(req: S.JournalScoreRequest):
 async def journal_score_upload(
     file: UploadFile = File(...),  # noqa: B008
     journal: str = Form("default"),
+    domain: str = Form("biomedical"),
 ):
     """Upload a document → journal-calibrated omega + verdict. Convenience alias."""
+    from ..engine import SciExpCritiqueEngine
     from ..journal.journal_scorer import JournalScorer
+    from ..logos.domain.registry import get_domain
+
+    try:
+        get_domain(domain)
+    except KeyError as exc:
+        raise HTTPException(400, str(exc)) from exc
 
     suffix = Path(file.filename or "upload.txt").suffix.lower()
     if suffix not in SUPPORTED:
@@ -338,7 +367,8 @@ async def journal_score_upload(
         text = _extract_file_text(tmp_path)
         if not text.strip():
             raise HTTPException(422, "Could not extract text from the uploaded file.")
-        report = _engine.critique(text)
+        eng = SciExpCritiqueEngine(domain=domain)
+        report = eng.critique(text)
         scorer = JournalScorer()
         result = scorer.score(report, journal=journal)
     except KeyError as exc:
@@ -400,7 +430,15 @@ async def generate_response_letter(req: S.ResponseLetterRequest):
     if req.style not in ("ieee", "acm", "nature"):
         raise HTTPException(400, "style must be one of: ieee, acm, nature")
 
-    report = _engine.critique(req.report_text)
+    from ..engine import SciExpCritiqueEngine
+    from ..logos.domain.registry import get_domain
+    try:
+        get_domain(req.domain)
+    except KeyError as exc:
+        raise HTTPException(400, str(exc)) from exc
+
+    eng = SciExpCritiqueEngine(domain=req.domain)
+    report = eng.critique(req.report_text)
     rb_engine = RebuttalEngine()
     rb_report = rb_engine.generate(report, style=req.style)
 

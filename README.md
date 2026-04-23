@@ -1,4 +1,4 @@
-# VERITAS v3.4.1
+# VERITAS v3.4.2
 ## AI Critique Experimental Report Analysis Framework
 
 [![CI](https://github.com/flamehaven01/Flamehaven-Veritas/actions/workflows/ci.yml/badge.svg)](https://github.com/flamehaven01/Flamehaven-Veritas/actions/workflows/ci.yml)
@@ -12,7 +12,7 @@
 [![SIDRCE](https://img.shields.io/badge/SIDRCE-Omega%200.9978-blue.svg)](#quality)
 
 A **sovereignty-grade** experimental report critique engine.  
-Implements the **VERITAS v3.4.1 protocol** as a fully executable Python package + REST API + CLI.
+Implements the **VERITAS v3.4.2 protocol** as a fully executable Python package + REST API + CLI.
 
 > **VERITAS is the only open framework that closes the full academic submission loop:**  
 > Critique → Rebuttal → Journal Score → Response Letter → Revision Diff  
@@ -28,7 +28,7 @@ Implements the **VERITAS v3.4.1 protocol** as a fully executable Python package 
 > for your target journal (IEEE / ACM / Nature). No RAG tool, no paper summarizer, no LLM chatbot  
 > offers this. It is the only framework that closes the full academic submission cycle.
 
-| | VERITAS v3.4.1 | SciSpace / Elicit | ChatPDF / LLM |
+| | VERITAS v3.4.2 | SciSpace / Elicit | ChatPDF / LLM |
 |---|---|---|---|
 | **Architecture** | CPU-Only · pure Python deterministic pipeline | Large-scale cloud server | Cloud LLM API |
 | **Speed / Resources** | ~0.3–1 s/doc · parallel batch optimized | Server latency (seconds–tens of seconds) | Proportional to token generation |
@@ -781,7 +781,7 @@ See [docs/architecture.md](docs/architecture.md) for detailed component specific
 | **v3.2** ✅ | 2026 Q2 | Peer-review simulation (`veritas review-sim`), 3-persona consensus, DR3 conflict resolution, tabbed Web UI |
 | **v3.3** ✅ | 2026 Q2 | Rebuttal engine, journal-calibrated scoring (7 profiles), response letter renderer (IEEE/ACM/Nature), Rebuttal + Journal Score Web UI tabs |
 | **v3.4** ✅ | 2026 Q2 | Domain plugin architecture — CS/Math/Biomedical IRF scoring, `veritas domains list`, external plugin entry_points, journal `domain_hint` |
-| **v3.4.1** ✅ | 2026 Q2 | Lint/CI hardening — resolve 49 ruff errors (I001, F401, F821, F841, SIM115, UP035/UP037), `TYPE_CHECKING` guard for `DomainRuleset` annotation |
+| **v3.4.2** ✅ | 2026 Q2 | Lint/CI hardening — resolve 49 ruff errors (I001, F401, F821, F841, SIM115, UP035/UP037), `TYPE_CHECKING` guard for `DomainRuleset` annotation |
 
 ---
 
