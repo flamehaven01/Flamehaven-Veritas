@@ -31,7 +31,9 @@ _TMP.mkdir(exist_ok=True)
 @router.post("/critique/text", response_model=S.CritiqueResponse, tags=["critique"])
 async def critique_text(req: S.CritiqueRequest):
     """Submit raw text and receive structured VERITAS."""
-    report = _engine.critique(req.report_text, round_number=req.round_number)
+    from ..engine import SciExpCritiqueEngine
+    eng = SciExpCritiqueEngine(domain=req.domain)
+    report = eng.critique(req.report_text, round_number=req.round_number)
     return _to_response(report)
 
 
@@ -154,12 +156,14 @@ async def generate_rebuttal(req: S.RebuttalRequest):
 
     Runs full critique pipeline then maps findings to point-by-point RebuttalItems.
     """
+    from ..engine import SciExpCritiqueEngine
     from ..rebuttal.rebuttal_engine import RebuttalEngine
 
     if req.style not in ("ieee", "acm", "nature"):
         raise HTTPException(400, "style must be one of: ieee, acm, nature")
 
-    report = _engine.critique(req.report_text)
+    eng = SciExpCritiqueEngine(domain=req.domain)
+    report = eng.critique(req.report_text)
 
     rb_engine = RebuttalEngine()
     rb_report = rb_engine.generate(report, style=req.style)
@@ -246,16 +250,48 @@ async def list_journal_profiles():
     return [S.JournalProfileOut(**profile.as_dict()) for profile in JOURNAL_PROFILES.values()]
 
 
+# ── /domains (v3.4) ───────────────────────────────────────────────────────────
+
+
+@router.get("/domains", response_model=list[S.DomainOut], tags=["domain"])
+async def list_domains():
+    """Return all registered IRF scoring domains (built-in + plugins).
+
+    Built-in domains: biomedical, cs, math.
+    External plugins registered via entry_points group 'veritas.domains' are
+    included automatically when installed.
+    """
+    from ..logos.domain.registry import _registry
+
+    domains = []
+    for rs in _registry:
+        domains.append(
+            S.DomainOut(
+                key=rs.domain_key,
+                name=rs.name,
+                composite_threshold=rs.composite_threshold,
+                component_min=rs.component_min,
+                marker_counts={
+                    dim: len(rs.markers_for(dim))
+                    for dim in ("M", "A", "D", "I", "F", "P")
+                },
+            )
+        )
+    return sorted(domains, key=lambda d: d.key)
+
+
 # ── /journal-score (v3.3) ─────────────────────────────────────────────────────
 
 
 @router.post("/journal-score", response_model=S.JournalScoreResponse, tags=["journal"])
 async def journal_score(req: S.JournalScoreRequest):
     """Critique a report and return journal-calibrated omega + verdict."""
+    from ..engine import SciExpCritiqueEngine
     from ..journal.journal_scorer import JournalScorer
 
     try:
-        report = _engine.critique(req.report_text)
+        eng = SciExpCritiqueEngine(domain=req.domain)
+        report = eng.critique(req.report_text)
         scorer = JournalScorer()
         result = scorer.score(report, journal=req.journal)
     except KeyError as exc:

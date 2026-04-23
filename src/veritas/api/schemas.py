@@ -9,6 +9,10 @@ class CritiqueRequest(BaseModel):
     report_text: str = Field(..., description="Raw text of the experimental report")
     template: str = Field("bmj", description="Output template: 'bmj' or 'ku'")
     round_number: int = Field(1, ge=1, description="Critique round number")
+    domain: str = Field(
+        "biomedical",
+        description="IRF scoring domain: biomedical (default) | cs | math",
+    )
 
 
 class FindingOut(BaseModel):
@@ -148,6 +152,7 @@ class ReviewSimResponse(BaseModel):
 class RebuttalRequest(BaseModel):
     report_text: str = Field(..., description="Raw text of the experimental report to rebut")
     style: str = Field("ieee", description="Response letter style: ieee | acm | nature")
+    domain: str = Field("biomedical", description="IRF scoring domain: biomedical | cs | math")
 
 
 class RebuttalItemOut(BaseModel):
@@ -179,11 +184,28 @@ class JournalProfileOut(BaseModel):
     revise_omega: float
     step_weights: dict
     description: str
+    domain_hint: str = ""
 
 
 class JournalScoreRequest(BaseModel):
     report_text: str = Field(..., description="Raw text of the experimental report")
     journal: str = Field("default", description="Journal key: nature, ieee, lancet, q1, q2, q3, default")
+    domain: str = Field("biomedical", description="IRF scoring domain: biomedical | cs | math")
+
+
+# ── Domain schemas (v3.4) ──────────────────────────────────────────────────────
+
+
+class DomainOut(BaseModel):
+    """Single registered domain metadata."""
+
+    key: str
+    name: str
+    composite_threshold: float
+    component_min: float
+    marker_counts: dict[str, int] = Field(
+        description="Number of markers per IRF dimension (M/A/D/I/F/P)"
+    )
 
 
 class StepContributionOut(BaseModel):

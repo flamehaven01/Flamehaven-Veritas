@@ -54,6 +54,7 @@ class JournalProfile:
     revise_omega: float
     step_weights: dict = field(default_factory=dict, compare=False)
     description: str = ""
+    domain_hint: str = ""  # v3.4: preferred IRF domain key ("cs", "biomedical", "" = agnostic)
 
     def verdict_for(self, omega: float) -> JournalVerdict:
         """Return verdict enum for a raw omega value (before calibration)."""
@@ -71,6 +72,7 @@ class JournalProfile:
             "revise_omega": self.revise_omega,
             "step_weights": dict(self.step_weights),
             "description": self.description,
+            "domain_hint": self.domain_hint,
         }
 
 
@@ -89,6 +91,7 @@ JOURNAL_PROFILES: dict[str, JournalProfile] = {
         revise_omega=0.75,
         step_weights={"1": 1.6, "2": 1.6, "3": 1.2, "4": 1.0, "5": 1.4},
         description="Top-tier multidisciplinary; claims and reproducibility heavily weighted.",
+        domain_hint="",
     ),
     "ieee": JournalProfile(
         key="ieee",
@@ -97,6 +100,7 @@ JOURNAL_PROFILES: dict[str, JournalProfile] = {
         revise_omega=0.68,
         step_weights={"1": 1.3, "2": 1.5, "3": 1.2, "4": 1.1, "5": 1.2},
         description="Engineering/CS focus; data traceability and methodology continuity prioritized.",
+        domain_hint="cs",
     ),
     "lancet": JournalProfile(
         key="lancet",
@@ -105,6 +109,7 @@ JOURNAL_PROFILES: dict[str, JournalProfile] = {
         revise_omega=0.72,
         step_weights={"1": 1.4, "2": 1.5, "3": 1.3, "4": 1.2, "5": 1.5},
         description="Clinical medicine; intervention claims and statistical integrity paramount.",
+        domain_hint="biomedical",
     ),
     "q1": JournalProfile(
         key="q1",

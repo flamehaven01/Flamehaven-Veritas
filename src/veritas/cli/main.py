@@ -34,11 +34,19 @@ if _VERSION == "unknown":
     _VERSION = "3.2.0"
 
 
-def _load_engine():
+def _load_engine(domain: str = "biomedical"):
     """Lazy import — keeps startup fast for simple sub-commands."""
     from ..engine import SciExpCritiqueEngine
+    from ..logos.domain.registry import list_domain_keys
 
-    return SciExpCritiqueEngine()
+    valid = list_domain_keys()
+    if domain not in valid:
+        import click
+
+        raise click.ClickException(
+            f"Unknown domain '{domain}'. Valid: {', '.join(valid)}"
+        )
+    return SciExpCritiqueEngine(domain=domain)
 
 
 def _load_renderers():
@@ -195,7 +203,14 @@ def main():
     metavar="KEY",
     help="Journal profile for calibrated scoring: nature, ieee, lancet, q1, q2, q3, default.",
 )
-def critique(file, text, stdin, fmt, template, round_num, prev, save_round, out, quiet, rag, journal):
+@click.option(
+    "--domain",
+    default="biomedical",
+    metavar="DOMAIN",
+    show_default=True,
+    help="IRF scoring domain: biomedical (default), cs, math, or any registered plugin domain.",
+)
+def critique(file, text, stdin, fmt, template, round_num, prev, save_round, out, quiet, rag, journal, domain):
     """Analyse a document and emit a structured critique report.
 
     Examples:\n
@@ -248,7 +263,7 @@ def critique(file, text, stdin, fmt, template, round_num, prev, save_round, out,
         except Exception as exc:
             raise click.ClickException(f"Failed to parse previous round JSON: {exc}") from exc
 
-    engine = _load_engine()
+    engine = _load_engine(domain=domain)
     # Inject RAG context into raw text when available
     critique_input = f"{raw}\n\n[RAG CONTEXT]\n{rag_context}" if rag_context else raw
     report = engine.critique(critique_input, round_number=round_num, prev_report=prev_report)
@@ -635,7 +650,14 @@ def review_sim(file, text, stdin, reviewers, fmt, out):
     default=False,
     help="Render a formal IEEE/ACM/Nature response letter (Markdown).",
 )
-def rebuttal(file, text, stdin, style, fmt, out, render_letter):
+@click.option(
+    "--domain",
+    default="biomedical",
+    metavar="DOMAIN",
+    show_default=True,
+    help="IRF scoring domain for critique: biomedical (default), cs, math.",
+)
+def rebuttal(file, text, stdin, style, fmt, out, render_letter, domain):
     """Generate a structured point-by-point rebuttal from a critique report.
 
     Runs the full critique pipeline, then maps every reviewer finding to a
@@ -650,7 +672,7 @@ def rebuttal(file, text, stdin, style, fmt, out, render_letter):
     from ..rebuttal.rebuttal_engine import RebuttalEngine
 
     raw = _read_input(file, text, stdin)
-    engine = _load_engine()
+    engine = _load_engine(domain=domain)
     critique_report = engine.critique(raw)
 
     rb_engine = RebuttalEngine()
@@ -803,6 +825,68 @@ def journal_profiles_cmd(fmt):
         output = "\n".join(lines)
 
     click.echo(output)
+
+
+# ---------------------------------------------------------------------------
+# domains
+# ---------------------------------------------------------------------------
+@main.group()
+def domains():
+    """Domain plugin management (list registered IRF scoring domains)."""
+
+
+@domains.command("list")
+@click.option(
+    "--format",
+    "-f",
+    "fmt",
+    type=click.Choice(["text", "json"], case_sensitive=False),
+    default="text",
+    show_default=True,
+    help="Output format.",
+)
+def domains_list(fmt):
+    """List all registered IRF scoring domains (built-in + plugins).
+
+    Built-in domains: biomedical, cs, math.
+    External plugins registered via entry_points group 'veritas.domains' are
+    included automatically when installed.
+
+    Examples:\n
+      veritas domains list\n
+      veritas domains list --format json
+    """
+    from ..logos.domain.registry import list_domain_keys, get_domain
+
+    keys = list_domain_keys()
+    if fmt == "json":
+        result = {}
+        for k in keys:
+            rs = get_domain(k)
+            result[k] = {
+                "name": rs.name,
+                "composite_threshold": rs.composite_threshold,
+                "component_min": rs.component_min,
+                "marker_counts": {
+                    dim: len(rs.markers_for(dim)) for dim in ("M", "A", "D", "I", "F", "P")
+                },
+            }
+        click.echo(json.dumps(result, indent=2, ensure_ascii=False))
+    else:
+        lines = ["VERITAS Registered IRF Domains", ""]
+        for k in sorted(keys):
+            rs = get_domain(k)
+            counts = "/".join(
+                str(len(rs.markers_for(d))) for d in ("M", "A", "D", "I", "F", "P")
+            )
+            lines.append(
+                f"  {k:<14}  [{rs.name}]  "
+                f"threshold={rs.composite_threshold:.2f}  "
+                f"markers(M/A/D/I/F/P)={counts}"
+            )
+        lines.append("")
+        lines.append("Use: veritas critique paper.pdf --domain <key>")
+        click.echo("\n".join(lines))
 
 
 if __name__ == "__main__":
