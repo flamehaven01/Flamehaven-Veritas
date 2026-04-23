@@ -262,7 +262,7 @@ class MICAStore:
     def show(self) -> SessionStatus:
         """Inspect current MICA state and DI counts."""
         state, mica_yaml, _ = detect_state(self.root)
-        crit, high, dis = 0, 0, []
+        crit, high, dis = 0, 0, []  # type: ignore[var-annotated]
         if state == STATE_INVOCATION and mica_yaml is not None:
             _, archive_path, _ = resolve_paths(self.root, mica_yaml)
             if archive_path is not None and archive_path.exists():
