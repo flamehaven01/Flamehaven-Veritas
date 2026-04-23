@@ -856,7 +856,7 @@ def domains_list(fmt):
       veritas domains list\n
       veritas domains list --format json
     """
-    from ..logos.domain.registry import list_domain_keys, get_domain
+    from ..logos.domain.registry import get_domain, list_domain_keys
 
     keys = list_domain_keys()
     if fmt == "json":

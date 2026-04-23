@@ -6,8 +6,6 @@ import pytest
 
 from veritas.engine import SciExpCritiqueEngine
 from veritas.ingest.section_parser import SectionParser
-from veritas.stats.claim_classifier import ClaimClassifier
-from veritas.stats.stat_validator import StatValidator
 from veritas.types import (
     AnalysisConfidence,
     ClaimType,
@@ -71,7 +69,6 @@ Therefore, it is clear that deep learning is the only viable approach.
 class TestSectionAwarePipeline:
     def test_step1_section_aware_accepts_section_map(self):
         from veritas import pipeline as _p
-        from veritas.ingest.section_parser import SectionParser
 
         parser = SectionParser()
         sm = parser.parse(CLINICAL_PAPER)
@@ -81,7 +78,6 @@ class TestSectionAwarePipeline:
     def test_scope_violation_restricted_to_results_discussion(self):
         """Scope violations should be found in RESULTS/DISCUSSION, not everywhere."""
         from veritas import pipeline as _p
-        from veritas.ingest.section_parser import SectionParser
 
         parser = SectionParser()
         sm = parser.parse(SCOPE_VIOLATION_TEXT)
@@ -98,7 +94,6 @@ class TestSectionAwarePipeline:
 
     def test_abstract_preferred_for_central_claim(self):
         from veritas import pipeline as _p
-        from veritas.ingest.section_parser import SectionParser
 
         parser = SectionParser()
         sm = parser.parse(CLINICAL_PAPER)

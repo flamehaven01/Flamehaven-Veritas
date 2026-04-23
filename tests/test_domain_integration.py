@@ -17,7 +17,6 @@ import pytest
 from click.testing import CliRunner
 from fastapi.testclient import TestClient
 
-
 # ---------------------------------------------------------------------------
 # Shared API client fixture
 # ---------------------------------------------------------------------------

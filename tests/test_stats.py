@@ -6,8 +6,7 @@ import pytest
 
 from veritas.stats.claim_classifier import ClaimClassifier
 from veritas.stats.stat_validator import StatValidator
-from veritas.types import ClaimType, SectionMap, StatValidity
-
+from veritas.types import ClaimType, StatValidity
 
 # ---------------------------------------------------------------------------
 # ClaimClassifier fixtures

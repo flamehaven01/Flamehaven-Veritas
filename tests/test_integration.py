@@ -17,10 +17,10 @@ import pytest
 from fastapi.testclient import TestClient
 
 from veritas.api.app import app
-from veritas.render.response_letter import ResponseLetterRenderer
-from veritas.rebuttal.rebuttal_engine import RebuttalEngine
-from veritas.journal.journal_profiles import get_profile, JOURNAL_PROFILES
+from veritas.journal.journal_profiles import JOURNAL_PROFILES
 from veritas.journal.journal_scorer import JournalScorer
+from veritas.rebuttal.rebuttal_engine import RebuttalEngine
+from veritas.render.response_letter import ResponseLetterRenderer
 
 # ---------------------------------------------------------------------------
 # Fixtures
@@ -116,7 +116,7 @@ class TestResponseLetterRenderer:
         md = renderer.render(rebuttal_report, style="ieee")
         assert "Author Response to Reviewer Comments" in md
         assert "IEEE" in md
-        assert "Ω" not in md or True  # omega may or may not appear — not required
+        assert "Ω" not in md or True  # noqa: SIM222 — omega may or may not appear
 
     def test_render_acm(self, rebuttal_report):
         renderer = ResponseLetterRenderer()
@@ -148,7 +148,8 @@ class TestResponseLetterRenderer:
         out = str(tmp_path / "letter.md")
         result = renderer.render_to_file(rebuttal_report, out, style="acm")
         assert result == out
-        content = open(out, encoding="utf-8").read()
+        with open(out, encoding="utf-8") as fh:
+            content = fh.read()
         assert "Response to Reviewer Comments" in content
 
     def test_render_sections_present(self, rebuttal_report):
@@ -301,6 +302,7 @@ class TestAPIDiffEndpoint:
 class TestCLISmoke:
     def test_rebuttal_text_style_ieee(self):
         from click.testing import CliRunner
+
         from veritas.cli.main import main
         runner = CliRunner()
         result = runner.invoke(main, ["rebuttal", "--text", _SAMPLE_TEXT, "--style", "ieee"])
@@ -309,6 +311,7 @@ class TestCLISmoke:
 
     def test_rebuttal_render_letter(self):
         from click.testing import CliRunner
+
         from veritas.cli.main import main
         runner = CliRunner()
         result = runner.invoke(
@@ -319,6 +322,7 @@ class TestCLISmoke:
 
     def test_journal_profiles_command(self):
         from click.testing import CliRunner
+
         from veritas.cli.main import main
         runner = CliRunner()
         result = runner.invoke(main, ["journal-profiles"])
@@ -327,6 +331,7 @@ class TestCLISmoke:
 
     def test_critique_journal_flag(self):
         from click.testing import CliRunner
+
         from veritas.cli.main import main
         runner = CliRunner()
         result = runner.invoke(main, ["critique", "--text", _SAMPLE_TEXT, "--journal", "default"])
@@ -334,6 +339,7 @@ class TestCLISmoke:
 
     def test_rebuttal_json_format(self):
         from click.testing import CliRunner
+
         from veritas.cli.main import main
         runner = CliRunner()
         result = runner.invoke(
@@ -346,6 +352,7 @@ class TestCLISmoke:
 
     def test_diff_identical_files(self, tmp_path):
         from click.testing import CliRunner
+
         from veritas.cli.main import main
         f1 = tmp_path / "v1.txt"
         f2 = tmp_path / "v2.txt"

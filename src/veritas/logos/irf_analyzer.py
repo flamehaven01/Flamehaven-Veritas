@@ -23,9 +23,12 @@ from __future__ import annotations
 
 import math
 import re
-from typing import Union
+from typing import TYPE_CHECKING
 
 from ..types import IRF6DScores, StatValidity
+
+if TYPE_CHECKING:
+    from .domain.base import DomainRuleset
 
 # Passing thresholds (kept for backward compat — actual values come from ruleset)
 COMPOSITE_THRESHOLD: float = 0.65
@@ -63,7 +66,7 @@ _P_MARKERS = [
 ]
 
 
-def _marker_density(text: str, markers: "list[str] | tuple[str, ...]", saturate_at: int = 5) -> float:
+def _marker_density(text: str, markers: list[str] | tuple[str, ...], saturate_at: int = 5) -> float:
     """Count distinct marker hits; saturate at *saturate_at* → 1.0."""
     hits = sum(1 for m in markers if m in text)
     return min(hits / saturate_at, 1.0)
@@ -101,12 +104,12 @@ class IRFAnalyzer:
 
     def __init__(
         self,
-        domain: "str | DomainRuleset | None" = None,
+        domain: str | DomainRuleset | None = None,
     ) -> None:
         self.ruleset = self._resolve_ruleset(domain)
 
     @staticmethod
-    def _resolve_ruleset(domain) -> "DomainRuleset":
+    def _resolve_ruleset(domain) -> DomainRuleset:
         from .domain.base import DomainRuleset as _DR
         from .domain.registry import get_domain as _get
 

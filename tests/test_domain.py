@@ -14,8 +14,6 @@ Coverage:
 
 from __future__ import annotations
 
-import importlib
-from typing import Any
 from unittest.mock import MagicMock, patch
 
 import pytest
@@ -25,10 +23,8 @@ from veritas.logos.domain.registry import (
     DomainRegistry,
     get_domain,
     list_domain_keys,
-    register_domain,
 )
 from veritas.logos.irf_analyzer import IRFAnalyzer
-
 
 # ---------------------------------------------------------------------------
 # Helpers

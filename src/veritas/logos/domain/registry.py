@@ -15,7 +15,7 @@ from __future__ import annotations
 
 import importlib.metadata
 import logging
-from typing import Iterator
+from collections.abc import Iterator
 
 from .base import DomainRuleset
 

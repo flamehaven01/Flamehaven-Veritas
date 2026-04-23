@@ -13,17 +13,15 @@ from __future__ import annotations
 
 import os
 import re
-from unittest.mock import MagicMock, patch
 
 import pytest
 
-from veritas.render.response_letter import ResponseLetterRenderer
 from veritas.rebuttal.rebuttal_engine import (
     RebuttalEngine,
     RebuttalItem,
     RebuttalReport,
 )
-
+from veritas.render.response_letter import ResponseLetterRenderer
 
 # ---------------------------------------------------------------------------
 # Helpers
@@ -227,7 +225,8 @@ class TestRenderToFile:
         report = _make_report()
         path = str(tmp_path / "letter.md")
         renderer.render_to_file(report, path, style="acm")
-        content = open(path, encoding="utf-8").read()
+        with open(path, encoding="utf-8") as fh:
+            content = fh.read()
         expected = renderer.render(report, style="acm")
         assert content == expected
 
@@ -235,22 +234,26 @@ class TestRenderToFile:
         renderer = ResponseLetterRenderer()
         path = str(tmp_path / "acm_letter.md")
         renderer.render_to_file(_make_report(), path, style="acm")
-        content = open(path, encoding="utf-8").read()
+        with open(path, encoding="utf-8") as fh:
+            content = fh.read()
         assert "ACM" in content
 
     def test_creates_nature_file(self, tmp_path):
         renderer = ResponseLetterRenderer()
         path = str(tmp_path / "nature_letter.md")
         renderer.render_to_file(_make_report(), path, style="nature")
-        content = open(path, encoding="utf-8").read()
+        with open(path, encoding="utf-8") as fh:
+            content = fh.read()
         assert "NATURE" in content
 
     def test_overwrites_existing_file(self, tmp_path):
         renderer = ResponseLetterRenderer()
         path = str(tmp_path / "letter.md")
-        open(path, "w", encoding="utf-8").write("old content")
+        with open(path, "w", encoding="utf-8") as fh:
+            fh.write("old content")
         renderer.render_to_file(_make_report(), path, style="ieee")
-        content = open(path, encoding="utf-8").read()
+        with open(path, encoding="utf-8") as fh:
+            content = fh.read()
         assert "old content" not in content
         assert "IEEE" in content
 

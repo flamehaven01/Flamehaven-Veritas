@@ -122,7 +122,6 @@ class ClaimClassifier:
 
     def _score_all(self, text: str) -> dict[ClaimType, float]:
         """Compute normalised density for each claim type."""
-        word_count = max(len(text.split()), 1)
         result: dict[ClaimType, float] = {}
         for ct, patterns in _COMPILED.items():
             hits = sum(1 for p in patterns if p.search(text))

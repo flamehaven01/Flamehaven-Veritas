@@ -13,7 +13,6 @@ from datetime import datetime, timezone
 
 from ..rebuttal.rebuttal_engine import RebuttalItem, RebuttalReport
 
-
 # ---------------------------------------------------------------------------
 # Style configurations (pure data — no logic)
 # ---------------------------------------------------------------------------
@@ -165,7 +164,7 @@ class ResponseLetterRenderer:
         response_line = cfg["response_prefix"].format(n=n, category=item.category)
 
         return [
-            f"---",
+            "---",
             f"**Issue ID:** `{item.issue_id}` | **Category:** {item.category}",
             "",
             reviewer_line,

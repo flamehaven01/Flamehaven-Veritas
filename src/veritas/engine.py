@@ -239,7 +239,7 @@ class SciExpCritiqueEngine:
             # Hypothesis extraction — use primary as central claim
             hypo_result = self._hypo_ext.extract(text) if self._hypo_ext else None
             hypothesis_text = hypo_result.primary if hypo_result else None
-            central_claim = (
+            _central_claim = (
                 hypothesis_text
                 or (claim_step.vulnerable_claim if claim_step else None)
                 or text[:200]
