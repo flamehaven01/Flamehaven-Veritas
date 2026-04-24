@@ -38,7 +38,7 @@ Implements the **VERITAS v3.4.2 protocol** as a fully executable Python package 
 | **Data sovereignty** | ✅ 100% Offline-First · fully self-hosted | ❌ Public cloud dependency | ❌ External API (data leak risk) |
 | **GPU required** | ❌ None — pure Python, no model loading | ✅ Cloud GPU | ✅ Cloud GPU |
 | **AI Slop risk** | ❌ Deterministic — fail-closed guardrails | ⚠️ High | ⚠️ Very high |
-| **Scoring system** | ✅ Calibrated Ω (SIDRCE Ω = 0.9978 S++) | External metrics only (citation count, IF) | None |
+| **Scoring system** | ✅ Calibrated Ω score (0.0–1.0 composite, S++ audit grade) | External metrics only (citation count, IF) | None |
 
 **VERITAS is not a research assistant.** It is an independent integrity verification engine — a microscope for a single experimental result, not a telescope for surveying literature.
 
@@ -47,11 +47,12 @@ Implements the **VERITAS v3.4.2 protocol** as a fully executable Python package 
 ## What It Does
 
 Accepts a raw experimental report (text, PDF, DOCX, MD) and produces a structured critique through a
-7-phase pipeline, enriched with LOGOS reasoning, HSTA scoring, bibliography analysis, and
+7-phase pipeline, enriched with LOGOS reasoning (rule-based logical consistency check),
+HSTA scoring (4-dimension bibliometric quality rubric), bibliography analysis, and
 reproducibility assessment.
 
 **Performance:** ~1 second per document · CPU-only · no model loading · no GPU required  
-**Governance:** SIDRCE Ω = 0.9978 (S++) · Fail-closed architecture · AI Slop guardrails enforced
+**Governance:** Quality score Ω = 0.9978 (S++ — internal audit grade) · Fail-closed architecture · AI Slop guardrails enforced
 
 | Phase | Name | Weight |
 |---|---|---|
@@ -284,9 +285,11 @@ See [docs/api_reference.md](docs/api_reference.md) for full schema.
 
 ## Enrichment Engines
 
-### LOGOS IRF-Calc 6D
+### LOGOS IRF-Calc 6D — Reasoning Quality Checker
 
-Six-dimensional reasoning quality score computed over the critique text:
+A **rule-based, deterministic** logical consistency analyzer — no neural network, no LLM.
+It scans the critique text for presence/absence of reasoning signal words across six dimensions
+and returns a composite quality score (Ω ≥ 0.78 = PASS threshold):
 
 | Dimension | Key | Meaning |
 |---|---|---|
@@ -378,9 +381,10 @@ After `pip install my-veritas-physics`, the domain appears automatically in `ver
 
 ---
 
-### HSTA 4D (BioMedical-Paper-Harvester)
+### HSTA 4D — Bibliometric Quality Rubric
 
-Four-dimensional bibliometric score:
+A **heuristic scoring rubric** (no ML) that evaluates the bibliometric strength of a paper's
+evidence base across four dimensions:
 
 | Dimension | Key | Meaning |
 |---|---|---|
@@ -565,8 +569,9 @@ Verdicts: **ACCEPT** / **REVISE** / **REJECT**
 
 ## MICA Playbook Mode
 
-The CLI supports **MICA** (Memory Invocation & Context Archive) structured output for
-agent / skill pipeline integration:
+The CLI supports **MICA mode** — a compact, machine-readable JSON output format
+designed for direct consumption by AI agents and orchestration pipelines
+(no prose formatting overhead):
 
 ```bash
 veritas critique report.pdf --mica
@@ -585,8 +590,9 @@ veritas playbook   # prints memory/playbook.md to stdout
 
 ## SPAR Integration
 
-VERITAS ships with an optional **SPAR** (Sovereign Protocol for Academic Review) integration layer
-that maps critique findings directly into the SPAR governance schema.
+VERITAS ships with an optional **SPAR** (Sovereign Protocol for Academic Review — a
+structured governance schema for mapping critique findings to standardized fields)
+integration layer:
 
 ```bash
 pip install flamehaven-veritas[spar]   # install SPAR extras
@@ -784,6 +790,25 @@ See [docs/architecture.md](docs/architecture.md) for detailed component specific
 | **v3.3** ✅ | 2026 Q2 | Rebuttal engine, journal-calibrated scoring (7 profiles), response letter renderer (IEEE/ACM/Nature), Rebuttal + Journal Score Web UI tabs |
 | **v3.4** ✅ | 2026 Q2 | Domain plugin architecture — CS/Math/Biomedical IRF scoring, `veritas domains list`, external plugin entry_points, journal `domain_hint` |
 | **v3.4.2** ✅ | 2026 Q2 | Lint/CI hardening — resolve 49 ruff errors (I001, F401, F821, F841, SIM115, UP035/UP037), `TYPE_CHECKING` guard for `DomainRuleset` annotation |
+
+---
+
+## Concepts & Terminology
+
+Veritas uses several shorthand terms inherited from the Flamehaven research stack.
+This table maps each term to its plain-language equivalent for external readers.
+
+| Term | Plain-language meaning |
+|---|---|
+| **Omega (Ω)** | Composite quality score, 0.0–1.0. The overall "pass grade" for a critique result. Ω ≥ 0.78 = PASS; Ω < 0.60 = REJECT. Computed as a weighted mean across pipeline steps. |
+| **LOGOS IRF-Calc 6D** | Rule-based logical consistency checker. Rates scientific writing across 6 reasoning dimensions (M/A/D/I/F/P) via deterministic keyword matching — no neural network. |
+| **IRF dimensions (M/A/D/I/F/P)** | The six axes of LOGOS: **M**ethodic doubt · **A**xiom/Hypothesis falsifiability · **D**eduction validity · **I**nduction quality · **F**alsification testability · **P**aradigm consistency. Each axis is scored 0.0–1.0. |
+| **HSTA 4D** | Bibliometric quality rubric. Scores a paper's reference section across Novelty · Consistency · Temporality · Reproducibility via heuristic pattern matching — no ML. |
+| **SIDRCE** | The internal quality governance pipeline used to audit the *framework itself* (lint score, slop detection, semantic drift). "SIDRCE Ω = 0.9978 (S++)" is the codebase's own audit result — equivalent to an A+ self-inspection grade. It does **not** rate your paper. |
+| **MICA mode** | Compact machine-readable JSON output (`--mica` flag). Use it when piping Veritas output to an AI agent or orchestration pipeline instead of human-readable prose. |
+| **SPAR** | Optional integration layer that maps Veritas findings to the SPAR academic governance schema. Requires `pip install flamehaven-veritas[spar]`. Falls back gracefully if not installed. |
+| **DR3 Protocol** | Conflict-resolution rule in Peer Review Simulation. When 3 simulated reviewer personas disagree beyond a spread threshold (> 0.30), DR3 applies a 0.90 penalty factor to flag unresolved disagreement explicitly. |
+| **PRECHECK gate** | Artifact sufficiency check run before the 7-phase pipeline. Determines whether the submitted document contains enough material to produce a valid critique. Possible outcomes: FULL / PARTIAL / LIMITED / BLOCKED. |
 
 ---
 
